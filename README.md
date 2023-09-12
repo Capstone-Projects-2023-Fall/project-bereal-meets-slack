@@ -50,18 +50,12 @@ SQL or NoSQL Database for logging
 <tr>
     <td align="center">
         <a href="https://github.com/ApplebaumIan">
-            <img src="https://avatars.githubusercontent.com/u/9451941?v=4" width="100;" alt="ApplebaumIan"/>
+            <img src="https://avatars.githubusercontent.com/u/72986170?v=4" width="100;" alt="Rishi Duggal"/>
             <br />
-            <sub><b>Ian Tyler Applebaum</b></sub>
+            <sub><b>Rishi Duggal</b></sub>
         </a>
     </td>
-    <td align="center">
-        <a href="https://github.com/leighflagg">
-            <img src="https://avatars.githubusercontent.com/u/77810293?v=4" width="100;" alt="leighflagg"/>
-            <br />
-            <sub><b>Null</b></sub>
-        </a>
-    </td></tr>
+  </tr>
 </table>
 
 [//]: # ( readme: collaborators -end )
