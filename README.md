@@ -11,28 +11,37 @@
 
 
 ## Keywords
-
-Section #, as well as any words that quickly give your peers insights into the application like programming language, development platform, type of application, etc.
+Slack, Chatbot, Social, Research, Group Engagement, Resilient Research Communities
 
 ## Project Abstract
 
-This document proposes a novel application of a text message (SMS or Email) read-out and hands-free call interacted between an Android Smartphone and an infotainment platform (headunit) in a car environment. When a phone receives an SMS or Email, the text message is transferred from the phone to the headunit through a Bluetooth connection. On the headunit, user can control which and when the received SMS or E-mail to be read out through the in-vehicle audio system. The user may press one button on the headunit to activate the hands-free feature to call back the SMS sender.
+This document proposes a community building social media tool that is integrated into a slack workspace. A slackbot will prompt users to post photos in a slack channel similar to the BeReal app. These images will be sent to the server and then to a moderation app where a mod can approve or deny the image and caption sent. The image will then be sent back to the slack where others can react and comment. This bot can be integrated into any slack workspace to promote lightweight community building.
 
 ## High Level Requirement
 
-Describe the requirements – i.e., what the product does and how it does it from a user point of view – at a high level.
+Communities should be able to install this, but into their slack channel. The bot will randomly prompt users at scheduled times to take a picture, with prompts such as “What are you having for lunch?”. When the user responds to the bot with an image, that image must be sent to a moderator which will then approve or deny the post to be publicly displayed in the slack channel. Responses and Reactions should be logged by the bot. 
 
 ## Conceptual Design
 
-Describe the initial design concept: Hardware/software architecture, programming language, operating system, etc.
+The bots behavior is detailed below in Figure 1. The slack bot will have choices of which prompts to use at any given time. Using the slack API, the bot will message the main channel directed towards a specific user privately. The user will click the “take picture” button triggering a modal with a camera to reply with an image. The image will then be sent to our backend server and then sent as a direct message to the moderator. If the moderator accepts the image, the image is sent back to the backend and then redistributed to the slack channel using the Slack API. Any reactions and comments would be logged to the database. 
+
+<img src="https://temple-cis-projects-in-cs.atlassian.net/jira/software/c/projects/CF2/boards/48/backlog?view=detail&selectedIssue=CF2-79&issueLimit=100&selectedEpic=CF2-1"/>
+
+Figure 1. Conceptual flow chart of bot behavior and user interaction
 
 ## Background
 
-The background will contain a more detailed description of the product and a comparison to existing similar projects/products. A literature search should be conducted and the results listed. Proper citation of sources is required. If there are similar open-source products, you should state whether existing source will be used and to what extent. If there are similar closed-source/proprietary products, you should state how the proposed product will be similar and different.
+This photo sharing is similar to the BeReal app which prompts users to post photos once a day to share with people they have added as friends. Our project differs in the fact that it will be used in communities of people who may not already be friends. BeReal users can only see the photos of people they have added.
 
-## Required Resources
+Required Resources
 
-Discuss what you need to develop this project. This includes background information you will need to acquire, hardware resources, and software resources. If these are not part of the standard Computer Science Department lab resources, these must be identified early and discussed with the instructor.
+Virtual Private Server or Cloud
+
+SlackAPI
+
+Backend Framework (Laravel PHP, or NodeJS)
+
+SQL or NoSQL Database for logging
 
 ## Collaborators
 
