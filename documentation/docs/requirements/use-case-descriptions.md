@@ -56,3 +56,12 @@ Alternate Flow:
 1. A user in the Slack community is notified  by the Slackbot that another user has posted a response to a prompt.
 2. User chooses not to open the community channel.
 3. After a certain amount of time, the user is sent another notification to react to the post.
+
+## Use Case 5: Moderator Accesses Reaction Data in Database
+Actor: Moderator
+Triggering Event: The moderator wants to review reaction data from the Slackbot to analyze community engagement.
+Normal Flow:
+1. A moderator authorized to access the system's database logs into the database management interface.
+2. From the system's dashboard or menu, the moderator opens the reaction and post data collected by the Slackbot
+3. Moderator with filters and sorts data they want to review.
+4. Moderator exports the data for analysis.
