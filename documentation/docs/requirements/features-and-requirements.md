@@ -3,3 +3,31 @@ sidebar_position: 4
 ---
 
 # Features and Requirements
+
+## Functional Requirements
+ 
+- Users can respond to the bot prompt by using a modal to submit a response
+- BMS bot will be able to randomly determine a time within its operating hours to send a prompt  
+- BMS bot will be able to randomly determine an appropriate prompt from a pool based on time of day and previous sends  
+- BMS bot will be able to send messages and tag users autonomously.  
+- BMS bot will be able to log post reaction data and send it to a server  
+  - Emoji Reactions  
+  - Threaded Replies  
+  - Other comments  
+- BMS bot will be able to log the time it takes to respond and send it to a server  
+- BMS bot will be able to reprompt a user or prompt a user after a set timeout  
+- BMS bot will integrate with slack to provide a modal window for camera access  
+- BMS bot will be able to receive user submissions and send them to a server to DM moderators & ask for approval  
+- BMS bot will be able to receive moderator feedback and send a DM to the user asking them to retry  
+- BMS bot will be able to receive moderator approval and send the submitted image back to the appropriate chat, with the initial caption  
+- BMS bot will be linked to Slack and added to a Slack chat by moderators via the bot/applications page of Slack  
+- Moderators can configure the operating hours & prompt pool via slash commands  
+- Moderators can approve or deny user submissions  
+  - If approved image will be posted to a specific channel  
+  - If denied moderator will provide feedback about denied image  
+
+## Nonfunctional Requirements
+
+- BMS bot will have pop ups with prompts for users to respond
+- BMS bot will format reaction data into a CSV in the server
+
