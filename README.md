@@ -26,7 +26,7 @@ Communities should be able to install this, but into their slack channel. The bo
 
 The bots behavior is detailed below in Figure 1. The slack bot will have choices of which prompts to use at any given time. Using the slack API, the bot will message the main channel directed towards a specific user privately. The user will click the “take picture” button triggering a modal with a camera to reply with an image. The image will then be sent to our backend server and then sent as a direct message to the moderator. If the moderator accepts the image, the image is sent back to the backend and then redistributed to the slack channel using the Slack API. Any reactions and comments would be logged to the database. 
 
-<img src="https://media.discordapp.net/attachments/1075087087260405832/1150946775960670238/8d04bac0-76e4-4126-b499-b0cfa71d5c15.png"/>
+<img src="https://media.discordapp.net/attachments/1150951348754456610/1153014601722646698/c52816cd-0b4d-40e1-a4ed-4a51289db728.png"/>
 
 Figure 1. Conceptual flow chart of bot behavior and user interaction
 
