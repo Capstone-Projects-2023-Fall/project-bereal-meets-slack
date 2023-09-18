@@ -6,7 +6,7 @@ sidebar_position: 4
 
 ## Functional Requirements
  
-- Users can respond to the bot prompt by using a modal to submit a response
+- Users will be able to submit an image to the bot
 - BMS bot will be able to randomly determine a time within its operating hours to send a prompt  
 - BMS bot will be able to randomly determine an appropriate prompt from a pool based on time of day and previous sends  
 - BMS bot will be able to send messages and tag users autonomously.  
@@ -30,4 +30,5 @@ sidebar_position: 4
 
 - BMS bot will have pop ups with prompts for users to respond
 - BMS bot will format reaction data into a CSV in the server
+- BMS bot will ask for submissions using a modal window/slack camera
 
