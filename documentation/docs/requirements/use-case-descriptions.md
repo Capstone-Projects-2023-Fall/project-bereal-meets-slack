@@ -69,7 +69,7 @@ Normal Flow:
 4. Moderator exports the data for analysis.
 
 ## Use Case 6: User Reacts to a New Post Notification
-###As a user in the Slack community, I want to be updated on other user’s activities and show my reaction to other users.
+### As a user in the Slack community, I want to be updated on other user’s activities and show my reaction to other users.
 Actor: User
 Triggering Event: The user receives a notification about a new post in the Slack community.
 
@@ -79,7 +79,7 @@ Normal Flow:
 3. User interacts with the post by leaving a comment or a reaction(likes, emojis, etc)
    
 ## Use Case 7: User ignores New Post Notification
-###As a user in the Slack community, I want to avoid certain notifications about posts from other users.
+### As a user in the Slack community, I want to avoid certain notifications about posts from other users.
 Actor: User
 Alternate Flow:
 1. A user in the Slack community goes to the settings of the Slackbot
