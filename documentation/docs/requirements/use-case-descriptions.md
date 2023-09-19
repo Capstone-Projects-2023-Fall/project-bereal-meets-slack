@@ -2,21 +2,22 @@
 sidebar_position: 5
 ---
 
-# Use Cases
+# Use Case Descriptions
 
-## Use Case 1: 
-Owner of the Slack Workspace Configures the Slackbot
-Actor: Owner of the Slack workspace.
-Triggering Event: The owner needs to configure the Slackbot for the community.
-Normal Flow:
-1. Owner accesses the workspace settings.
-2. Owner selects the option to enable the Slackbot.
-3. Owner assigns roles and privileges to users in the community.
-4. Owner defines moderation and content guidelines.
-5. Owner configures the schedule for SlackBot prompts, defining the hours when the Slackbot will send prompts.
-6. Owner selects how many prompts the Slackbot will send during a given time period.
-7. Owner sets the duration for prompt responses to remain in the chat.
-8. Owner saves the configuration settings.
+## Use Case 1: Owner of the Slack Workspace Configures the Slackbot
+### As a workspace owner, I want to easily integrate the slackbot into my workspace so that my community can become more active
+Actor: Owner of the Slack workspace.  
+Normal Flow:  
+1. User signs in to Slack
+2. User opens the workspace "Preferences".
+3. User selects "Apps and Integrations" and installs the BMS bot.
+4. User assigns roles and privileges to users in the community.
+5. User defines moderation and content guidelines.
+6. User defines type of prompts for BMS bot to send properly suit the culture and vibe of their community.
+7. User configures the schedule for BMS bot, defining the hours when the it will send prompts.
+8. User sets the duration for prompt responses to remain in the chat.
+9. User sets the amount of time users have to respond to prompt notification
+10. Owner saves the configuration settings.
 
 ## Use Case 2: User Responds to a Slackbot Prompt
 Actor: User
