@@ -20,39 +20,40 @@ Normal Flow:
 10. Owner saves the configuration settings.
 
 ## Use Case 2: User Responds to a Slackbot Prompt
-Actor: User
+### As a slack user, I want to respond to the bot’s prompt with an image so that I can share moments of my day with my community.  
+
+Actor: Slack User
+
 Triggering Event: The user receives a prompt from the Slackbot.
+
 Normal Flow:
-1.  User in Slack community gets a notification that they have received a prompt from  the Slackbot.
+1. Users in the Slack community receive a notification that they have received a prompt from  the Slackbot.
 2. User opens Slack.
 3. User creates a response to the prompt (text, taking a picture, uploading an image, etc.)
 4. User replies to the Slackbot with their response to the prompt, which is sent to the moderator.
 5. User waits for approval status from the Slackbot.
-Alternate Flow:
-1.  User in Slack community gets a notification that they have received a prompt from  the Slackbot.
-2. User does not respond within a certain timeframe. 
-3. User is prompted by the Slackbot again to submit a response.
 
-## Use Case 3: Moderator Reviews User-Submitted Response
-Actor: Moderator
-Triggering Event: The moderator receives a user-submitted response from the Slackbot.
-Normal Flow:
-1. Moderator receives a notification from the Slackbot that a user has responded to a prompt. 
-2. Moderator uses moderation and content guidelines to make a decision on whether to approve or deny the submission.
-3. Moderator approves the response and selects the option for the Slackbot to post response to the appropriate channel
-4. The Slackbot notifies the community to react to the response.
-Alternate Flow:
-1. Moderator receives a notification from the Slackbot that a user has responded to a prompt. 
-2. Moderator uses moderation and content guidelines to make a decision on whether to approve or deny the submission.
-3. Moderator denies the response and selects the option for the Slackbot to re-prompt the user to submit a response that fits community guidelines.
+## Use Case 3: User Does Not Respond to a Slackbot Prompt
+### As a slack user, I want the bot to remind me to engage with its prompts when I miss them.  
+
+Actor: Slack User  
+  
+Triggering Event: User fails to respond to the Slack bot’s prompt within a set time frame.
+
+1. The slack user receives a notification that they have received a prompt from the Slackbot.
+2. User either misses or chooses not to respond to the initial prompt within a certain timeframe. 
+3. Slack bot recognizes the user’s failure to respond, and sends a reminder notification to the users about the missed prompt.
+4. User is then prompted by the Slackbot again to submit a response.
 
 ## Use Case 4: User Reacts to a New Post Notification
 Actor: User
 Triggering Event: The user receives a notification about a new post in the Slack community.
+
 Normal Flow:
 1. A user in the Slack community is notified  by the Slackbot that another user has posted a response to a prompt.
 2. User opens  Slack to view the response in the Slack community channel
 3. User interacts with the post by leaving a comment or a reaction(likes, emojis, etc)
+   
 Alternate Flow:
 1. A user in the Slack community is notified  by the Slackbot that another user has posted a response to a prompt.
 2. User chooses not to open the community channel.
@@ -61,6 +62,7 @@ Alternate Flow:
 ## Use Case 5: Moderator Accesses Reaction Data in Database
 Actor: Moderator
 Triggering Event: The moderator wants to review reaction data from the Slackbot to analyze community engagement.
+
 Normal Flow:
 1. A moderator authorized to access the system's database logs into the database management interface.
 2. From the system's dashboard or menu, the moderator opens the reaction and post data collected by the Slackbot
