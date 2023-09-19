@@ -79,7 +79,7 @@ Normal Flow:
 
 ## Use Case 6: User Reacts to a New Post Notification
 
-### As a user in the Slack community, I want to be updated on other user’s activities and show my reaction to other users.
+### As a user in the Slack community, I want to be updated on other user’s activities and show my reaction to other users so I can feel more engaged in the community.
 
 Actor: User  
 Triggering Event: The user receives a notification about a new post in the Slack community.
@@ -91,7 +91,7 @@ Normal Flow:
    
 ## Use Case 7: User ignores New Post Notification
 
-### As a user in the Slack community, I want to avoid certain notifications about posts from other users.
+### As a user in the Slack community, I want to be able to avoid certain notifications about posts from other users so that I don't have too many notifications.
 
 Actor: User  
 Triggering Event: User is sent an unwanted post notification
