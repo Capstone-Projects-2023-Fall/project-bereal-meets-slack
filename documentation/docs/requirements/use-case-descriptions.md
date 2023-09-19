@@ -101,7 +101,7 @@ Alternate Flow:
 2. User chooses an option to turn off new post notifications.
 3. The user is no longer sent another post notification.
 
-## Use Case 8: Moderator Accesses Reaction Data in Database (gevork)
+## Use Case 8: Moderator Accesses Reaction Data in Database 
 
 ### As a moderator I want to be able to see reaction data so that I can understand how well users are interacting with the bot and each other.
 
@@ -118,7 +118,7 @@ Alternate Flow:
 1. Moderator logs into admin account for Slack
 2. Moderator checks settings to ensure data collection is enabled
 
-## Use Case 9: Moderator makes approval status decision (gevork)
+## Use Case 9: Moderator makes approval status decision 
 
 ### As a moderator I want to be able to approve or deny user submissions, so that I can make sure community guidelines are being followed and users remain safe.
 
