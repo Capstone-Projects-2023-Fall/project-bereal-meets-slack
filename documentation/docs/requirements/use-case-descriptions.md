@@ -67,3 +67,22 @@ Normal Flow:
 2. From the system's dashboard or menu, the moderator opens the reaction and post data collected by the Slackbot
 3. Moderator with filters and sorts data they want to review.
 4. Moderator exports the data for analysis.
+
+## Use Case 6: User Reacts to a New Post Notification
+###As a user in the Slack community, I want to be updated on other user’s activities and show my reaction to other users.
+Actor: User
+Triggering Event: The user receives a notification about a new post in the Slack community.
+
+Normal Flow:
+1. A user in the Slack community is notified by the Slackbot that another user has posted a response to a prompt.
+2. User opens Slack to view the response in the Slack community channel
+3. User interacts with the post by leaving a comment or a reaction(likes, emojis, etc)
+   
+## Use Case 7: User ignores New Post Notification
+###As a user in the Slack community, I want to avoid certain notifications about posts from other users.
+Actor: User
+Alternate Flow:
+1. A user in the Slack community goes to the settings of the Slackbot
+2. User chooses an option to turn off new post notifications.
+3. The user is no longer sent another post notification.
+
