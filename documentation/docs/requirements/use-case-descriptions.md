@@ -44,6 +44,27 @@ Normal Flow:
 3. Slack bot recognizes the user’s failure to respond, and sends a reminder notification to the users about the missed prompt.
 4. User is then prompted by the Slackbot again to submit a response.
 
+
+## Use Case 4: User Submits a Photo that is Approved by the Moderator
+### As a Slack user I want to post an appropriate photo so I can get reactions and feel more connected.
+Actor: Slack community member  
+1. User in Slack community gets a notification that they have received a prompt from the BMS bot to post a photo.
+2. User opens the notification in Slack to launch their camera in Slack.
+3. User in Slack community responds to a BMS bot prompt with a photo, which the BMS bot sends to the moderator.
+4. User receives a notification from the BMS bot that their photo has been approved and will be posted to the channel.
+5. User receives reactions on their from their community.
+
+## Use Case 5:  User Submits a Photo that is Denied by the Moderator
+### As a Slack user I want to have another chance to post a photo if it does not follow content guidelines so I can respectfully engage with my community. 
+Actor: Slack community member  
+1. User in Slack community gets a notification that they have received a prompt from the BMS bot to post a photo.
+2. User opens the notification in Slack to launch their camera in Slack.
+3. User in Slack community responds to a BMS bot prompt with a photo, which the BMS bot sends to the moderator.
+4. User receives a notification from the BMS bot that their photo has been denied by the moderator and receives feedback from the BMS bot about which content guideline their photo violated.
+5. User is prompted by the BMS bot to post another photo
+6. User captures a photo, which is sent to the moderator for approval.
+
+
 ## Use Case 4: User Reacts to a New Post Notification
 Actor: User
 Triggering Event: The user receives a notification about a new post in the Slack community.
