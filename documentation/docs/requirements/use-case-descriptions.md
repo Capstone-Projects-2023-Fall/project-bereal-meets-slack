@@ -22,9 +22,8 @@ Normal Flow:
 ## Use Case 2: User Responds to a Slackbot Prompt
 ### As a slack user, I want to respond to the bot’s prompt with an image so that I can share moments of my day with my community.  
 
-Actor: Slack User
-
-Triggering Event: The user receives a prompt from the Slackbot.
+Actor: Slack User  
+Triggering Event: The user receives a prompt from the Slackbot.  
 
 Normal Flow:
 1. Users in the Slack community receive a notification that they have received a prompt from  the Slackbot.
@@ -37,8 +36,7 @@ Normal Flow:
 ### As a slack user, I want the bot to remind me to engage with its prompts when I miss them.  
 
 Actor: Slack User  
-  
-Triggering Event: User fails to respond to the Slack bot’s prompt within a set time frame.
+Triggering Event: User fails to respond to the Slack bot’s prompt within a set time frame.  
 
 1. The slack user receives a notification that they have received a prompt from the Slackbot.
 2. User either misses or chooses not to respond to the initial prompt within a certain timeframe. 
