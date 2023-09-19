@@ -8,7 +8,7 @@ sidebar_position: 5
 
 ### As a workspace owner, I want to easily integrate the slackbot into my workspace so that my community can become more active
 
-Actor: Owner of the Slack workspace.
+Actor: Owner of the Slack workspace.  
 Triggering event: Slack workspace creation
 
 Normal Flow:  
@@ -27,7 +27,7 @@ Normal Flow:
 
 ### As a slack user, I want to respond to the bot’s prompt with an image so that I can share moments of my day with my community.  
 
-Actor: Slack User
+Actor: Slack User  
 Triggering Event: The user receives a prompt from the Slackbot.  
 
 Normal Flow:
@@ -52,7 +52,7 @@ Normal Flow:
 ## Use Case 4 : User-Submission approved 
 ### As the Bot I want to post photos after they have been approved so they can get reactions and users can feel more connected.
 
-Actor: BMS bot
+Actor: BMS bot  
 Triggering event: the submitted image is approved by moderators
 
 Normal Flow:
@@ -66,7 +66,7 @@ Normal Flow:
 
 ### As a Slack user I want to have another chance to post a photo if it does not follow content guidelines so I can respectfully engage with my community
 
-Actor: Slack User
+Actor: Slack User  
 Trigering event: The submitted image is denied by moderators
 
 Normal Flow:
@@ -81,7 +81,7 @@ Normal Flow:
 
 ### As a user in the Slack community, I want to be updated on other user’s activities and show my reaction to other users.
 
-Actor: User
+Actor: User  
 Triggering Event: The user receives a notification about a new post in the Slack community.
 
 Normal Flow:
@@ -93,7 +93,7 @@ Normal Flow:
 
 ### As a user in the Slack community, I want to avoid certain notifications about posts from other users.
 
-Actor: User
+Actor: User  
 Triggering Event: User is sent an unwanted post notification
 
 Alternate Flow:
@@ -105,7 +105,7 @@ Alternate Flow:
 
 ### As a moderator I want to be able to see reaction data so that I can understand how well users are interacting with the bot and each other.
 
-Actor: Moderator 
+Actor: Moderator  
 Triggering Event: Timeframe for getting reactions has ended
 
 Normal Flow: 
@@ -122,7 +122,7 @@ Alternate Flow:
 
 ### As a moderator I want to be able to approve or deny user submissions, so that I can make sure community guidelines are being followed and users remain safe.
 
-Actor: Moderator
+Actor: Moderator  
 Triggering Event: Moderator receives response from user submission via BMS
 
 Normal Flow:
