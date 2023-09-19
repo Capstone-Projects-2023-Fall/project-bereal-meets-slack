@@ -38,6 +38,7 @@ Normal Flow:
 Actor: Slack User  
 Triggering Event: User fails to respond to the Slack bot’s prompt within a set time frame.  
 
+Normal Flow:
 1. The slack user receives a notification that they have received a prompt from the Slackbot.
 2. User either misses or chooses not to respond to the initial prompt within a certain timeframe. 
 3. Slack bot recognizes the user’s failure to respond, and sends a reminder notification to the users about the missed prompt.
