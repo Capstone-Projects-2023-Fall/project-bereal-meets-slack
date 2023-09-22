@@ -24,11 +24,16 @@ sidebar_position: 4
 - Moderators can configure the operating hours & prompt pool via slash commands  
 - Moderators can approve or deny user submissions  
   - If approved image will be posted to a specific channel  
-  - If denied moderator will provide feedback about denied image  
+  - If denied moderator will provide feedback about denied image
+- BMS bot will be able to have a moderator managed “blacklist” of users who cannot receive prompts
+- Moderators will be able to add or remove users from a no prompt "blacklist" at will.
 
 ## Nonfunctional Requirements
 
 - BMS bot will have pop ups with prompts for users to respond
 - BMS bot will format reaction data into a CSV in the server
-- BMS bot will ask for submissions using a modal window/slack camera
+- BMS bot will format data into visual aids (graphs/charts)
+- BMS bot will make use of the slash command format to allow moderators to configure the bot and see data
+- BMS bot will use a modal window to allow users to submit.
+- BMS bot will make use of the rear camera for user submissions
 
