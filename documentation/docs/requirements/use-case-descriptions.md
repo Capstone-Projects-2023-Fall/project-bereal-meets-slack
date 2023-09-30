@@ -31,7 +31,7 @@ Actor: Slack User
 Triggering Event: The user receives a prompt from the Slackbot.  
 
 Normal Flow:
-1. Users in the Slack community receive a notification that they have received a prompt from  the Slackbot.
+1. User in the Slack community receives a notification that they have received a prompt from  the Slackbot.
 2. User opens Slack.
 3. User creates a response to the prompt (text, taking a picture, uploading an image, etc.)
 4. User replies to the Slackbot with their response to the prompt, which is sent to the moderator.
