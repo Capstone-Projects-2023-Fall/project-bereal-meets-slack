@@ -4,7 +4,7 @@ sidebar_position: 2
 
 # System Block Diagram
 
-![Block Diagram](</static/img/BMS Block Diagram.png>)
+![Block Diagram](</documentation/static/img/BMS Block Diagram.png>)
 
 ## The BMS bot uses 3 Microservices  
 
