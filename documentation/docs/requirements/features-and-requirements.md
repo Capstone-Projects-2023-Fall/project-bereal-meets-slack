@@ -16,7 +16,6 @@ sidebar_position: 4
   - Other comments  
 - BMS bot will be able to log the time it takes to respond and send it to a server  
 - BMS bot will be able to reprompt a user or prompt a user after a set timeout  
-- BMS bot will integrate with slack to provide a modal window for camera access  
 - BMS bot will be able to receive user submissions and send them to a server to DM moderators & ask for approval  
 - BMS bot will be able to receive moderator feedback and send a DM to the user asking them to retry  
 - BMS bot will be able to receive moderator approval and send the submitted image back to the appropriate chat, with the initial caption  
@@ -25,6 +24,7 @@ sidebar_position: 4
 - Moderators can approve or deny user submissions  
   - If approved image will be posted to a specific channel  
   - If denied moderator will provide feedback about denied image
+- BMS bot will provide some means of data viewing be it through the server or Slack
 - BMS bot will be able to have a moderator managed “blacklist” of users who cannot receive prompts
 - Moderators will be able to add or remove users from a no prompt "blacklist" at will.
 

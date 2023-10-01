@@ -73,10 +73,10 @@ Normal Flow:
 
 
 ## Use Case 6: User Reacts to a New Post Notification
-
 **As a user in the Slack community, I want to be updated on other user’s activities and show my reaction to other users so I can feel more engaged in the community.**
 
 Actor: User  
+
 Triggering Event: The user receives a notification about a new post in the Slack community.
 
 Normal Flow:
