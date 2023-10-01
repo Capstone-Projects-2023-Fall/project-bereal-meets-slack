@@ -24,9 +24,9 @@ sidebar_position: 4
 - Moderators can approve or deny user submissions  
   - If approved image will be posted to a specific channel  
   - If denied moderator will provide feedback about denied image
-- Moderators will be able to configure the bot to blacklist people from receiving prompts, or simply ban them using the bot after enough inappropriate submissions 
 - BMS bot will provide some means of data viewing be it through the server or Slack
-
+- BMS bot will be able to have a moderator managed “blacklist” of users who cannot receive prompts
+- Moderators will be able to add or remove users from a no prompt "blacklist" at will.
 
 ## Nonfunctional Requirements
 
@@ -35,7 +35,5 @@ sidebar_position: 4
 - BMS bot will format data into visual aids (graphs/charts)
 - BMS bot will make use of the slash command format to allow moderators to configure the bot and see data
 - BMS bot will use a modal window to allow users to submit.
-
-
-
+- BMS bot will make use of the rear camera for user submissions
 
