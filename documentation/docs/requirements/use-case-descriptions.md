@@ -38,9 +38,9 @@ Normal Flow:
 5. User waits for approval status from the Slackbot.
 
 ## Use Case 3: User Does Not Respond to a Slackbot Prompt
-### As a slack user, I want the bot to remind me to engage with its prompts when I miss them.  
+### As a slack bot, I want to remind the user to engage with its prompts when they miss them.  
 
-Actor: Slack User  
+Actor: Slack Bot 
 Triggering Event: User fails to respond to the Slack bot’s prompt within a set time frame.  
 
 Normal Flow:
@@ -56,11 +56,9 @@ Actor: BMS bot
 Triggering event: the submitted image is approved by moderators
 
 Normal Flow:
-1. BMS bot prompts a random user at a random time
-2. BMS bot receives a submission which it sends to the moderator
-3. BMS bot receives the approval decision
-4. BMS bot posts the image with the caption and notifies the user
-5. BMS bot logs the reactions from the community
+1. BMS bot receives the approval decision
+2. BMS bot posts the image with the caption and notifies the user
+3. BMS bot logs the reactions from the community
 
 ## Use Case 5: User’s submission is denied 
 
@@ -136,4 +134,19 @@ Alternate Flow:
 1. Moderator is unsure if response is appropriate
 2. Moderator flags response for review by another moderator or community manager
 3. Final approval or denial is made 
+
+## Use Case 10: Slack Bot bans User from Prompting 
+
+### As a slack bot I want to be able to prevent unwanted prompts, so that I can ensure users that break community guidelines are discouraged from doing so.
+
+Actor: Slack Bot 
+Triggering Event: Slack Bot detects that a user has violated community guidelines or engaged in unauthorized behavior.
+
+Normal Flow: 
+1. Slack Bot monitors user behavior within the Slack community, looking for violations of community guidelines.
+2. Slack Bot identifies a user who has violated the guidelines.
+3. Slack Bot sends a warning notification to the user about the guideline violation.
+4. If the user continues to violate guidelines, Slack Bot bans the user from receiving prompts.
+5. Slack Bot logs the ban action and the reason for the ban, then puts the User on a blacklist.
+
 
