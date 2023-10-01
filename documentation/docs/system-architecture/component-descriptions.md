@@ -15,7 +15,6 @@ SlackAPI will provide tools needed for the user and the bot to interact with eac
 
 
 
-
-**SQL/NoSQL Database for logging**
+**SQL**
 
 
