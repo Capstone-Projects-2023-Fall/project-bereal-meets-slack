@@ -3,31 +3,31 @@ sidebar_position: 1
 ---
 # BMS Bot Design Document
 
-# Components
+## Components
 
-## Chat Application
+### Chat Application
 
 The chat application acts as both the user portal for the bot and as the running environment for the bot. The chat application facilitates user interaction with the bot and allows for it to act like a psuedo user that can post and interact with messages. There will be a level of UI/UX design for the bot in slack using both its API & libraries for command and interaction formatting as well as block kit for formatting of modals, popups, and responses. The application will also act as the display for all data visualization that moderators ask for.
 
-## BMS Bot 
+### BMS Bot 
 
 The bot itself is a chatbot that is hosted on Google Cloud via cloud run, as mentioned previous it will act as a pseudo user posting messages and accepting/reacting to user responses with triggers. It interfaces with the slack API to send messages, and interfaces with the database to both store and pull user reaction data. When dealing with moderation the bot will opt to DM moderators and generate either popups, modals, or interfaceable actions for approvals, data requests, or moderation features. When logging data the bot will leverage the server to send data to firebase for storage.
 
-## Google Cloud Webserver
+### Google Cloud Webserver
 
 The Google Cloud webserver provides a hosting point for the bot using the cloud run service. The server allows for two things, bot uptime and bot access to the database, through the server the bot can make calls to the firebase database both for logging and for acces of data. The webserver will also provide containers that host the firebase database for reaction data.
 
-## Google Firebase Database
+### Google Firebase Database
 
 The Firebase database is contained in the cloud webserver and acts as a means of storing and logging all reaction data. The database will contain data pertaining to prompt
 
-# Class Diagram
+## Class Diagram
 
-# Algorithms
+## Algorithms
 
-# Database Diagrams
+## Database Diagrams
 
-# Sequence Diagrams
+## Sequence Diagrams
 
 ![Sequence Diagram 1](https://cdn.discordapp.com/attachments/1158176482569494568/1158237338221162556/Screen_Shot_2023-10-01_at_11.01.34_PM.png?ex=651b8414&is=651a3294&hm=64e7d144c9382697335076073cdd675565e9635a527c612978334f64166c7c1a&)
 
@@ -56,7 +56,7 @@ The Firebase database is contained in the cloud webserver and acts as a means of
 ![Sequence Diagram 11 Alt](https://cdn.discordapp.com/attachments/1158176482569494568/1158245708969811978/Screen_Shot_2023-10-01_at_11.34.53_PM.png?ex=651b8be0&is=651a3a60&hm=ea1ae6eebd6fdb5bce2dec8cd0e381bfd76e20541e8c73b85a343c59da5cd075&)
 
 
-# Document Requirements
+## Document Requirements
 
 **Purpose**
 
