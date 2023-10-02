@@ -122,15 +122,11 @@ Triggering Event: Moderator receives response from user submission via BMS
 
 Normal Flow:
 1. Moderator receives notification about a user submission 
-2. Moderator opens moderation panel to review submissions
+2. Moderator opens slack
 3. Moderator reviews submission using predefined criteria from community guidelines
 4. Based on guidelines, moderators approves or rejects submissions
-5. Moderator marks submissions as “Approved” or “Denied” in panel
+5. Moderator marks submissions as “Approved” or “Denied” to bot
 
-Alternate Flow:
-1. Moderator is unsure if response is appropriate
-2. Moderator flags response for review by another moderator or community manager
-3. Final approval or denial is made 
 
 ## Use Case 10: Slack Bot bans User from Prompting 
 
