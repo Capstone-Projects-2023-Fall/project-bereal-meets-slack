@@ -26,7 +26,6 @@ The Firebase database is contained in the cloud webserver and acts as a means of
 classDiagram
 webServer -- bmsBot
 webserver -- database
-bmsBot -- slackAPI
 class webServer{
   + generateCSV(int startTime, int endTime)
   + generateDataVis(int startTime, int endTime)
@@ -86,10 +85,6 @@ class database{
   + getUser()
 
 }
-interface slackAPI{
-}
-
-
 ```
 
 ## Algorithms
