@@ -22,6 +22,74 @@ The Google Cloud webserver provides a hosting point for the bot using the cloud 
 The Firebase database is contained in the cloud webserver and acts as a means of storing and logging all reaction data. The database will contain data pertaining to prompts, approved submitted images, time to post, emoji reactions, threaded replies, and number of comments. All of this data will be exportable as a CSV or in a visualization done by the host webserver.
 
 ## Class Diagram
+```mermaid
+webServer -- bmsBot
+webserver -- database
+bmsBot -- slackAPI
+class webServer{
+  + generateCSV(int startTime, int endTime)
+  + generateDataVis(int startTime, int endTime)
+}
+class bmsBot{
+  + String botName
+  + token botToken
+  - int startHour
+  - int endHour
+  - String [] promptList
+  - String [] blackList
+  - getCSV()
+  - getDatavis()
+  - getOperatingHours()
+  - sendPrompt()
+  - getResponseDelay()
+  - getResponse()
+  - setOperatingHours(int newStart, int newEnd)
+  - generateRandomPromptTime()
+  - generateRandomPrompt()
+  - getPromptList()
+  - setPromptList()
+  - getResponsePostComment()
+  - setReponsePostComment()
+  - getBlackList()
+  - addUserToBlackList()
+  - removeUserFromBlackList()
+  - selectRandomUserToPrompt()
+  - getApprovalStatus()
+  - setApprovalStatus()
+  - sendToReponseToMod()
+  - postReponseToChannel()
+  - deleteOriginalPromptFromChannel()
+  - setaUsersAlreadyPromptedList()
+}
+class database{
+  + String Prompt
+  + String imageLink
+  + int numReactions
+  + int numReplies
+  + int timeToPost 
+  + setUserRoles()
+  + setBotSettings()
+  + getBotSettings()
+  + updateTotalAverageTimeToPost()
+  + getReactionTS()
+  + getResponseTS()
+  + setPromptPostTS()
+  + updateUserTimeToPost()
+  + getUserTimeToPost()
+  + updateReactionsUsage()
+  + getReactionsUsage()
+  + updateUsersList()
+  + updateUserInfo()
+  + getUserInfo()
+  + createUser()
+  + getUser()
+
+}
+interface slackAPI{
+}
+
+
+```
 
 ## Algorithms
 
