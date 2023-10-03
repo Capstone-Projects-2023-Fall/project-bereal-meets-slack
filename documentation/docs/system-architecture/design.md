@@ -24,8 +24,8 @@ The Firebase database is contained in the cloud webserver and acts as a means of
 ## Class Diagram
 ```mermaid
 classDiagram
-webServer -- bmsBot
-webserver -- database
+webServer --> bmsBot
+webServer --> database
 class webServer{
   + generateCSV(int startTime, int endTime)
   + generateDataVis(int startTime, int endTime)
