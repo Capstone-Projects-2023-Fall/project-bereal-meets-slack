@@ -23,6 +23,7 @@ The Firebase database is contained in the cloud webserver and acts as a means of
 
 ## Class Diagram
 ```mermaid
+classDiagram
 webServer -- bmsBot
 webserver -- database
 bmsBot -- slackAPI
