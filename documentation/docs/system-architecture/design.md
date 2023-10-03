@@ -33,16 +33,16 @@ The Firebase database is contained in the cloud webserver and acts as a means of
   <summary>
     Usecase 1:
   </summary>
-  1. Owner signs in to Slack
-  2. Owner opens the workspace "Preferences".
-  3. Owner selects "Apps and Integrations" and installs the BMS bot.
-  4. Owner assigns roles and privileges to users in the community.
-  5. Owner defines moderation and content guidelines.
-  6. Owner defines type of prompts for BMS bot to send properly suit the culture and vibe of their community.
-  7. Owner configures the schedule for BMS bot, defining the hours when the it will send prompts.
-  8. Owner sets the duration for prompt responses to remain in the chat.
-  9. Owner sets the amount of time users have to respond to prompt notification
-  10. Owner saves the configuration settings.
+  1. Owner signs in to Slack  
+  2. Owner opens the workspace "Preferences".  
+  3. Owner selects "Apps and Integrations" and installs the BMS bot.  
+  4. Owner assigns roles and privileges to users in the community.  
+  5. Owner defines moderation and content guidelines.  
+  6. Owner defines type of prompts for BMS bot to send properly suit the culture and vibe of their community.  
+  7. Owner configures the schedule for BMS bot, defining the hours when the it will send prompts.  
+  8. Owner sets the duration for prompt responses to remain in the chat.  
+  9. Owner sets the amount of time users have to respond to prompt notification.  
+  10. Owner saves the configuration settings.  
 </details>
 
 ![Sequence Diagram 1](https://cdn.discordapp.com/attachments/1158176482569494568/1158237338221162556/Screen_Shot_2023-10-01_at_11.01.34_PM.png?ex=651b8414&is=651a3294&hm=64e7d144c9382697335076073cdd675565e9635a527c612978334f64166c7c1a&)
