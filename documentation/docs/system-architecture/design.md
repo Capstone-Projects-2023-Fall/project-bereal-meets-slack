@@ -101,7 +101,7 @@ Prompts {
 
 Responses {
   Int response_id PK
-  Num reaction
+  Int numReaction
   Int timetoRespond
   Int prompt_id FK
 }
