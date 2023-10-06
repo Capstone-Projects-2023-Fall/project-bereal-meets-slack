@@ -90,24 +90,24 @@ class database{
 ## Algorithms
 
 ## Database Diagrams
+
 ```mermaid
 erDiagram
-class Prompts {
-  + <<Pk>> Prompt_id
-  + Text
-  + Date
-
+Prompts {
+  Int prompt_id PK
+  String text
+  Int date
 }
 
-class Responses {
-  + Response_id
-  + Reaction #
-  + Time
-  + <<FK>> Prompt_id
-
+Responses {
+  Int responce_id PK
+  Int Reaction
+  Int time
+  Int prompt_id FK
 }
 
-Responses "Many" -- "1" Prompts : Belongs to
+Prompts ||--|{ Responses : "belongs to"
+
 ```
 ## Sequence Diagrams
 
