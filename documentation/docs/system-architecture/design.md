@@ -91,11 +91,12 @@ class database{
 
 ## Database Diagrams
 ```mermaid
-databaseTables
+classDiagram
 class Prompts {
   + <<Pk>> Prompt_id
   + Text
   + Date
+
 }
 
 class Responses {
@@ -103,6 +104,7 @@ class Responses {
   + Reaction #
   + Time
   + <<FK>> Prompt_id
+
 }
 
 Responses "Many" -- "1" Prompts : Belongs to
