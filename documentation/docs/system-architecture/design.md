@@ -100,13 +100,13 @@ Prompts {
 }
 
 Responses {
-  Int responce_id PK
-  Int Reaction
-  Int time
+  Int response_id PK
+  Num reaction
+  Int timetoRespond
   Int prompt_id FK
 }
 
-Prompts ||--|{ Responses : "belongs to"
+Prompts ||--|{ Responses : ""
 
 ```
 ## Sequence Diagrams
