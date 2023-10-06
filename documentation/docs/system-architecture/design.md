@@ -91,6 +91,23 @@ class database{
 
 ## Database Diagrams
 
+```mermaid
+erDiagram
+Prompts {
+  Int prompt_id PK
+  String text
+}
+
+Responses {
+  Int response_id PK
+  Int numReaction
+  Int timetoRespond
+  Int prompt_id FK
+}
+
+Prompts ||--|{ Responses : ""
+
+```
 ## Sequence Diagrams
 
 <details>
