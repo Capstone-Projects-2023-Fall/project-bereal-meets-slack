@@ -91,7 +91,7 @@ class database{
 
 ## Database Diagrams
 ```mermaid
-Database Tables
+databaseTables
 Responses "Many" -- "1" Prompts : Belongs to
 class Prompts {
   + <<Pk>> Prompt_id
