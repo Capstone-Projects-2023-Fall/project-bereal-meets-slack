@@ -4,7 +4,7 @@ sidebar_position: 2
 
 # System Block Diagram
 
-![Block Diagram](</documentation/static/img/BMS Block Diagram.png>)
+![Block Diagram](https://cdn.discordapp.com/attachments/1158176482569494568/1158176510864281670/BMS_Block_Diagram.png?ex=651b4b6e&is=6519f9ee&hm=62360592131a751e85cd11d0414f710a81d8990f70bf611f2b6af5c1ba04224a&)
 
 ## The BMS bot uses 3 Microservices  
 
