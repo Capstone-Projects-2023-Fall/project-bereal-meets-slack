@@ -1,6 +1,9 @@
 # Generated files
 .docusaurus
 
+#Node Files
+node_modules
+
 # Misc
 .env
 .DS_Store
