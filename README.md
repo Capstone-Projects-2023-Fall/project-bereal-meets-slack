@@ -64,15 +64,15 @@ SQL or NoSQL Database for logging
         </a>
     </td>
         <td align="center">
-        <a href="https://github.com/RishiDuggal">
-            <img src="https://avatars.githubusercontent.com/u/72986170?v=4" width="100;" alt="Tara Feeley"/>
+        <a href="https://github.com/tup31461">
+            <img src="https://avatars.githubusercontent.com/u/123909507?v=4" width="100;" alt="Tara Feeley"/>
             <br />
             <sub><b>Tara Feeley</b></sub>
         </a>
     </td>
         <td align="center">
         <a href="https://github.com/NTRachel">
-            <img src="https://avatars.githubusercontent.com/u/73837312?v=4" alt="Rachel To"/>
+            <img src="https://avatars.githubusercontent.com/u/73837312?v=4" width="100; alt="Rachel To"/>
             <br />
             <sub><b>Rachel To</b></sub>
         </a>
