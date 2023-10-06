@@ -96,7 +96,6 @@ erDiagram
 Prompts {
   Int prompt_id PK
   String text
-  Int date
 }
 
 Responses {
