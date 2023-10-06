@@ -50,12 +50,61 @@ SQL or NoSQL Database for logging
 <table>
 <tr>
     <td align="center">
-        <a href="https://github.com/ApplebaumIan">
+        <a href="https://github.com/RishiDuggal">
             <img src="https://avatars.githubusercontent.com/u/72986170?v=4" width="100;" alt="Rishi Duggal"/>
             <br />
             <sub><b>Rishi Duggal</b></sub>
         </a>
     </td>
+        <td align="center">
+        <a href="https://github.com/vivekpatell3">
+            <img src="https://avatars.githubusercontent.com/u/111992734?v=4" width="100;" alt="Vivek Patel"/>
+            <br />
+            <sub><b>Vivek Patel</b></sub>
+        </a>
+    </td>
+        <td align="center">
+        <a href="https://github.com/RishiDuggal">
+            <img src="https://avatars.githubusercontent.com/u/72986170?v=4" width="100;" alt="Tara Feeley"/>
+            <br />
+            <sub><b>Tara Feeley</b></sub>
+        </a>
+    </td>
+        <td align="center">
+        <a href="https://github.com/NTRachel">
+            <img src="https://avatars.githubusercontent.com/u/73837312?v=4" alt="Rachel To"/>
+            <br />
+            <sub><b>Rachel To</b></sub>
+        </a>
+    </td>
+        <td align="center">
+        <a href="https://github.com/gevdram">
+            <img src="https://avatars.githubusercontent.com/u/111989879?v=4" width="100;" alt="Gevork Dramagotchian"/>
+            <br />
+            <sub><b>Gevork Dramagotchian</b></sub>
+        </a>
+    </td>
+        <td align="center">
+        <a href="https://github.com/SSunnydev">
+            <img src="https://avatars.githubusercontent.com/u/70705060?v=4" width="100;" alt="Sojel Sunny"/>
+            <br />
+            <sub><b>Sojel Sunny</b></sub>
+        </a>
+    </td>
+        <td align="center">
+        <a href="https://github.com/ChristianS2001">
+            <img src="https://avatars.githubusercontent.com/u/97468890?v=4" width="100;" alt="Christian Smith"/>
+            <br />
+            <sub><b>Christian Smith</b></sub>
+        </a>
+    </td>
+        <td align="center">
+        <a href="https://google.com">
+            <img src="https://imgs.search.brave.com/MWlI8P3aJROiUDO9A-LqFyca9kSRIxOtCg_Vf1xd9BA/rs:fit:860:0:0/g:ce/aHR0cHM6Ly90NC5m/dGNkbi5uZXQvanBn/LzAyLzE1Lzg0LzQz/LzM2MF9GXzIxNTg0/NDMyNV90dFg5WWlJ/SXllYVI3TmU2RWFM/TGpNQW15NEd2UEM2/OS5qcGc" width="100;" alt="Nick Sowers"/>
+            <br />
+            <sub><b>Nick Sowers</b></sub>
+        </a>
+    </td>+
   </tr>
 </table>
 
