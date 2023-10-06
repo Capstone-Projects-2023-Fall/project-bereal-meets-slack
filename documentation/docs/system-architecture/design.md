@@ -91,7 +91,7 @@ class database{
 
 ## Database Diagrams
 ```mermaid
-classDiagram
+erDiagram
 class Prompts {
   + <<Pk>> Prompt_id
   + Text
