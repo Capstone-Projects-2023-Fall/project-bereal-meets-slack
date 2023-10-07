@@ -72,7 +72,7 @@ SQL or NoSQL Database for logging
     </td>
         <td align="center">
         <a href="https://github.com/NTRachel">
-            <img src="https://avatars.githubusercontent.com/u/73837312?v=4" width="100; alt="Rachel To"/>
+            <img src="https://avatars.githubusercontent.com/u/73837312?v=4" width="100;" alt="Rachel To"/>
             <br />
             <sub><b>Rachel To</b></sub>
         </a>
