@@ -89,4 +89,41 @@ Return Value: Data visualization object.
 - **Returns:**
   - `return_code` - Code indicating success or failure.
 
+### Response API Methods
+
+#### `get_response(response_id, user_id)`
+- **Description:** Get the user response to a BMS bot prompt.
+- **Parameters:**
+  - `response_id` - ID of the response to be retrieved.
+  - `user_id` - Include the user ID who sent the response.
+- **Returns:**
+  - `return_code` - Code indicating success or failure.
+  - `response_id` - ID of the response.
+  - `num_reactions` - Number of reactions.
+  - `time_to_respond` - Time taken to respond.
+  - `user_id` - User ID who sent the response.
+  - `image_link` - Link to the response in Discord chat.
+  - `prompt_id` - Foreign key to the Prompt data table.
+
+#### `set_response(num_reactions, time_to_respond, prompt_id, user_id, image_link)`
+- **Description:** Set or update a user response to a BMS bot prompt.
+- **Parameters:**
+  - `num_reactions` - Number of reactions.
+  - `time_to_respond` - Time taken to respond.
+  - `prompt_id` - Foreign key to the Prompt data table.
+  - `user_id` - User ID who sent the response.
+  - `image_link` - Link to the response in Discord chat.
+- **Returns:**
+  - `return_code` - Code indicating success or failure.
+
+#### `add_response(num_reactions, time_to_respond, prompt_id, user_id, image_link)`
+- **Description:** Add a new user response to a BMS bot prompt.
+- **Parameters:**
+  - `num_reactions` - Number of reactions.
+  - `time_to_respond` - Time taken to respond.
+  - `prompt_id` - Foreign key to the Prompt data table.
+  - `user_id` - User ID who sent the response.
+  - `image_link` - Link to the response in Discord chat.
+- **Returns:**
+  - `return_code` - Code indicating success or failure.
 
