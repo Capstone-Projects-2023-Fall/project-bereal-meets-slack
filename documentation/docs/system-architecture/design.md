@@ -86,6 +86,9 @@ class database{
 
 }
 ```
+## BMS Bot
+This class will contain methods that allow the bot to interact with the users and moderator
+
 **Fields**
 
   **-botName**: Display name for the bot and how users and other members of the platform will recognize and refer to the bot
