@@ -86,6 +86,41 @@ class database{
 
 }
 ```
+**Fields**
+
+**-botName**: Display name for the bot and how users and other members of the platform will recognize and refer to the bot
+**- botToken**: Unique access token or authentication key that allows the bot to connect to the platform’s API and perform actions
+**- startHour**: Hour of when the bot will start 
+**- endHour**: Hour of when bot will end
+**- promptList**: List of all the prompts the bot can choose from
+**- blackList**: List of users on the blacklist
+
+**Methods**
+
+**-getCSV()**: Gets the CSV fields
+**-getDatavis()**: Checks for CSV fields by parsing lines from a file
+**-getOperatingHours()**: Gets the operation hours of the bot
+**-sendPrompt()**: Sends a prompt to a user
+**-getResponseDelay()**: Gets the time it takes when the bot has to resend a prompt to the user
+**-getResponse()**: gets response from the user
+**-setOperatingHours(int newStart, int newEnd)**: Sets the operating hours
+**-generateRandomPromptTime()**: Generates a random time for when prompts are assigned
+**-generateRandomPrompt()**: Generates a random prompt
+**-getPromptList()**: Gets the prompt list
+**-setPromptList()**: Sets the prompt list 
+**-getResponsePostComment()**: Gets and stores the response of a post comment
+**-setReponsePostComment()**: Sets a response of a post comment
+**-getBlackList()**: Shows the blacklist
+**-addUserToBlackList()**: Adds users to the blacklist
+**-removeUserFromBlackList()**: Removes a user from the blacklist
+**-selectRandomUserToPrompt()**: Selects a random user to assign a prompt to
+**-getApprovalStatus()**: Gets the approval status after sending a user response to the moderator
+**-setApprovalStatus()**: Sets the approval status after sending a user response to a moderator
+**-sendToReponseToMod()**:  Sends a user response to a prompt to a moderator
+**-postReponseToChannel()**: Posts the response of a moderator to a user to a channel
+**-deleteOriginalPromptFromChannel()**: Deletes a prompt from a certain channel
+**-setaUsersAlreadyPromptedList()**: Sets a list of users that were already prompted by the bot
+
 
 ## Algorithms
 
