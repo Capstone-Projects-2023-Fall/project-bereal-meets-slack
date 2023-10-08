@@ -3,39 +3,53 @@ sidebar_position: 1
 description: What should be in this section.
 ---
 
-Design Document - Part II API
+Server Api Spec
 =============================
 
-**Purpose**
+**Introduction**
 
-This Design Document gives the complete design of the software implementation. This information should be in structured comments (e.g. Javadoc) in the source files. We encourage the use of a documentation generation tool to generate a draft of your API that you can augment to include the following details.
+This outlines the API specification for the server. It provides details on the methods available, their parameters, return values, and the usage.
 
-**Requirements**
+**Server Methods**
 
-In addition to the general documentation requirements the Design Document - Part II API will contain:
+generateCSV(int startTime, int endTime)  -
 
-General review of the software architecture for each module specified in Design Document - Part I Architecture. Please include your class diagram as an important reference.
+&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;
+Description: Generates a CSV file for a specified time range.    
+&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;
+Parameters:  
+&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;
+startTime (int): The start time for data collection.  
+&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;
+endTime (int): The end time for data collection.  
+&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;
+Return Value: CSV file.  
 
-**For each class define the data fields, methods.**
 
-The purpose of the class.
+generateDataVis(int startTime, int endTime) -
 
-The purpose of each data field.
+&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;
+Description: Generates data visualization for a specified time range.  
+&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;
+Parameters:   
+&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;
+startTime (int): The start time for data visualization.  
+&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;
+endTime (int): The end time for data visualization.  
+&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;
+Return Value: Data visualization object.  
 
-The purpose of each method
-
-Pre-conditions if any.
-
-Post-conditions if any.
-
-Parameters and data types
-
-Return value and output variables
-
-Exceptions thrown\* (PLEASE see note below for details).
-
-An example of an auto-generated and then augmented API specification is here ([Fiscal Design Document 2\_API.docx](https://templeu.instructure.com/courses/106563/files/16928898?wrap=1 "Fiscal Design Document 2_API.docx") )
-
-This group developed their API documentation by hand ([Design Document Part 2 API-1\_MovieMatch.docx](https://templeu.instructure.com/courses/106563/files/16928899?wrap=1 "Design Document Part 2 API-1_MovieMatch.docx") )
-
-\*At the top level, or where appropriate, all exceptions should be caught and an error message that is meaningful to the user generated. It is not OK to say ("xxxx has encountered a problem and will now close (OK?)". Error messages and recovery procedures should be documented in the User’s Manual.
