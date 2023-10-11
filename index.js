@@ -1,12 +1,8 @@
 require('dotenv').config(); //initialize dotenv
 const Discord = require('discord.js'); //import discord.js
-const { REST } = require('@discordjs/rest')
-const { Routes } = require('discord.js');
+const registrar = require('./commandregistrar'); 
 
 const TOKEN = process.env.DISCORD_TOKEN;
-const CLIENT_ID = process.env.DISCORD_CLIENT_ID;
-const GUILD_ID = process.env.DISCORD_GUILD_ID;
-
 
 const client = new Discord.Client({ 
     intents: [
@@ -19,36 +15,18 @@ const client = new Discord.Client({
 
 client.on('ready', () => {
   console.log(`Logged in as ${client.user.tag}!`);
-});
+  //make sure commands are synced & registered
+  registrar.registercommands();
+}); // when client is ready to listen, log.
 
 client.on('messageCreate', async msg => {
     if (msg.content === 'ping') {
         msg.reply('stop trying to do that.');
     }
-  });
+  }); //listens for "ping"
 
 
-  const commands = [
-    {
-      name: 'ping',
-      description: 'Replies with Pong!',
-    },
-  ];
-
-const rest = new REST({ version: '10' }).setToken(TOKEN);
-
-( async () =>{
-  try {
-    console.log('Started refreshing application (/) commands.');
-
-    rest.put(Routes.applicationGuildCommands(CLIENT_ID, GUILD_ID), { body: commands });
-
-    console.log('Successfully reloaded application (/) commands.');
-  } catch (error) {
-  console.error(error);
-  }
-})();
-  
+//check for ping command.
 client.on('interactionCreate', async interaction => {
     if (!interaction.isChatInputCommand()) return;
   
