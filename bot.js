@@ -38,8 +38,9 @@ client.on('ready', () => {
 }); // when client is ready to listen, log.
 
 client.on('messageCreate', async msg => {
+	if (msg.author.bot) { return; }
     if (msg.content === 'ping') {
-        msg.reply('ping');
+        msg.reply('pong');
     }
   }); //listens for "ping"
 

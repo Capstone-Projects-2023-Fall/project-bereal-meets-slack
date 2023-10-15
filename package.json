@@ -4,8 +4,8 @@
   "description": "Bot that brings bereal like services to chat apps",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "startdev": "nodemon ./index.js"
+    "test": "mocha",
+    "startdev": "nodemon ./bot.js"
   },
   "repository": {
     "type": "git",
@@ -22,11 +22,14 @@
   },
   "homepage": "https://github.com/Capstone-Projects-2023-Fall/project-bereal-meets-slack#readme",
   "dependencies": {
-    "@discordjs/rest": "^2.0.1",
     "axios": "^1.5.1",
-    "discord.js": "^14.13.0",
     "dotenv": "^16.3.1",
     "fs": "^0.0.1-security",
     "nodemon": "^3.0.1"
+  },
+  "devDependencies": {
+    "@discordjs/rest": "^2.0.1",
+    "discord.js": "^14.13.0",
+    "mocha": "^10.2.0"
   }
 }
