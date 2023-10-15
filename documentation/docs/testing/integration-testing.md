@@ -6,8 +6,11 @@ sidebar_position: 2
 Tests to demonstrate each use-case based on the use-case descriptions and the sequence diagrams. External input should be provided via mock objects and results verified via mock objects. Integration tests should not require manual entry of data nor require manual interpretation of results.
 
 | Test Case ID | Test Case Objective||Test Case Description||Expected Result|
-| -------- | -------- |
-|1 |1. Test moderator signing into slack
+| -------- | -------- | -------- | -------- |
+|1 | |Test if owner successful adds bot into the workspace
+
+Test that all the guidelines, roles, and settings of server are configured and saved correctly
+||1. Test moderator signing into slack
 2. Owner accesses “preferences”
 3. owner selects “apps and integration” Install BMS bot, verifies if installation is successful
 4. Owner assigns roles and privileges within slack community, validates that assigned roles and privileges are correctly reflected
