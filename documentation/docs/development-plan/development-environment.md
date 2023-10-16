@@ -10,11 +10,10 @@ sidebar_position: 4
 ## Languages, Frameworks and Management Systems
 
 ### Programming Language:
-- Python for BMS Bot logic, interactions, and data visualization.
-- Node.js for the backend framework.
+- Node.js for BMS Bot logic, interactions, data visualization, and backend framework.
 
-### Slack Integration Framework:
-- Slack API
+### Discord Integration:
+- discord.js module for interacting with the Discord API
 
 ### Database System:
 - SQL
@@ -23,5 +22,4 @@ sidebar_position: 4
 - Docasaurus
 
 ## Testing Tools
- - Pytest for Python testing
- - Jest for Node.js backend testing
+ - Mocha
