@@ -8,10 +8,10 @@ Tests to demonstrate each use-case based on the use-case descriptions and the se
 [//]: # ( integrationtests: tests -start )
 <table>
   <tr>
-    <td><h3>Test Case ID</h3></td>
-    <td><h3>Test Case Objective</h3></td>
-    <td><h3>Test Case Description</h3></td>
-    <td><h3>Expected Value</h3></td>
+    <th>Test Case ID</th>
+    <th>Test Case Objective</th>
+    <th>Test Case Description</th>
+    <th>Expected Value</th>
   </tr>
   <tr>
     <td>1</td>
@@ -35,7 +35,7 @@ Tests to demonstrate each use-case based on the use-case descriptions and the se
   <tr>
     <td>2</td>
     <td> 
-         Test if slack bot successfully prompted user <br><br/>
+         Test if slack bot successfully prompted user <br/><br/>
          Test If user responded, If bot got user response and if it is sent to the moderator <br/><br/>
          Test If user can get approval status from slackbot
     </td>
