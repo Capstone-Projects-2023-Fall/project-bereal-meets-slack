@@ -13,3 +13,20 @@ describe('Math Operation', function() {
     assert.equal(result, 3);
   })
 })
+
+describe('Math Operation', function() {
+  it('add two numbers', () => {
+    const result = 1 + 2;
+    assert.equal(result, 3);
+  })
+})
+
+describe('String Tests', () => {
+  it('returns the length of a string', () => {
+    const helloWorld = 'Hello, World!';
+    const stringLength = helloWorld.length;
+
+    assert.equal(stringLength, 13);
+  });
+
+});
