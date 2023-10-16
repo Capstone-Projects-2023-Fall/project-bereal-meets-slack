@@ -7,10 +7,9 @@ describe('Array', function () {
   });
 });
 
-function handleCommand(command){
-  if(command === '/ping'){
-    return 'Pong!';
-  } else {
-    return 'Command does not exist'
-  }
-}
+describe('Math Operation', function() {
+  it('add two numbers', () => {
+    const result = 1 + 2;
+    assert.equal(result, 3);
+  })
+})
