@@ -1,6 +1,19 @@
----
-sidebar_position: 3
----
+
 # Acceptance test
 
 Demonstration of all of the functional and non-functional requirements. This can be a combination of automated tests derived from the use-cases (user stories) and manual tests with recorded observation of the results.
+<br>
+<br>
+| Test ID      | Action/Steps                                                                                                                                                                     | Notes/Expected Result                                                                                       |
+|--------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------|
+| 1            | <strong>Configure Slackbot</strong> <br>Download and sign in to discord configure the Slackbot to your discord app                                                               | Discord should be corredctly downloaded and slackbot should be configured.                                  |
+| 2            | <strong>Response to Slackbot Prompt</strong> <br>Open the discord notification received Take pictue/ upload picture to discord bot which is sent to the moderator.               | The image should be confirmed and approved by the slackbot.                                                 |
+| 3            | <strong>No Response to Slackbot Prompt</strong> <br>User fails to respond to slackbots prompt within set time frame.                                                             | Slackbot recognizes the users failure to respond and sends a reminder notification about the missed interval|
+| 4            | <strong>Submission Approved </strong> <br>Slackbot recieves approval from decision from moderator.                                                                               | Slackbot send logs to server database and posts the image with caption along with notifying user.           |
+| 5            | <strong>Submission Denied</strong> <br>Image is denied by moderators due to not following content guidelines.                                                                    | User recieves notification that image was not approves and is given vhnce to resubmit.                      |
+| 6            | <strong>Reaction to New Post Notification</strong> <br>A notification is received about a new post.                                                                              | User is able to go into notification to see the new post and react to it.                                   |
+| 7            | <strong>Ignore New Post Notification </strong> <br>User is sent a notification that is not wanted. User then goes to settings and chooses to turn off the new post notifications.| User no longer recieves new post notifications.                                                             |
+| 8            | <strong>Moderator Access Reaction Data</strong> <br>Moderator logs into BMS and runs commands to request data in csv format.                                                     | Data is received and available to be downloaded in csv format.                                              |
+| 9            | <strong>Moderator Makes Approval  </strong> <br>A user submission is posted. Moderator then reviews the submission using the guidelines and marks as "Approved" or "Denied".     | The submission is sucessfully approved or denied due to the moderators input.                               |
+| 10           | <strong>Slackbot Bans User  </strong> <br>User inputs bad behavior in community. User is warned by slackbot via notifccation. User contiunes behavior.                           | Slackbot adds user to blacklist and the user becomes ban from community. Slackbot logs action.              |
+| 11           | <strong>Moderator Manages Blacklist</strong> <br>Moderator chooses a user to add to blacklist. Moderator then goes into blacklist and removes user.                              | User becomes banned from community then unbanned from community and no longer is present on blacklist.      |
