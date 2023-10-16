@@ -6,3 +6,11 @@ describe('Array', function () {
     });
   });
 });
+
+function handleCommand(command){
+  if(command === '/ping'){
+    return 'Pong!';
+  } else {
+    return 'Command does not exist'
+  }
+}
