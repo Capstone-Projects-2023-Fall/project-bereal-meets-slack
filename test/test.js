@@ -29,4 +29,17 @@ describe('String Tests', () => {
     assert.equal(stringLength, 13);
   });
 
+  describe('#indexOf()', function () {
+    it('should return the index when the value is present', function () {
+      assert.equal([1, 2, 3].indexOf(2), 1);
+    });
+  });
+
+  describe('#indexOf()', function () {
+    it('should handle duplicate values and return the first index', function () {
+      assert.equal([1, 2, 2, 3].indexOf(2), 1);
+    });
+  });
+  
 });
+
