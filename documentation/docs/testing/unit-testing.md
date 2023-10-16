@@ -30,3 +30,10 @@ Tests to ensure each method of the classes `bmsBot`, `database`, and `webServer`
 | 21           | Test if `bmsBot` can add users to blacklist.                | Provide a mock user to `addUserToBlackList()` method. | User is added to the blacklist correctly. |
 | 22           | Test if `bmsBot` can remove users from blacklist.           | Provide a mock user to `removeUserFromBlackList()` method. | Remove user from blacklist |
 | 23           | Test if `bmsBot` can selected a random user to prompt       | Provide a mock user to select from a mock list | Select a random user from the database to prompt |
+| 24           | Test if `database` can update total average time to post.   | Provide mock data to `updateTotalAverageTimeToPost()` method. | Total average time to post in the mock database is updated correctly. |
+| 25           | Test if `database` can get reaction timestamps.             | Invoke `getReactionTS()` method of `database` class. | Reaction timestamps are fetched from the mock database. |
+| 26           | Test if `database` can get response timestamps.             | Invoke `getResponseTS()` method of `database` class. | Response timestamps are fetched from the mock database. |
+| 27           | Test if `database` can set prompt post timestamps.          | Provide mock data to `setPromptPostTS()` method. | Prompt post timestamps are set in the mock database. |
+| 28           | Test if `database` can update user's time to post.          | Provide mock user data to `updateUserTimeToPost()` method. | User's time to post is updated in the mock database. |
+| 29           | Test if `database` can get user's time to post.             | Invoke `getUserTimeToPost()` method of `database` class. | User's time to post is fetched from the mock database. |
+| 30           | Test if `database` can update reactions usage.              | Provide mock data to `updateReactionsUsage()` method. | Reactions usage is updated in the mock database. |
