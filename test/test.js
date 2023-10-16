@@ -6,3 +6,10 @@ describe('Array', function () {
     });
   });
 });
+
+describe('Math Operation', function() {
+  it('add two numbers', () => {
+    const result = 1 + 2;
+    assert.equal(result, 3);
+  })
+})
