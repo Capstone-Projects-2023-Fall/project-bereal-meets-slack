@@ -44,6 +44,20 @@ Backend Framework (Laravel PHP, or NodeJS)
 
 SQL or NoSQL Database for logging
 
+## [BeReal Bot](https://capstone-projects-2023-fall.github.io/project-bereal-meets-slack/) GitHub Stats
+
+### Number of opened pull requests made by each team member
+
+![BeReal Bot pull requests](https://courses.ianapplebaum.com/api/pull-requests/Capstone-Projects-2023-Fall/project-bereal-meets-slack)
+
+### Number of code reviews made by each team member
+
+![BeReal Bot reviews](https://courses.ianapplebaum.com/api/reviews/Capstone-Projects-2023-Fall/project-bereal-meets-slack)
+
+### Number of commits made by each team member
+
+![BeReal Bot commits](https://courses.ianapplebaum.com/api/commits/Capstone-Projects-2023-Fall/project-bereal-meets-slack)
+
 ## Collaborators
 
 [//]: # ( readme: collaborators -start )
