@@ -25,6 +25,7 @@
     "axios": "^1.5.1",
     "dotenv": "^16.3.1",
     "fs": "^0.0.1-security",
+    "node-localstorage": "^3.0.5",
     "nodemon": "^3.0.1"
   },
   "devDependencies": {
