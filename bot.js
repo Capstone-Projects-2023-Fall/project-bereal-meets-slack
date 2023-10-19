@@ -4,7 +4,7 @@ const path = require('node:path');
 const fs = require('fs');
 const registrar = require('./commandregistrar'); 
 const cron = require('node-cron');
-const { DateTime } = require('luxon');
+const moment = require('moment-timezone');
 
 const TOKEN = process.env.DISCORD_TOKEN;
 
@@ -34,11 +34,21 @@ for (const file of commandFiles) {
 }
 
 client.on('ready', () => {
-  console.log(`Logged in as ${client.user.tag}!`);
-  //make sure commands are synced & registered
-  scheduleRandomTask();
-  registrar.registercommands();
-}); // when client is ready to listen, log.
+    console.log(`Logged in as ${client.user.tag}!`);
+    
+    const now = moment().tz("America/New_York");
+    if (now.hour() > 12) {// If the bot is started before 12 PM EST, try to schedule for today
+		console.log("Since I was started after 12 PM EST, I might wait till the next day to start") //have this become a message sent into the discord channel
+        schedulePost();
+    }
+    //scheduling for the scheduled post
+    cron.schedule('* 12 * * *', schedulePost, {
+        scheduled: true,
+        timezone: "America/New_York"
+    });
+    registrar.registercommands();
+});
+
 
 client.on('messageCreate', async msg => {
 	if (msg.author.bot) { return; }
@@ -46,7 +56,6 @@ client.on('messageCreate', async msg => {
         msg.reply('pong');
     }
   }); //listens for "ping"
-
 
 //check for ping command.
 client.on(Events.InteractionCreate, async interaction => {
@@ -70,44 +79,26 @@ client.on(Events.InteractionCreate, async interaction => {
 		}
 	}
 });
+function getRandomHour() {
+    return Math.floor(Math.random() * (24 - 14) + 14);
+}
 
-let lastExecutionTime = null;
+function schedulePost() {
+    const targetHour = getRandomHour();
+    const now = moment().tz("America/New_York");
+    const targetTime = now.clone().hour(targetHour).minute(0).second(0);
 
-function scheduleRandomTask() {
-    const now = DateTime.now().setZone('America/New_York');
-
-    let startHour = 14; // 2 PM EST
-    let endHour = 23;   // 11 PM EST
-
-    let targetTime;
-    if (now.hour < startHour) {
-        // If it's before 2 PM, schedule the task for a random time after 2 PM on the same day
-        targetTime = now.set({ hour: startHour, minute: 0, second: getRandomInt(0, 3599) });
-    } else if (now.hour >= endHour) {
-        // If it's after 11 PM, schedule the task for a random time after 2 PM on the next day
-        targetTime = now.plus({ days: 1 }).set({ hour: startHour, minute: 0, second: getRandomInt(0, 3599) });
-    } else {
-        // If it's between 2 PM and 11 PM, schedule the task for a random time within this window
-        const secondsUntilEnd = endHour * 3600 - (now.hour * 3600 + now.minute * 60 + now.second);
-        targetTime = now.plus({ seconds: getRandomInt(0, secondsUntilEnd) });
+    if (now.isAfter(targetTime)) {
+        console.log("Bot was added to discord or started to late, skipping today and only today")
     }
 
-    const delayInMilliseconds = targetTime.diff(now).as('milliseconds');
-
-    console.log(`Task scheduled for: ${targetTime.toString()}`); // For debugging
+    const timeDifference = targetTime.diff(now);
+    console.log(`Scheduling post for ${targetHour}:00 EST`);
 
     setTimeout(() => {
-        // This is where the bot sends the notification to make a post
         console.log("Time to make a post!");
-
-        // Schedule the next notification
-        scheduleRandomTask();
-    }, delayInMilliseconds);
+    }, timeDifference);
 }
-
-function getRandomInt(min, max) {
-    return Math.floor(Math.random() * (max - min + 1)) + min;
-}
-//make sure this line is the last line
-client.login(TOKEN); //login bot using token
+// Make sure this line is the last line
+client.login(TOKEN);
 
