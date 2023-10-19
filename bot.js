@@ -3,6 +3,8 @@ const { Client, Collection, Events, GatewayIntentBits } = require('discord.js');
 const path = require('node:path');
 const fs = require('fs');
 const registrar = require('./commandregistrar'); 
+const cron = require('node-cron');
+const { DateTime } = require('luxon');
 
 const TOKEN = process.env.DISCORD_TOKEN;
 
@@ -34,6 +36,7 @@ for (const file of commandFiles) {
 client.on('ready', () => {
   console.log(`Logged in as ${client.user.tag}!`);
   //make sure commands are synced & registered
+  scheduleRandomTask();
   registrar.registercommands();
 }); // when client is ready to listen, log.
 
@@ -68,6 +71,43 @@ client.on(Events.InteractionCreate, async interaction => {
 	}
 });
 
+let lastExecutionTime = null;
+
+function scheduleRandomTask() {
+    const now = DateTime.now().setZone('America/New_York');
+
+    let startHour = 14; // 2 PM EST
+    let endHour = 23;   // 11 PM EST
+
+    let targetTime;
+    if (now.hour < startHour) {
+        // If it's before 2 PM, schedule the task for a random time after 2 PM on the same day
+        targetTime = now.set({ hour: startHour, minute: 0, second: getRandomInt(0, 3599) });
+    } else if (now.hour >= endHour) {
+        // If it's after 11 PM, schedule the task for a random time after 2 PM on the next day
+        targetTime = now.plus({ days: 1 }).set({ hour: startHour, minute: 0, second: getRandomInt(0, 3599) });
+    } else {
+        // If it's between 2 PM and 11 PM, schedule the task for a random time within this window
+        const secondsUntilEnd = endHour * 3600 - (now.hour * 3600 + now.minute * 60 + now.second);
+        targetTime = now.plus({ seconds: getRandomInt(0, secondsUntilEnd) });
+    }
+
+    const delayInMilliseconds = targetTime.diff(now).as('milliseconds');
+
+    console.log(`Task scheduled for: ${targetTime.toString()}`); // For debugging
+
+    setTimeout(() => {
+        // This is where the bot sends the notification to make a post
+        console.log("Time to make a post!");
+
+        // Schedule the next notification
+        scheduleRandomTask();
+    }, delayInMilliseconds);
+}
+
+function getRandomInt(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
 //make sure this line is the last line
 client.login(TOKEN); //login bot using token
 
