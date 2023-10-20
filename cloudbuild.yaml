@@ -1,7 +1,7 @@
 steps:
   # Step 1: Clone the GitHub repository
   - name: 'gcr.io/cloud-builders/git'
-    args: ['pull']
+    args: ['pull', 'main']
 
   # Step 2: Install Node.js and npm
   - name: 'gcr.io/cloud-builders/npm'
