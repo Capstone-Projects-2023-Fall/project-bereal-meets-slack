@@ -14,7 +14,7 @@ steps:
 
   # Step 3: Run the Node.js application
   - name: 'gcr.io/cloud-builders/npm'
-    args: ['startdev']
+    args: ['run', 'startdev']
     dir: 'main'  # Set the working directory to the cloned repository
 
 timeout: '900s'  # Set a timeout for the build in seconds
