@@ -1,17 +1,17 @@
 ---
 sidebar_position: 1
 ---
-# BMS Bot Design Document
+# BeReal Bot Design Document
 
 ## Components
 
 ### Chat Application
 
-The chat application acts as both the user portal for the bot and as the running environment for the bot. The chat application facilitates user interaction with the bot and allows for it to act like a psuedo user that can post and interact with messages. There will be a level of UI/UX design for the bot in slack using both its API & libraries for command and interaction formatting as well as block kit for formatting of modals, popups, and responses. The application will also act as the display for all data visualization that moderators ask for.
+The chat application acts as both the user portal for the bot and as the running environment for the bot. The chat application facilitates user interaction with the bot and allows for it to act like a psuedo user that can post and interact with messages. There will be a level of UI/UX design for the bot in Discord using both its API & libraries for command and interaction formatting as well as block kit for formatting of modals, popups, and responses. The application will also act as the display for all data visualization that moderators ask for.
 
-### BMS Bot 
+### BeReal Bot 
 
-The bot itself is a chatbot that is hosted on Google Cloud via cloud run, as mentioned previous it will act as a pseudo user posting messages and accepting/reacting to user responses with triggers. It interfaces with the slack API to send messages, and interfaces with the database to both store and pull user reaction data. When dealing with moderation the bot will opt to DM moderators and generate either popups, modals, or interfaceable actions for approvals, data requests, or moderation features. When logging data the bot will leverage the server to send data to firebase for storage.
+The bot itself is a chatbot that is hosted on Google Cloud via cloud run, as mentioned previous it will act as a pseudo user posting messages and accepting/reacting to user responses with triggers. It interfaces with the Discord API to send messages, and interfaces with the database to both store and pull user reaction data. When dealing with moderation the bot will opt to DM moderators and generate either popups, modals, or interfaceable actions for approvals, data requests, or moderation features. When logging data the bot will leverage the server to send data to firebase for storage.
 
 ### Google Cloud Webserver
 
@@ -24,13 +24,13 @@ The Firebase database is contained in the cloud webserver and acts as a means of
 ## Class Diagram
 ```mermaid
 classDiagram
-webServer --> bmsBot
+webServer --> BeRealBot
 webServer --> database
 class webServer{
   + generateCSV(int startTime, int endTime)
   + generateDataVis(int startTime, int endTime)
 }
-class bmsBot{
+class BeRealBot{
   + String botName
   + token botToken
   - int startHour
@@ -86,7 +86,7 @@ class database{
 
 }
 ```
-## BMS Bot
+## BeReal Bot
 This class will contain methods that allow the bot to interact with the users and moderator
 
 **Fields**
@@ -180,13 +180,13 @@ Prompts ||--|{ Responses : ""
   <summary>
     Usecase 1:
   </summary>
-  1. Owner signs in to Slack  
-  2. Owner opens the workspace "Preferences".  
-  3. Owner selects "Apps and Integrations" and installs the BMS bot.  
+  1. Owner signs in to Discord  
+  2. Owner opens the server "Preferences".  
+  3. Owner selects "Apps and Integrations" and installs the BeReal bot.  
   4. Owner assigns roles and privileges to users in the community.  
   5. Owner defines moderation and content guidelines.  
-  6. Owner defines type of prompts for BMS bot to send properly suit the culture and vibe of their community.  
-  7. Owner configures the schedule for BMS bot, defining the hours when the it will send prompts.  
+  6. Owner defines type of prompts for BeReal bot to send properly suit the culture and vibe of their community.  
+  7. Owner configures the schedule for BeReal bot, defining the hours when the it will send prompts.  
   8. Owner sets the duration for prompt responses to remain in the chat.  
   9. Owner sets the amount of time users have to respond to prompt notification.  
   10. Owner saves the configuration settings.  
