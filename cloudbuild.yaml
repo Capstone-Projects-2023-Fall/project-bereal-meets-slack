@@ -12,16 +12,9 @@ steps:
     args: ['install']
     dir: 'source'  # Set the working directory to the cloned repository
 
-  # Step 3: Build your Node.js application (if needed)
-  - name: 'gcr.io/cloud-builders/npm'
-    args: ['run', 'build']
-    dir: 'source'  # Set the working directory to the cloned repository
-
-  # Step 4: Run your Node.js application
+  # Step 3: Run the Node.js application
   - name: 'gcr.io/cloud-builders/npm'
     args: ['start']
     dir: 'source'  # Set the working directory to the cloned repository
 
-# You can specify additional build configurations here, like timeouts and substitutions.
-
-timeout: '900s'  # Optional: Set a timeout for the build in seconds
+timeout: '900s'  # Set a timeout for the build in seconds
