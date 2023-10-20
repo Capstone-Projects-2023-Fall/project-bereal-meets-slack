@@ -1,5 +1,9 @@
 steps:
-  # Step 1: Clone the GitHub repository
+   # Step 0: configure git
+  - name: 'gcr.io/cloud-builders/git'
+    args: ['config', 'pull.rebase', 'true']
+   
+   # Step 1: Clone the GitHub repository
   - name: 'gcr.io/cloud-builders/git'
     args: ['pull', 'https://github.com/Capstone-Projects-2023-Fall/project-bereal-meets-slack', 'main']
 
