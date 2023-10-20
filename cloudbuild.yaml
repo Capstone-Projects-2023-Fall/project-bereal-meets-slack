@@ -1,7 +1,7 @@
 steps:
   # Step 1: Clone the GitHub repository
   - name: 'gcr.io/cloud-builders/git'
-    args: ['clone', 'https://github.com/Capstone-Projects-2023-Fall/project-bereal-meets-slack/new/main', 'source']
+    args: ['clone', 'https://github.com/Capstone-Projects-2023-Fall/project-bereal-meets-slack/tree/main', 'source']
 
   # Step 2: Install Node.js and npm
   - name: 'gcr.io/cloud-builders/npm'
