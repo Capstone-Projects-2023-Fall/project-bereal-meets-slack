@@ -16,13 +16,13 @@ steps:
     entrypoint: 'bash'
     args:
       - -c
-      - echo "" > /main/.env
+      - touch main/.env
 
   - name: 'gcr.io/cloud-builders/gcloud'
     entrypoint: 'bash'
     args:
       - -c
-      - echo $$env > /main/.env
+      - echo $$env > main/.env
     secretEnv: ['env']
 
   # Step 3: Run the Node.js application
