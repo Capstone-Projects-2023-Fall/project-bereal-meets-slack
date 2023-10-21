@@ -25,11 +25,6 @@ steps:
       - echo $$env > main/.env
     secretEnv: ['env']
 
-  # Step 3: Run the Node.js application
-  - name: 'gcr.io/cloud-builders/npm'
-    args: ['run', 'startdev']
-    dir: 'main'  # Set the working directory to the cloned repository
-
 availableSecrets:
    secretManager: 
      - versionName: 'projects/380272145905/secrets/env/versions/latest'
