@@ -42,6 +42,9 @@ client.on('messageCreate', async msg => {
     if (msg.content === 'ping') {
         msg.reply('pong');
     }
+    else if(msg.content === 'are you alive?'){
+        msg.reply('what gives you that impression?')
+    }
   }); //listens for "ping"
 
 
