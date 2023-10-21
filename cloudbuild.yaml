@@ -12,9 +12,24 @@ steps:
     args: ['install']
     dir: 'main'  # Set the working directory to the cloned repository
 
+  - name: 'gcr.io/cloud-builders/gcloud'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - 'echo "" > /main/.env'
+
+  - name: 'gcr.io/cloud-builders/gcloud'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - 'echo $${env} > /main/.env'
+
   # Step 3: Run the Node.js application
   - name: 'gcr.io/cloud-builders/npm'
     args: ['run', 'startdev']
     dir: 'main'  # Set the working directory to the cloned repository
+
+secrets:
+  - 'env'
 
 timeout: '900s'  # Set a timeout for the build in seconds
