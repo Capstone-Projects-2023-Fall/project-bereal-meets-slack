@@ -27,15 +27,9 @@ steps:
       - echo $$env > app/.env
     secretEnv: ['env']
 
-  - name: 'gcr.io/cloud-builders/gcloud'
-    entrypoint: 'bash'
-    args:
-      - '-c'
-      - 'mkdir /tmp/app && cp -r * /tmp/app'
-
   # Step 5: Build a docker image using the code.  
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['build', '-t', 'gcr.io/berealbot/berealbotdeploy', './tmp/app']
+    args: ['build', '-t', 'gcr.io/berealbot/berealbotdeploy', '.']
     dir: 'app'
     
   # Step 6: Push the Docker container to Google Container Registry
