@@ -23,7 +23,7 @@ async function notifyMods(guild, content, author, attachments){
     const embed = new EmbedBuilder()
         .setTitle('New Submission!') //title of embedded message
         .setDescription(`New Submission from: ${author.tag} `) //who submitted post
-        .setColor('#000000')
+        .setColor('Green')
     
     if (content){
         //include text from post with image
