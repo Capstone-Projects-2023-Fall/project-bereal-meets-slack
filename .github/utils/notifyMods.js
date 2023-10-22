@@ -15,10 +15,10 @@ async function notifyMods(guild, message){
     //Embedd message to include images
     const embed = new EmbedBuilder()
         .setTitle('New Submission!') //title of embedded message
-        .setDescription(`New Submission from ${message.author.tag}`) //who submitted post
+        .setDescription(`New Submission from: `) //who submitted post
         .setColor('#000000')
     
-    if (message.content.trim()){
+    if (message.content){
         //include text from post with image
         embed.addField('Post:', message.content);
     }
@@ -26,7 +26,7 @@ async function notifyMods(guild, message){
         embed.addField('Note', 'No caption submitted.');
     }
 
-    if(message.attachments && message.attachments.size > 0){
+    if(message.attachments.size > 0){
         //if theres an attachment, include it
         const image = message.attachments.first(); //get the first attachment
 
@@ -35,16 +35,10 @@ async function notifyMods(guild, message){
         }
     }
     else{
-        //check if note already exists 
-        const noteFeild = embed.fields.find(field => field.name === 'Note');
-
-        if(noteFeild){
-            noteFeild.value += 'No image was submitted.';
-        } else{
-            embed.addField('Note', 'No image was submitted.');
+            embed.addField('Attachment:', 'No image was submitted.');
         }
-    }
     
+
     //Send DM to all mods
     for (const moderator of moderators.values()){
         try{
