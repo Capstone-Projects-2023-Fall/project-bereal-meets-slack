@@ -1,4 +1,4 @@
-const {MessageEmbed} = require('discord.js');
+const {EmbedBuilder} = require('discord.js');
 
 async function notifyMods(guild, message){
 
@@ -13,7 +13,7 @@ async function notifyMods(guild, message){
     const moderators = guild.members.cache.filter(member => member.roles.cache.has(modRole.id));
 
     //Embedd message to include images
-    const embed = new MessageEmbed()
+    const embed = new EmbedBuilder()
         .setTitle('New Submission!') //title of embedded message
         .setDescription(`New Submission from ${message.author.tag}`) //who submitted post
         .setColor('#000000')
