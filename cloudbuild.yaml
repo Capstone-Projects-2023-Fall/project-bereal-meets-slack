@@ -27,7 +27,7 @@ steps:
       - echo $$env > app/.env
     secretEnv: ['env']
 
-    - name: 'gcr.io/cloud-builders/gcloud'
+  - name: 'gcr.io/cloud-builders/gcloud'
     entrypoint: 'bash'
     args:
       - '-c'
