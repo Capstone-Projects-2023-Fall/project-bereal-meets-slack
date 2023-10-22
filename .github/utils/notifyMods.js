@@ -3,7 +3,7 @@ const {EmbedBuilder, Attachment} = require('discord.js');
 async function notifyMods(guild, content, author, attachments){
 
     //Get role for mods
-    const modRole = guild.roles.cache.find(role => role.name === 'mod all');
+    const modRole = guild.roles.cache.find(role => role.name === 'bot mod');
     await guild.members.fetch();
 
     if(!modRole){
