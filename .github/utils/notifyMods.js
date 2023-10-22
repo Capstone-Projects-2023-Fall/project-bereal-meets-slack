@@ -1,3 +1,5 @@
+const {messageEmbed} = require('discord.js');
+
 async function notifyMods(guild, submissionDetails, submitter){
 
     //Get role for mods
@@ -9,6 +11,19 @@ async function notifyMods(guild, submissionDetails, submitter){
 
     //Fetch memebrs with mod all role 
     const moderators = guild.members.cache.filter(member => member.roles.cache.has(modRole.id));
+
+    //Embedd message to include images
+    const embed = new messageEmbed()
+        .setTitle('New Submission!') //title of embedded message
+        .setDescription('New Submission from ${message.author.tag}') //who submitted post
+        .setColor('#000000')
+    
+    if (message.content){
+        //include text from post with image
+        embed.addField('Post', message.content);
+    }
+
+
 
     const content = `New submission from ${submitter.tag}: ${submissionDetails}`;
 
