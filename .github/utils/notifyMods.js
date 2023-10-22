@@ -18,12 +18,12 @@ async function notifyMods(guild, message){
         .setDescription(`New Submission from ${message.author.tag}`) //who submitted post
         .setColor('#000000')
     
-    if (message.content){
+    if (message.content.trim()){
         //include text from post with image
-        embed.addFields('Post:', message.content);
+        embed.addField('Post:', message.content);
     }
     else{
-        embed.addFields({name: 'Note', value: 'No caption submitted.'});
+        embed.addField('Note', 'No caption submitted.');
     }
 
     if(message.attachments && message.attachments.size > 0){
@@ -35,9 +35,16 @@ async function notifyMods(guild, message){
         }
     }
     else{
-        embed.addFields({name: 'Note', value: 'No image was submitted.'});
-    }
+        //check if note already exists 
+        const noteFeild = embed.fields.find(field => field.name === 'Note');
 
+        if(noteFeild){
+            noteFeild.value += 'No image was submitted.';
+        } else{
+            embed.addField('Note', 'No image was submitted.');
+        }
+    }
+    
     //Send DM to all mods
     for (const moderator of moderators.values()){
         try{
