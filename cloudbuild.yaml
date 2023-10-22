@@ -31,6 +31,10 @@ steps:
   - name: 'gcr.io/cloud-builders/docker'
     args: ['build', '-t', 'gcr.io/berealbot/berealbotdeploy', '.']
     dir: 'app'
+    
+  # Step 6: Push the Docker container to Google Container Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'gcr.io/berealbot/berealbotdeploy']
 
 availableSecrets:
    secretManager: 
