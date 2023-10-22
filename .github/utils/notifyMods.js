@@ -1,4 +1,4 @@
-async function notifyMods(guild, submissionDetails){
+async function notifyMods(guild, submissionDetails, submitter){
 
     //Get role for mods
     const modRole = guild.roles.cache.find(role => role.name === 'mod all');
@@ -10,7 +10,7 @@ async function notifyMods(guild, submissionDetails){
     //Fetch memebrs with mod all role 
     const moderators = guild.members.cache.filter(member => member.roles.cache.has(modRole.id));
 
-    const content = `New submission: ${submissionDetails}`;
+    const content = `New submission from ${submitter.tag}: ${submissionDetails}`;
 
     //Send DM to all mods
     for (const moderator of moderators.values()){
