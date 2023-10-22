@@ -56,7 +56,7 @@ client.on('messageCreate', async msg => {
 
     if (msg.channel.id === process.env.DISCORD_SUBMISSION_CHANNEL_ID){
         try{
-            await notifyMods(msg.guild, msg.author, msg.content, msg.attachments);
+            await notifyMods(msg.guild, msg.content, msg.author, msg.attachments);
         } catch (error){
             console.error(`Error notifying moderator:`, error);
         }
