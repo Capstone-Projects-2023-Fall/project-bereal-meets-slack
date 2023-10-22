@@ -4,6 +4,7 @@ async function notifyMods(guild, content, author, attachments){
 
     //Get role for mods
     const modRole = guild.roles.cache.find(role => role.name === 'mod all');
+    await guild.members.fetch();
 
     if(!modRole){
         return console.error("Moderator role not found");
@@ -11,6 +12,11 @@ async function notifyMods(guild, content, author, attachments){
 
     //Fetch memebrs with mod all role 
     const moderators = guild.members.cache.filter(member => member.roles.cache.has(modRole.id));
+
+    // console.log("List of mods");
+    // moderators.forEach(moderator => {
+    //     console.log(`Moderator: ${moderator.user.username} #${moderator.user.discriminator}`);
+    // });
 
     //Embedd message to include images
     const embed = new EmbedBuilder()
