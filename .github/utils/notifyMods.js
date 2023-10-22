@@ -21,12 +21,6 @@ async function notifyMods(guild, message){
     if (message.content){
         //include text from post with image
         embed.addFields('Post:', message.content);
-
-        //check for an image url and embed it
-        const url = message.content.match(/\bhttps?:\/\/\S+/gi);
-        if (url){
-            embed.setImage(url[0]);
-        }
     }
 
     if(message.attachment.size > 0){
