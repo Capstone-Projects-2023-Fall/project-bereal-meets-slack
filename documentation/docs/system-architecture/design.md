@@ -176,31 +176,213 @@ Prompts ||--|{ Responses : ""
 ```
 ## Sequence Diagrams
 
+**Use Case #1**: Owner of the Discord Server Configures the BeReal bot
 <details>
-  <summary>
-    Usecase 1:
-  </summary>
-  1. Owner signs in to Discord  
-  2. Owner opens the server "Preferences".  
-  3. Owner selects "Apps and Integrations" and installs the BeReal bot.  
-  4. Owner assigns roles and privileges to users in the community.  
-  5. Owner defines moderation and content guidelines.  
+<summary>
+Use Case 1 Discription
+</summary>
+  
+  1. Owner signs in to Discord.
+  2. Owner opens the server "Preferences". 
+  3. Owner selects "Apps and Integrations" and installs the BeReal bot.
+  4. Owner assigns roles and privileges to users in the community.
+  5. Owner defines moderation and content guidelines.
   6. Owner defines type of prompts for BeReal bot to send properly suit the culture and vibe of their community.  
-  7. Owner configures the schedule for BeReal bot, defining the hours when the it will send prompts.  
-  8. Owner sets the duration for prompt responses to remain in the chat.  
-  9. Owner sets the amount of time users have to respond to prompt notification.  
-  10. Owner saves the configuration settings.  
+  7. Owner configures the schedule for BeReal bot, defining the hours when the it will send prompts.
+  8. Owner sets the duration for prompt responses to remain in the chat.
+  9. Owner sets the amount of time users have to respond to prompt notification.
+  10. Owner saves the configuration settings.
+      
 </details>
 
-![Sequence Diagram 1](https://cdn.discordapp.com/attachments/1158176482569494568/1158237338221162556/Screen_Shot_2023-10-01_at_11.01.34_PM.png?ex=651b8414&is=651a3294&hm=64e7d144c9382697335076073cdd675565e9635a527c612978334f64166c7c1a&)
+```mermaid
 
-![Sequence Diagram 2](https://cdn.discordapp.com/attachments/1158176482569494568/1158237386623430796/Screen_Shot_2023-10-01_at_11.01.48_PM.png?ex=651b841f&is=651a329f&hm=a635eee997369eba307166f4ce3e27570a2a2153e721ea3f188f0677782cde91&)
+sequenceDiagram
+    participant Owner as Owner
+    participant Discord as Discord Server
+    participant BeRealBot as BeReal Bot
+    participant Database as Configuration Database
 
-![Sequence Diagram 3](https://cdn.discordapp.com/attachments/1158176482569494568/1158237435608707092/Screen_Shot_2023-10-01_at_11.02.00_PM.png?ex=651b842b&is=651a32ab&hm=2e797a3213ae347d91b4da7140a2f0793f467013deaf1b55e9b37dd0ff4645ca&)
+    Owner ->> Discord: Open server "Preferences"
+    activate Discord
+    Owner ->> Discord: Select "Apps and Integrations"
+    Discord ->> BeRealBot: Install BeReal bot
+    deactivate Discord
+    activate BeRealBot
+    Owner ->> BeRealBot: Assign roles and privileges
+    Owner ->> BeRealBot: Define moderation and content guidelines
+    Owner ->> BeRealBot: Define prompts culture and vibe
+    Owner ->> BeRealBot: Configure schedule for prompts
+    Owner ->> BeRealBot: Set duration for prompt responses
+    Owner ->> BeRealBot: Set response time limit
+    BeRealBot ->> Database: Save configuration settings
+    deactivate BeRealBot
+    Database -->> BeRealBot: Confirmation
+    activate Database
+    BeRealBot -->> Owner: Configuration settings saved
+    deactivate Database
 
-![Sequence Diagram 4](https://cdn.discordapp.com/attachments/1158176482569494568/1158237490910597120/Screen_Shot_2023-10-01_at_11.02.13_PM.png?ex=651b8438&is=651a32b8&hm=94d1998b4b779cec3beddca54a8a0a63baa724b85b87767120bb5e82ad49a1df&)
+```
+<br/><br/>
 
-![Sequence Diagram 5](https://cdn.discordapp.com/attachments/1158176482569494568/1158237540818620516/Screen_Shot_2023-10-01_at_11.02.25_PM.png?ex=651b8444&is=651a32c4&hm=d488e68106cb8d0857f6f22401cdcc93fec4ce58b5777e21fa4dc727e590c63b&)
+**Use Case #2**: User Responds to a BeReal bot Prompt
+<details>
+<summary>
+Use Case 2 Discription
+</summary>
+  
+  1. User in the Discord community receives a notification at a random time of day that they have received a prompt from the BeReal bot
+  2. User opens Discord.
+  3. User responds to the random prompt by taking a picture and uploading it.
+  4. User replies to the BeReal bot with their response to the prompt, which is sent to the moderator.
+  5. User waits for approval status from the BeReal bot.
+      
+</details>
+
+```mermaid
+
+sequenceDiagram
+    participant User as Discord User
+    participant BeRealBot as BeReal Bot
+    participant Moderator as Moderator
+    participant Database as Response Database
+
+    User ->> User: Receive BeReal bot prompt notification
+    User ->> User: Respond to prompt by taking a picture
+    User ->> BeRealBot: Reply to the BeReal bot with the image
+    BeRealBot ->> Moderator: Send user's response to moderator
+    Moderator ->> Database: Review user's response
+    Database -->> Moderator: Response approval status
+    Moderator -->> BeRealBot: Send approval status
+    BeRealBot -->> User: Display approval status
+
+```
+<br/><br/>
+
+**Use Case #3**: User Does Not Respond to a BeReal bot Prompt
+<details>
+<summary>
+Use Case 3 Discription
+</summary>
+  
+  1. The BeReal bot waits until timeout The BeReal bot sends a notification to the Discord user
+  2. BeReal bot recognizes the user’s failure to respond, and sends a reminder notification to the users about the missed prompt.
+      
+</details>
+
+```mermaid
+
+sequenceDiagram
+    participant BeRealBot as BeReal Bot
+    participant User as Discord User
+
+    BeRealBot ->> BeRealBot: Wait until timeout
+    BeRealBot ->> User: Send a notification
+    User ->> User: Receive notification
+    User -->> BeRealBot: Acknowledge notification
+    BeRealBot ->> BeRealBot: Recognize user's failure to respond
+    BeRealBot ->> User: Send a reminder notification
+
+```
+<br/><br/>
+
+**Use Case #4**: User-Submission approved
+<details>
+<summary>
+Use Case 4 Discription
+</summary>
+  
+  1. BeReal bot receives the approval decision
+  2. BeReal bot posts the image with the caption and notifies the user
+  3. BeReal bot logs emoji reactions, threaded replies, and comments from the community
+  4. BeReal bot sends logs to the server
+      
+</details>
+
+```mermaid
+
+sequenceDiagram
+    participant BeRealBot as BeReal Bot
+    participant Moderators as Moderators
+    participant User as Discord User
+    participant Server as Discord Server
+
+    Moderators -->> BeRealBot: Approval decision
+    BeRealBot ->> BeRealBot: Process approval decision
+    BeRealBot ->> BeRealBot: Retrieve image and caption
+    BeRealBot ->> BeRealBot: Notify user
+    BeRealBot ->> User: Post image with caption
+    User ->> Server: Post image with caption
+    User ->> User: React with emoji, thread replies, and comment
+    BeRealBot ->> BeRealBot: Log emoji reactions, threaded replies, and comments
+    BeRealBot ->> Server: Send logs
+
+
+```
+<br/><br/>
+
+**Use Case #5**: User’s submission is denied
+<details>
+<summary>
+Use Case 5 Discription
+</summary>
+  
+  1. User receives a notification that the post was not approved and is asked to resubmit with feedback
+  2. User resubmits the image
+  3. User receives a notification that the post was approved and it was posted
+      
+</details>
+
+```mermaid
+
+sequenceDiagram
+    participant User as Discord User
+    participant BeRealBot as BeReal Bot
+    participant Moderator as Moderator
+
+    User ->> BeRealBot: Receives a notification that the post was not approved
+    BeRealBot -->> User: Notifies the user to resubmit the image with feedback
+    User ->> User: Resubmits the image with necessary changes
+    BeRealBot ->> Moderator: Notifies the moderator about the resubmission
+    Moderator -->> BeRealBot: Reviews the resubmitted image
+    Moderator -->> BeRealBot: Approves the resubmitted image
+    BeRealBot -->> User: Notifies the user that the post was approved and posted
+
+
+```
+<br/><br/>
+
+**Use Case #6**: User Reacts to a New Post Notification
+<details>
+<summary>
+Use Case 6 Discription
+</summary>
+  
+  1. A user in the Discord community is notified by the BeReal bot that another user has posted a response to a prompt.
+  2. User opens Discord to view the response in the Discord community channel
+  3. User interacts with the post by leaving a comment or a reaction(likes, emojis, etc)
+
+</details>
+
+```mermaid
+
+sequenceDiagram
+    participant User as Discord User
+    participant BeRealBot as BeReal Bot
+    participant Community as Discord Community
+
+    User ->> BeRealBot: Receives a new post notification
+    User ->> Discord: Opens Discord to view the post
+    BeRealBot -->> User: Displays the new post in the Discord channel
+    User ->> BeRealBot: Interacts with the post (e.g., leaves a comment or reacts with emojis)
+    BeRealBot ->> Community: Updates the post with user interactions
+    Community -->> BeRealBot: Views reactions and comments on the post
+    BeRealBot ->> BeRealBot: Collects data on reactions and comments
+
+
+
+```
+<br/><br/>
 
 ![Sequence Diagram 6](https://cdn.discordapp.com/attachments/1158176482569494568/1158237782037237820/Screen_Shot_2023-10-01_at_11.03.21_PM.png?ex=651b847e&is=651a32fe&hm=fcf069c658390ca156bbed7c35e4d62131da2d5c69a67afddb15c99c53fef0b3&)
 
