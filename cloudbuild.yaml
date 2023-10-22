@@ -5,30 +5,39 @@ steps:
    
    # Step 1: Clone the GitHub repository
   - name: 'gcr.io/cloud-builders/git'
-    args: ['clone', 'https://github.com/Capstone-Projects-2023-Fall/project-bereal-meets-slack.git', 'main']
+    args: ['clone', 'https://github.com/Capstone-Projects-2023-Fall/project-bereal-meets-slack.git', 'app']
 
   # Step 2: Install Node.js and npm
   - name: 'gcr.io/cloud-builders/npm'
     args: ['install']
-    dir: 'main'  # Set the working directory to the cloned repository
+    dir: 'app'  # Set the working directory to the cloned repository
 
+  # Step 3: create .env
   - name: 'gcr.io/cloud-builders/gcloud'
     entrypoint: 'bash'
     args:
       - -c
-      - touch main/.env
+      - touch app/.env
 
+  # Step 4: fill out .env from the secrets
   - name: 'gcr.io/cloud-builders/gcloud'
     entrypoint: 'bash'
     args:
       - -c
-      - echo $$env > main/.env
+      - echo $$env > app/.env
     secretEnv: ['env']
+
+  # Step 5: Build a docker image using the code.  
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-t', 'gcr.io/berealbot/berealbotdeploy', '.']
+    dir: 'app'
 
 availableSecrets:
    secretManager: 
      - versionName: 'projects/380272145905/secrets/env/versions/latest'
        env: 'env'
-    
+
+images:
+   - 'gcr.io/berealbot/berealbotdeploy'
 
 timeout: '900s'  # Set a timeout for the build in seconds
