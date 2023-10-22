@@ -5,6 +5,7 @@ const fs = require('fs');
 const registrar = require('./commandregistrar'); 
 const cron = require('node-cron');
 const moment = require('moment-timezone');
+const notifyMods = require('./.github/utils/notifyMods');
 
 const TOKEN = process.env.DISCORD_TOKEN;
 
@@ -52,6 +53,15 @@ client.on('ready', () => {
 
 client.on('messageCreate', async msg => {
 	if (msg.author.bot) { return; }
+
+    if (msg.channel.id === 'submissions'){
+        try{
+            await notifyMods(msg.guild, msg.content);
+        } catch (error){
+            console.error('Error notifying moderator:', error);
+        }
+    }
+    
     if (msg.content === 'ping') {
         msg.reply('pong');
     }
