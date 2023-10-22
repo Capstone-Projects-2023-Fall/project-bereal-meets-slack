@@ -15,12 +15,12 @@ async function notifyMods(guild, message){
     //Embedd message to include images
     const embed = new EmbedBuilder()
         .setTitle('New Submission!') //title of embedded message
-        .setDescription(`New Submission from ${message.author.tag}`) //who submitted post
+        .setDescription(`New Submission `) //who submitted post
         .setColor('#000000')
     
     if (message.content){
         //include text from post with image
-        embed.addField('Post:', message.content);
+        embed.addFields('Post:', message.content);
 
         //check for an image url and embed it
         const url = message.content.match(/\bhttps?:\/\/\S+/gi);
