@@ -25,14 +25,14 @@ async function notifyMods(guild, message){
 
     if(message.attachment.size > 0){
         //if theres an attachment, include it
-        const image = message.attachment.first(); //get the first attachment
+        const image = message.attachments.first(); //get the first attachment
         embed.setImage(image.url); //embed image 
     }
 
     //Send DM to all mods
     for (const moderator of moderators.values()){
         try{
-            await moderator.send(content);
+            await moderator.send({ embeds: [embed] });
         } catch (error){
             console.error(`Could not send DM to ${moderator.user.tag}.`, error);
         }
