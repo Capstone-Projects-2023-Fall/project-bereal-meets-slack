@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "mocha",
+    "start": "node ./bot.js",
     "startdev": "nodemon ./bot.js"
   },
   "repository": {
