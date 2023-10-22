@@ -58,7 +58,7 @@ client.on('messageCreate', async msg => {
         try{
             await notifyMods(msg.guild, msg.content);
         } catch (error){
-            console.error('Error notifying moderator:', error);
+            console.error(`Error notifying moderator:`, error);
         }
     }
     
