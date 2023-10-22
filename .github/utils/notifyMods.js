@@ -10,14 +10,14 @@ async function notifyMods(guild, submissionDetails){
     //Fetch memebrs with mod all role 
     const moderators = guild.members.cache.filter(member => member.roles.cache.has(modRole.id));
 
-    const content = 'New submission: ${submissionDetails}';
+    const content = `New submission: ${submissionDetails}`;
 
     //Send DM to all mods
     for (const moderator of moderators.values()){
         try{
             await moderator.send(content);
         } catch (error){
-            console.error('Cold not send DM to ${moderator.user.tag}.', error);
+            console.error(`Could not send DM to ${moderator.user.tag}.`, error);
         }
     }
 }
