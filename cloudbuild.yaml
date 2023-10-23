@@ -12,29 +12,14 @@ steps:
     args: ['install']
     dir: 'app'  # Set the working directory to the cloned repository
 
-  # Step 3: create .env
-  - name: 'gcr.io/cloud-builders/gcloud'
-    entrypoint: 'bash'
-    args:
-      - -c
-      - touch app/.env
-
-  # Step 4: fill out .env from the secrets
-  - name: 'gcr.io/cloud-builders/gcloud'
-    entrypoint: 'bash'
-    args:
-      - -c
-      - echo $$env > app/.env
-    secretEnv: ['env']
-
-  # Step 5: create DockerFile
+  # Step 3: create DockerFile
   - name: 'gcr.io/cloud-builders/gcloud'
     entrypoint: 'bash'
     args:
       - -c
       - touch app/Dockerfile
 
-  # Step 6: fill out DockerFile
+  # Step 4: fill out DockerFile
   - name: 'gcr.io/cloud-builders/gcloud'
     entrypoint: 'bash'
     args:
@@ -52,8 +37,10 @@ steps:
 
 availableSecrets:
    secretManager: 
-     - versionName: 'projects/380272145905/secrets/env/versions/latest'
-       env: 'env'
+     - versionName: 'projects/380272145905/secrets/API_TOKEN/versions/latest'
+       env: 'DISCORD_TOKEN'
+     - versionName: 'projects/380272145905/secrets/CLIENT_ID/versions/latest'
+       env: 'DISCORD_CLIENT_ID'
 
 images:
    - 'us-central1-docker.pkg.dev/berealbot/berealbotdeploy/deployimage'
