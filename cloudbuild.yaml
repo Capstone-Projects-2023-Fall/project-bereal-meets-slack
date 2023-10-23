@@ -32,14 +32,14 @@ steps:
     entrypoint: 'bash'
     args:
       - -c
-      - touch app/DockerFile
+      - touch app/Dockerfile
 
   # Step 6: fill out DockerFile
   - name: 'gcr.io/cloud-builders/gcloud'
     entrypoint: 'bash'
     args:
       - -c
-      - echo -e "FROM node:18\n\nCOPY package.json /app/package.json\nWORKDIR /app\nRUN npm install\n\nCOPY . /app\n\nCMD ["node", "start"]" > app/DockerFile
+      - echo -e "FROM node:18\n\nCOPY package.json /app/package.json\nWORKDIR /app\nRUN npm install\n\nCOPY . /app\n\nCMD ["node", "start"]" > app/Dockerfile
     secretEnv: ['env']
 
   # Step 5: Build a docker image using the code.  
