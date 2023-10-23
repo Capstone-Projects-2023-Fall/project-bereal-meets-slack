@@ -42,6 +42,9 @@ availableSecrets:
      - versionName: 'projects/380272145905/secrets/CLIENT_ID/versions/latest'
        env: 'DISCORD_CLIENT_ID'
 
+options:
+   logging: CLOUD_LOGGING_ONLY
+
 images:
    - 'us-central1-docker.pkg.dev/berealbot/berealbotdeploy/deployimage'
 
