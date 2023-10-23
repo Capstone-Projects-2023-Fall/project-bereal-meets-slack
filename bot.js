@@ -6,6 +6,22 @@ const registrar = require('./commandregistrar');
 const cron = require('node-cron');
 const moment = require('moment-timezone');
 const notifyMods = require('./.github/utils/notifyMods');
+const http = require('http');
+
+//for cloud run, serverless application needs a server to listen.
+const port = 8080;
+
+const server = http.createServer((req, res) => {
+// Set the response HTTP header with HTTP status and Content type
+res.writeHead(200, {'Content-Type': 'text/plain'});
+// Send the response body "Hello World"
+res.end('BeRealBot lives here\n');
+});
+
+server.listen(port, () => {
+console.log('Hello world listening on port', port);
+});
+
 
 const TOKEN = process.env.DISCORD_TOKEN;
 

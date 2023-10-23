@@ -46,9 +46,8 @@ function registercommands(){
         { body: commands },
       );
   
-      console.log(`Successfully reloaded ${data.length} application (/) commands.`);
+      console.log(`Successfully reloaded ${data} application (/) commands.`);
     } catch (error) {
-      // And of course, make sure you catch and log any errors!
       console.error(error);
   }
 }
