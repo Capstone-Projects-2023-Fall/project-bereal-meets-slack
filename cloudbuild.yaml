@@ -35,12 +35,6 @@ steps:
   - name: 'gcr.io/cloud-builders/docker'
     args: ['push', 'us-central1-docker.pkg.dev/berealbot/berealbotdeploy/deployimage']
 
-availableSecrets:
-   secretManager: 
-     - versionName: 'projects/380272145905/secrets/API_TOKEN/versions/latest'
-       env: 'DISCORD_TOKEN'
-     - versionName: 'projects/380272145905/secrets/CLIENT_ID/versions/latest'
-       env: 'DISCORD_CLIENT_ID'
 
 options:
    logging: CLOUD_LOGGING_ONLY
