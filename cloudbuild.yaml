@@ -44,12 +44,12 @@ steps:
 
   # Step 5: Build a docker image using the code.  
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['build', '-t', 'gcr.io/berealbot/berealbotdeploy', '.']
+    args: ['build', '-t', 'us-central1-docker.pkg.dev/berealbot/berealbotdeploy', '.']
     dir: 'app'
     
   # Step 6: Push the Docker container to Google Container Registry
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['push', 'gcr.io/berealbot/berealbotdeploy']
+    args: ['push', 'us-central1-docker.pkg.dev/berealbot/berealbotdeploy']
 
 availableSecrets:
    secretManager: 
