@@ -27,6 +27,21 @@ steps:
       - echo $$env > app/.env
     secretEnv: ['env']
 
+  # Step 5: create DockerFile
+  - name: 'gcr.io/cloud-builders/gcloud'
+    entrypoint: 'bash'
+    args:
+      - -c
+      - touch app/DockerFile
+
+  # Step 6: fill out DockerFile
+  - name: 'gcr.io/cloud-builders/gcloud'
+    entrypoint: 'bash'
+    args:
+      - -c
+      - echo -e "FROM node:18\n\nCOPY package.json /app/package.json\nWORKDIR /app\nRUN npm install\n\nCOPY . /app\n\nCMD ["node", "start"]" > app/DockerFile
+    secretEnv: ['env']
+
   # Step 5: Build a docker image using the code.  
   - name: 'gcr.io/cloud-builders/docker'
     args: ['build', '-t', 'gcr.io/berealbot/berealbotdeploy', '.']
