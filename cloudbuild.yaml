@@ -40,7 +40,6 @@ steps:
     args:
       - -c
       - echo -e "FROM node:18\n\nCOPY package.json /app/package.json\nWORKDIR /app\nRUN npm install\n\nCOPY . /app\n\nCMD [\"npm\", \"run\", \"startdev\"]" > app/Dockerfile
-    secretEnv: ['env']
 
   # Step 5: Build a docker image using the code.  
   - name: 'gcr.io/cloud-builders/docker'
@@ -57,6 +56,6 @@ availableSecrets:
        env: 'env'
 
 images:
-   - 'gcr.io/berealbot/berealbotdeploy'
+   - 'us-central1-docker.pkg.dev/berealbot/berealbotdeploy/deployimage'
 
 timeout: '900s'  # Set a timeout for the build in seconds
