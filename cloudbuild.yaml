@@ -44,7 +44,7 @@ steps:
 
   # Step 5: Build a docker image using the code.  
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['build', '-t', 'deployimage', '.']
+    args: ['build', '-t', 'us-central1-docker.pkg.dev/berealbot/berealbotdeploy/deployimage', '.']
     dir: 'app'
     
   # Step 6: Push the Docker container to Google Container Registry
