@@ -15,10 +15,10 @@ Tests to demonstrate each use-case based on the use-case descriptions and the se
   </tr>
   <tr>
     <td>1</td>
-    <td>Test if owner successful adds bot into the workspace. <br/> <br/> Test that all the guidelines, roles, and settings of server are configured and saved correctly. </td>
+    <td>Test if owner successful adds bot into the server. <br/> <br/> Test that all the guidelines, roles, and settings of server are configured and saved correctly. </td>
     <td>
       <ol>
-        <li>Test moderator signing into workspace </li>
+        <li>Test moderator signing into server </li>
         <li>Owner accesses “preferences”</li>
         <li>Owner selects “apps and integration” Install the bot, verifies if installation is successful</li>
         <li>Owner assigns roles and privileges within the community, validates that assigned roles and privileges are correctly reflected</li>
@@ -30,28 +30,28 @@ Tests to demonstrate each use-case based on the use-case descriptions and the se
         <li>Confirms that settings are saved | Assert that actions taken by owner are successful and expected settings are configured and saved correctly</li>
       </ol>
     </td>
-    <td> Assert that actions taken by owner are successful and expected settings are configured and saved correctly <br/><br/> Overall bot should be successfully configured in the workspace </td>
+    <td> Assert that actions taken by owner are successful and expected settings are configured and saved correctly <br/><br/> Overall bot should be successfully configured in the server </td>
   </tr>
   <tr>
     <td>2</td>
     <td> 
-         Test if slack bot successfully prompted user <br/><br/>
+         Test if BeReal bot successfully prompted user <br/><br/>
          Test If user responded, If bot got user response and if it is sent to the moderator <br/><br/>
-         Test If user can get approval status from slackbot
+         Test If user can get approval status from BeReal bot
     </td>
     <td>      
       <ol>
         <li>Stimulate of notification sent and user receiving notification</li>
-        <li>User opens slack</li>
+        <li>User opens Discord</li>
         <li>User responds to random prompt by taking a photo and uploading it</li>
-        <li>User sends text response to slack bot</li>
+        <li>User sends text response to BeReal bot</li>
         <li>Moderator is sent the user’s response via the bot, for review</li>
-        <li>Slack user waits for approval status from bot, to see whether response was approved or not (test waits for reasonable time and checks for arrival of this status)</li>
+        <li>Discord user waits for approval status from bot, to see whether response was approved or not (test waits for reasonable time and checks for arrival of this status)</li>
       </ol>
     </td>
     <td>
       Assert that moderator receive user’s response for review <br/><br/>
-      Slack user receives approval status or feedback from slackbot within reasonable time 
+      Discord user receives approval status or feedback from BeReal bot within reasonable time 
     </td>
   </tr>
   <tr>
@@ -123,8 +123,8 @@ Tests to demonstrate each use-case based on the use-case descriptions and the se
     </td>
     <td>
       <ol>
-        <li>A user in the Slack community is notified by the Slackbot that another user has posted a response to a prompt. </li>
-        <li>User opens Slack to view the response in the Slack community channel</li>
+        <li>A user in the Discord community is notified by the BeReal bot that another user has posted a response to a prompt. </li>
+        <li>User opens Discord to view the response in the Discord community channel</li>
         <li>User interacts with the post by leaving a comment or a reaction(likes, emojis, etc)</li>
       </ol>
     </td>
@@ -148,20 +148,20 @@ Tests to demonstrate each use-case based on the use-case descriptions and the se
   <tr>
     <td>8</td>
     <td> 
-      Test that the moderator can log into slack, is able to run a command to request data in csv format, and is able to export reaction data for further analysis <br/><br/>
+      Test that the moderator can log into Discord, is able to run a command to request data in csv format, and is able to export reaction data for further analysis <br/><br/>
       That the moderator can run a command to see reaction data, as well as being able to receive data visualizations from the bot
     </td>
     <td>
       <h4>Main Testing Flow</h4>
       <ol>
-        <li>Moderator logs into Slack</li>
+        <li>Moderator logs into Discord</li>
         <li>Moderator runs datacsv command from bot</li>
         <li>Moderator exports reaction data, and recieves a CSV</li>
       </ol> 
       <br/><br/>
       <h4>Alternate Testing Flow</h4>
       <ol>
-        <li>Moderator logs into Slack</li>
+        <li>Moderator logs into Discord</li>
         <li>Moderator runs datavis command from bot</li>
         <li>Moderator receives data visualizations from bot</li>
       </ol>
@@ -178,7 +178,7 @@ Tests to demonstrate each use-case based on the use-case descriptions and the se
     <td>
       <ol>
         <li>Moderator receives notification about a user submission</li>
-        <li>Moderator opens slack</li>
+        <li>Moderator opens Discord</li>
         <li>Marks Submission as approved or denied</li>
         <li>Recieves a confirmation</li>
       </ol>
@@ -199,9 +199,9 @@ Tests to demonstrate each use-case based on the use-case descriptions and the se
     <td>
       <ol>
         <li>Bot is repeatedly ignored to a set limit</li>
-        <li>Slack Bot sends a warning notification about the bad behavior.</li>
-        <li>Slack Bot notifies moderators about the bad behavior and asks if they want to add the user to the blacklist.</li>
-        <li>Slack Bot logs the action.</li>
+        <li>BeReal bot sends a warning notification about the bad behavior.</li>
+        <li>BeReal bot notifies moderators about the bad behavior and asks if they want to add the user to the blacklist.</li>
+        <li>BeReal bot logs the action.</li>
       </ol>
     </td>
     <td>
