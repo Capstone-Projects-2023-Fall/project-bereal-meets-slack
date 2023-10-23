@@ -39,7 +39,7 @@ steps:
     entrypoint: 'bash'
     args:
       - -c
-      - echo -e "FROM node:18\n\nCOPY package.json /app/package.json\nWORKDIR /app\nRUN npm install\n\nCOPY . /app\n\nCMD ["node", "start"]" > app/Dockerfile
+      - echo -e "FROM node:18\n\nCOPY package.json /app/package.json\nWORKDIR /app\nRUN npm install\n\nCOPY . /app\n\nCMD ["npm", "run", "startdev"]" > app/Dockerfile
     secretEnv: ['env']
 
   # Step 5: Build a docker image using the code.  
