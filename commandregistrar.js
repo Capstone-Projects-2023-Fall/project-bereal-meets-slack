@@ -42,7 +42,7 @@ function registercommands(){
   
       // The put method is used to fully refresh all commands in the guild with the current set
       const data = rest.put(
-        Routes.applicationGuildCommands(CLIENT_ID, GUILD_ID),
+        Routes.applicationGuildCommands(CLIENT_ID, 1150951348754456607),
         { body: commands },
       );
   
