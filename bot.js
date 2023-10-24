@@ -70,7 +70,7 @@ client.on('ready', () => {
 client.on('messageCreate', async msg => {
 	if (msg.author.bot) { return; }
 
-    if (msg.channel.id === 1165442182937841684){
+    if (msg.channel.id === "1165442182937841684"){
         try{
             await notifyMods(msg.guild, msg.content, msg.author, msg.attachments);
         } catch (error){
