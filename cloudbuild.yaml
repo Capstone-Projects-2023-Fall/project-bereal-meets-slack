@@ -74,9 +74,13 @@ steps:
       - 'create'
       - 'http'
       - 'GET-berealbot'
-      --schedule='* * * * *'
-      --http-method='GET'
-      --uri='https://berealbot-huu2d6kw5a-uc.a.run.app'
+      - >-
+        --schedule='* * * * *'
+      - >-
+        --http-method='GET'
+      - >-
+        --uri='https://berealbot-huu2d6kw5a-uc.a.run.app'
+    entrypoint: gcloud
   
 
 options:
