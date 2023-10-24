@@ -66,9 +66,13 @@ steps:
     id: Deploy
     entrypoint: gcloud
 
-
 options:
    logging: CLOUD_LOGGING_ONLY
+
+availableSecrets:
+  secretManager:
+  - versionName: projects/berealbot/secrets/env/versions/latest
+    env: 'env'
 
 images:
    - 'us-central1-docker.pkg.dev/berealbot/berealbotdeploy/deployimage'
