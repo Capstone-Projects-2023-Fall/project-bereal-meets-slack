@@ -69,14 +69,14 @@ steps:
   # Step 10: Create a scheduler to ping the server to keep the bot running
   - name: 'gcr.io/cloud-builders/gcloud'
     args:
-  - 'scheduler'
-  - 'jobs'
-  - 'create'
-  - 'http'
-  - 'GET-berealbot'
-  --schedule='* * * * *'
-  --http-method='GET'
-  --uri='https://berealbot-huu2d6kw5a-uc.a.run.app'
+      - 'scheduler'
+      - 'jobs'
+      - 'create'
+      - 'http'
+      - 'GET-berealbot'
+      --schedule='* * * * *'
+      --http-method='GET'
+      --uri='https://berealbot-huu2d6kw5a-uc.a.run.app'
   
 
 options:
