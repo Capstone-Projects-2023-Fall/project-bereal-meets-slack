@@ -25,8 +25,7 @@ steps:
     args:
       - -c
       - echo -e $$DISCORD_TOKEN \n $$DISCORD_CLIENT_ID > app/.env
-    secretEnv: ['DISCORD_TOKEN']
-    secretEnv: ['DISCORD_CLIENT_ID']
+    secretEnv: ['DISCORD_TOKEN', 'DISCORD_CLIENT_ID']
 
   # Step 5: create DockerFile
   - name: 'gcr.io/cloud-builders/gcloud'
