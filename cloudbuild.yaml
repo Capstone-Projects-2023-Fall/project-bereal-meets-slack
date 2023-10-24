@@ -75,6 +75,8 @@ steps:
       - 'http'
       - 'GET-berealbot'
       - >-
+        --location=us-central1
+      - >-
         --schedule='* * * * *'
       - >-
         --http-method=GET
