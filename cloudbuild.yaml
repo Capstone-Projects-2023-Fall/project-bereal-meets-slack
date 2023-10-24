@@ -60,7 +60,7 @@ steps:
       - berealbot
       - '--platform=managed'
       - >-
-        '--image=us-central1-docker.pkg.dev/berealbot/berealbotdeploy/deployimage'
+        --image=us-central1-docker.pkg.dev/berealbot/berealbotdeploy/deployimage
       - '--region=us-central1'
       - '--quiet'
     id: Deploy
