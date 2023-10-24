@@ -77,7 +77,7 @@ steps:
       - >-
         --location=us-central1
       - >-
-        --schedule='* * * * *'
+        --schedule=* * * * *
       - >-
         --http-method=GET
       - >-
