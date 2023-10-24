@@ -12,7 +12,23 @@ steps:
     args: ['install']
     dir: 'app'  # Set the working directory to the cloned repository
 
-  # Step 3: create DockerFile
+
+  # Step 3: create .env
+  - name: 'gcr.io/cloud-builders/gcloud'
+    entrypoint: 'bash'
+    args:
+      - -c
+      - touch app/.env
+
+  # Step 4: fill out .env from the secrets
+  - name: 'gcr.io/cloud-builders/gcloud'
+    entrypoint: 'bash'
+    args:
+      - -c
+      - echo -e $$env > app/.env
+    secretEnv: ['env']
+
+  # Step 5: create DockerFile
   - name: 'gcr.io/cloud-builders/gcloud'
     entrypoint: 'bash'
     args:
@@ -41,5 +57,8 @@ options:
 
 images:
    - 'us-central1-docker.pkg.dev/berealbot/berealbotdeploy/deployimage'
+
+options:
+   logging: CLOUD_LOGGING_ONLY
 
 timeout: '900s'  # Set a timeout for the build in seconds

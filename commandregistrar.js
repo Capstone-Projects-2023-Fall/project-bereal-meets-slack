@@ -5,7 +5,7 @@ const fs = require('fs');
 const path = require('node:path');
 
 const { REST } = require('@discordjs/rest')
-const { Routes } = require('discord.js');
+const { Routes, Guild } = require('discord.js');
 
 const TOKEN = process.env.DISCORD_TOKEN;
 const CLIENT_ID = process.env.DISCORD_CLIENT_ID;
