@@ -11,9 +11,6 @@ const TOKEN = process.env.DISCORD_TOKEN;
 const CLIENT_ID = process.env.DISCORD_CLIENT_ID;
 const GUILD_ID = process.env.DISCORD_GUILD_ID;
 
-
-console.log(GUILD_ID);
-
 const commands = [];
 
 // Grab all the command files from the commands directory 
@@ -45,7 +42,7 @@ function registercommands(){
   
       // The put method is used to fully refresh all commands in the guild with the current set
       const data = rest.put(
-        Routes.applicationGuildCommands(CLIENT_ID, "1150951348754456607"),
+        Routes.applicationGuildCommands(CLIENT_ID, GUILD_ID),
         { body: commands },
       );
   

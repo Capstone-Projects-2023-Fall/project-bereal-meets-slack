@@ -24,8 +24,8 @@ steps:
     entrypoint: 'bash'
     args:
       - -c
-      - echo -e $$DISCORD_TOKEN\n$$DISCORD_CLIENT_ID > app/.env
-    secretEnv: ['DISCORD_TOKEN', 'DISCORD_CLIENT_ID']
+      - echo -e $$env > app/.env
+    secretEnv: ['env']
 
   # Step 5: create DockerFile
   - name: 'gcr.io/cloud-builders/gcloud'
@@ -52,10 +52,8 @@ steps:
 
 availableSecrets:
    secretManager: 
-     - versionName: 'projects/380272145905/secrets/API_TOKEN/versions/latest'
-       env: 'DISCORD_TOKEN'
-     - versionName: 'projects/380272145905/secrets/CLIENT_ID/versions/latest'
-       env: 'DISCORD_CLIENT_ID'
+     - versionName: 'projects/380272145905/secrets/env/versions/latest'
+       env: 'env'
 
 images:
    - 'us-central1-docker.pkg.dev/berealbot/berealbotdeploy/deployimage'
