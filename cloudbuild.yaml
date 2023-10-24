@@ -24,7 +24,7 @@ steps:
     entrypoint: 'bash'
     args:
       - -c
-      - echo -e $$DISCORD_TOKEN\n $$DISCORD_CLIENT_ID > app/.env
+      - echo -e $$DISCORD_TOKEN \n $$DISCORD_CLIENT_ID > app/.env
     secretEnv: ['DISCORD_TOKEN']
     secretEnv: ['DISCORD_CLIENT_ID']
 
