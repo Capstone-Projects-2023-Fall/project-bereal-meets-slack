@@ -24,7 +24,7 @@ steps:
     entrypoint: 'bash'
     args:
       - -c
-      - echo -e $$DISCORD_TOKEN \n $$DISCORD_CLIENT_ID > app/.env
+      - echo -e $$DISCORD_TOKEN\n $$DISCORD_CLIENT_ID > app/.env
     secretEnv: ['DISCORD_TOKEN', 'DISCORD_CLIENT_ID']
 
   # Step 5: create DockerFile
