@@ -15,8 +15,8 @@ describe('Math Operation', function() {
 })
 
 describe('Math Operation', function() {
-  it('add two numbers', () => {
-    const result = 1 + 2;
+  it('add three numbers', () => {
+    const result = 1 + 2 + 3;
     assert.equal(result, 3);
   })
 })

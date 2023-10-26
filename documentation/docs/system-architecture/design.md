@@ -1,17 +1,17 @@
 ---
 sidebar_position: 1
 ---
-# BMS Bot Design Document
+# BeReal Bot Design Document
 
 ## Components
 
 ### Chat Application
 
-The chat application acts as both the user portal for the bot and as the running environment for the bot. The chat application facilitates user interaction with the bot and allows for it to act like a psuedo user that can post and interact with messages. There will be a level of UI/UX design for the bot in slack using both its API & libraries for command and interaction formatting as well as block kit for formatting of modals, popups, and responses. The application will also act as the display for all data visualization that moderators ask for.
+The chat application acts as both the user portal for the bot and as the running environment for the bot. The chat application facilitates user interaction with the bot and allows for it to act like a psuedo user that can post and interact with messages. There will be a level of UI/UX design for the bot in Discord using both its API & libraries for command and interaction formatting as well as block kit for formatting of modals, popups, and responses. The application will also act as the display for all data visualization that moderators ask for.
 
-### BMS Bot 
+### BeReal Bot 
 
-The bot itself is a chatbot that is hosted on Google Cloud via cloud run, as mentioned previous it will act as a pseudo user posting messages and accepting/reacting to user responses with triggers. It interfaces with the slack API to send messages, and interfaces with the database to both store and pull user reaction data. When dealing with moderation the bot will opt to DM moderators and generate either popups, modals, or interfaceable actions for approvals, data requests, or moderation features. When logging data the bot will leverage the server to send data to firebase for storage.
+The bot itself is a chatbot that is hosted on Google Cloud via cloud run, as mentioned previous it will act as a pseudo user posting messages and accepting/reacting to user responses with triggers. It interfaces with the Discord API to send messages, and interfaces with the database to both store and pull user reaction data. When dealing with moderation the bot will opt to DM moderators and generate either popups, modals, or interfaceable actions for approvals, data requests, or moderation features. When logging data the bot will leverage the server to send data to firebase for storage.
 
 ### Google Cloud Webserver
 
@@ -24,13 +24,13 @@ The Firebase database is contained in the cloud webserver and acts as a means of
 ## Class Diagram
 ```mermaid
 classDiagram
-webServer --> bmsBot
+webServer --> BeRealBot
 webServer --> database
 class webServer{
   + generateCSV(int startTime, int endTime)
   + generateDataVis(int startTime, int endTime)
 }
-class bmsBot{
+class BeRealBot{
   + String botName
   + token botToken
   - int startHour
@@ -86,7 +86,7 @@ class database{
 
 }
 ```
-## BMS Bot
+## BeReal Bot
 This class will contain methods that allow the bot to interact with the users and moderator
 
 **Fields**
@@ -176,39 +176,321 @@ Prompts ||--|{ Responses : ""
 ```
 ## Sequence Diagrams
 
+**Use Case #1**: Owner of the Discord Server Configures the BeReal bot
 <details>
-  <summary>
-    Usecase 1:
-  </summary>
-  1. Owner signs in to Slack  
-  2. Owner opens the workspace "Preferences".  
-  3. Owner selects "Apps and Integrations" and installs the BMS bot.  
-  4. Owner assigns roles and privileges to users in the community.  
-  5. Owner defines moderation and content guidelines.  
-  6. Owner defines type of prompts for BMS bot to send properly suit the culture and vibe of their community.  
-  7. Owner configures the schedule for BMS bot, defining the hours when the it will send prompts.  
-  8. Owner sets the duration for prompt responses to remain in the chat.  
-  9. Owner sets the amount of time users have to respond to prompt notification.  
-  10. Owner saves the configuration settings.  
+<summary>
+Use Case 1 Discription
+</summary>
+  
+  1. Owner signs in to Discord.
+  2. Owner opens the server "Preferences". 
+  3. Owner selects "Apps and Integrations" and installs the BeReal bot.
+  4. Owner assigns roles and privileges to users in the community.
+  5. Owner defines moderation and content guidelines.
+  6. Owner defines type of prompts for BeReal bot to send properly suit the culture and vibe of their community.  
+  7. Owner configures the schedule for BeReal bot, defining the hours when the it will send prompts.
+  8. Owner sets the duration for prompt responses to remain in the chat.
+  9. Owner sets the amount of time users have to respond to prompt notification.
+  10. Owner saves the configuration settings.
+      
 </details>
 
-![Sequence Diagram 1](https://cdn.discordapp.com/attachments/1158176482569494568/1158237338221162556/Screen_Shot_2023-10-01_at_11.01.34_PM.png?ex=651b8414&is=651a3294&hm=64e7d144c9382697335076073cdd675565e9635a527c612978334f64166c7c1a&)
+```mermaid
 
-![Sequence Diagram 2](https://cdn.discordapp.com/attachments/1158176482569494568/1158237386623430796/Screen_Shot_2023-10-01_at_11.01.48_PM.png?ex=651b841f&is=651a329f&hm=a635eee997369eba307166f4ce3e27570a2a2153e721ea3f188f0677782cde91&)
+sequenceDiagram
+    participant Owner as Owner
+    participant Discord as Discord Server
+    participant BeRealBot as BeReal Bot
+    participant Database as Configuration Database
 
-![Sequence Diagram 3](https://cdn.discordapp.com/attachments/1158176482569494568/1158237435608707092/Screen_Shot_2023-10-01_at_11.02.00_PM.png?ex=651b842b&is=651a32ab&hm=2e797a3213ae347d91b4da7140a2f0793f467013deaf1b55e9b37dd0ff4645ca&)
+    Owner ->> Discord: Open server "Preferences"
+    activate Discord
+    Owner ->> Discord: Select "Apps and Integrations"
+    Discord ->> BeRealBot: Install BeReal bot
+    deactivate Discord
+    activate BeRealBot
+    Owner ->> BeRealBot: Assign roles and privileges
+    Owner ->> BeRealBot: Define moderation and content guidelines
+    Owner ->> BeRealBot: Define prompts culture and vibe
+    Owner ->> BeRealBot: Configure schedule for prompts
+    Owner ->> BeRealBot: Set duration for prompt responses
+    Owner ->> BeRealBot: Set response time limit
+    BeRealBot ->> Database: Save configuration settings
+    deactivate BeRealBot
+    Database -->> BeRealBot: Confirmation
+    activate Database
+    BeRealBot -->> Owner: Configuration settings saved
+    deactivate Database
 
-![Sequence Diagram 4](https://cdn.discordapp.com/attachments/1158176482569494568/1158237490910597120/Screen_Shot_2023-10-01_at_11.02.13_PM.png?ex=651b8438&is=651a32b8&hm=94d1998b4b779cec3beddca54a8a0a63baa724b85b87767120bb5e82ad49a1df&)
+```
+<br/><br/>
 
-![Sequence Diagram 5](https://cdn.discordapp.com/attachments/1158176482569494568/1158237540818620516/Screen_Shot_2023-10-01_at_11.02.25_PM.png?ex=651b8444&is=651a32c4&hm=d488e68106cb8d0857f6f22401cdcc93fec4ce58b5777e21fa4dc727e590c63b&)
+**Use Case #2**: User Responds to a BeReal bot Prompt
+<details>
+<summary>
+Use Case 2 Discription
+</summary>
+  
+  1. User in the Discord community receives a notification at a random time of day that they have received a prompt from the BeReal bot
+  2. User opens Discord.
+  3. User responds to the random prompt by taking a picture and uploading it.
+  4. User replies to the BeReal bot with their response to the prompt, which is sent to the moderator.
+  5. User waits for approval status from the BeReal bot.
+      
+</details>
 
-![Sequence Diagram 6](https://cdn.discordapp.com/attachments/1158176482569494568/1158237782037237820/Screen_Shot_2023-10-01_at_11.03.21_PM.png?ex=651b847e&is=651a32fe&hm=fcf069c658390ca156bbed7c35e4d62131da2d5c69a67afddb15c99c53fef0b3&)
+```mermaid
 
-![Sequence Diagram 7](https://cdn.discordapp.com/attachments/1158176482569494568/1158237840665227344/Screen_Shot_2023-10-01_at_11.03.36_PM.png?ex=651b848c&is=651a330c&hm=75954aae53a176a0f42a28b76db1fb4b644b5962383e82667911f434ef2c8822&)
+sequenceDiagram
+    participant User as Discord User
+    participant BeRealBot as BeReal Bot
+    participant Moderator as Moderator
+    participant Database as Response Database
 
-![Sequence Diagram 8](https://cdn.discordapp.com/attachments/1158176482569494568/1158237977969958982/Screen_Shot_2023-10-01_at_11.04.09_PM.png?ex=651b84ac&is=651a332c&hm=2c6a27091a0c972aeb5d295fafa13e9a426058b1e21895359df799a3e3c86fe9&)
+    User ->> BeRealBot: Receive BeReal bot prompt notification
+    activate User
+    User ->> BeRealBot: Respond to prompt by taking a picture
+    User ->> BeRealBot: Reply to the BeReal bot with the image
+    BeRealBot ->> Moderator: Send user's response to moderator
+    Moderator ->> Database: Review user's response
+    Database -->> Moderator: Response approval status
+    Moderator -->> BeRealBot: Send approval status
+    BeRealBot -->> User: Display approval status
+    deactivate User
 
-![Sequence Diagram 8 Alt](https://cdn.discordapp.com/attachments/1158176482569494568/1158238081594433686/Screen_Shot_2023-10-01_at_11.04.35_PM.png?ex=651b84c5&is=651a3345&hm=3a33061f226553ef3a82bb64ef9ebd11026cda3ea08b63fea1d7ecd5cdd712c1&)
+```
+<br/><br/>
+
+**Use Case #3**: User Does Not Respond to a BeReal bot Prompt
+<details>
+<summary>
+Use Case 3 Discription
+</summary>
+  
+  1. The BeReal bot waits until timeout The BeReal bot sends a notification to the Discord user
+  2. BeReal bot recognizes the user’s failure to respond, and sends a reminder notification to the users about the missed prompt.
+      
+</details>
+
+```mermaid
+
+sequenceDiagram
+    participant BeRealBot as BeReal Bot
+    participant User as Discord User
+
+    activate BeRealBot
+    BeRealBot ->> BeRealBot: Wait until timeout
+    BeRealBot ->> User: Send a notification
+    activate User
+    User ->> User: Receive notification
+    User -->> BeRealBot: Acknowledge notification
+    deactivate User
+    BeRealBot ->> BeRealBot: Recognize user's failure to respond
+    BeRealBot ->> User: Send a reminder notification
+
+```
+<br/><br/>
+
+**Use Case #4**: User-Submission approved
+<details>
+<summary>
+Use Case 4 Discription
+</summary>
+  
+  1. BeReal bot receives the approval decision
+  2. BeReal bot posts the image with the caption and notifies the user
+  3. BeReal bot logs emoji reactions, threaded replies, and comments from the community
+  4. BeReal bot sends logs to the server
+      
+</details>
+
+```mermaid
+
+sequenceDiagram
+    participant BeRealBot as BeReal Bot
+    participant Moderators as Moderators
+    participant User as Discord User
+    participant Server as Discord Server
+
+    Moderators -->> BeRealBot: Approval decision
+    BeRealBot ->> BeRealBot: Process approval decision
+    BeRealBot ->> BeRealBot: Retrieve image and caption
+    BeRealBot ->> BeRealBot: Notify user
+    BeRealBot ->> User: Post image with caption
+    User ->> Server: Post image with caption
+    User ->> User: React with emoji, thread replies, and comment
+    BeRealBot ->> BeRealBot: Log emoji reactions, threaded replies, and comments
+    BeRealBot ->> Server: Send logs
+
+```
+<br/><br/>
+
+**Use Case #5**: User’s submission is denied
+<details>
+<summary>
+Use Case 5 Discription
+</summary>
+  
+  1. User receives a notification that the post was not approved and is asked to resubmit with feedback
+  2. User resubmits the image
+  3. User receives a notification that the post was approved and it was posted
+      
+</details>
+
+```mermaid
+
+sequenceDiagram
+    participant User as Discord User
+    participant BeRealBot as BeReal Bot
+    participant Moderator as Moderator
+
+    User ->> BeRealBot: Receives a notification that the post was not approved
+    BeRealBot -->> User: Notifies the user to resubmit the image with feedback
+    User ->> User: Resubmits the image with necessary changes
+    BeRealBot ->> Moderator: Notifies the moderator about the resubmission
+    Moderator -->> BeRealBot: Reviews the resubmitted image
+    Moderator -->> BeRealBot: Approves the resubmitted image
+    BeRealBot -->> User: Notifies the user that the post was approved and posted
+
+```
+<br/><br/>
+
+**Use Case #6**: User Reacts to a New Post Notification
+<details>
+<summary>
+Use Case 6 Discription
+</summary>
+  
+  1. A user in the Discord community is notified by the BeReal bot that another user has posted a response to a prompt.
+  2. User opens Discord to view the response in the Discord community channel
+  3. User interacts with the post by leaving a comment or a reaction(likes, emojis, etc)
+
+</details>
+
+```mermaid
+
+sequenceDiagram
+    participant User as Discord User
+    participant BeRealBot as BeReal Bot
+    participant Community as Discord Community
+
+    activate User
+    User ->> BeRealBot: Receives a new post notification
+    User ->> Discord: Opens Discord to view the response
+    BeRealBot -->> User: Displays the new post in the Discord channel
+    User ->> BeRealBot: Interacts with the post (e.g., leaves a comment or reacts with emojis)
+    BeRealBot ->> Community: Updates the post with user interactions
+    Community -->> BeRealBot: Views reactions and comments on the post
+    BeRealBot ->> BeRealBot: Collects data on reactions and comments
+    deactivate User
+
+```
+<br/><br/>
+
+**Use Case #7**: User ignores New Post Notification
+<details>
+<summary>
+Use Case 7 Discription
+</summary>
+  
+  1. A user in the Discord community goes to the settings of the BeReal bot
+  2. User chooses an option to turn off new post notifications.
+  3. The user is no longer sent another post notification.
+
+
+</details>
+
+```mermaid
+
+sequenceDiagram
+    participant User as Discord User
+    participant DiscordInterface as Discord Interface
+    participant BeRealBot as BeReal Bot
+    participant NotificationSettings as Notification Settings
+
+    User ->> DiscordInterface: Opens BeReal Bot settings
+    DiscordInterface -->> User: Notification viewed
+    User ->> DiscordInterface: Accesses Settings
+    DiscordInterface ->> NotificationSettings: Turn Off Notification settings
+    NotificationSettings -->> BeRealBot: Sends updated notification settings
+    BeRealBot -->> DiscordInterface: Forwards the updated settings (OFF)
+    DiscordInterface -->> User: Sent the new notification settings
+    Note over DiscordInterface: User views notifications
+
+```
+<br/><br/>
+
+**Use Case #8**: Moderator Accesses Reaction Data in Database
+<details>
+<summary>
+Use Case 8 Discription
+</summary>
+Normal Flow:
+
+  1. Moderator logs into Discord
+  2. Moderator runs a command to request reaction data in csv format
+  3. Moderator exports reaction data for further analysis, if needed
+
+</details>
+
+```mermaid
+
+sequenceDiagram
+    participant Moderator as Moderator
+    participant Discord as Discord Server
+    participant BeRealBot as BeReal Bot
+    participant Database as Configuration Database
+
+    Moderator ->> Discord: Log into Discord
+    activate Discord
+    Moderator ->> Discord: Run command to request reaction data in CSV format
+    Discord ->> BeRealBot: Send data view command
+    BeRealBot ->> Database: Retrieve reaction data
+    activate BeRealBot
+    Database -->> BeRealBot: Reaction data
+    BeRealBot -->> Discord: Provide reaction data
+    Discord -->> Moderator: Display reaction data
+    deactivate BeRealBot
+    Moderator ->> Moderator: Exports reaction data for further analysis (if needed)
+    deactivate Discord
+
+```
+<details>
+<summary>
+Use Case 8 Alternate Discription
+</summary>
+  
+Alternate Flow:
+
+  1. Moderator logs into Discord
+  2. Moderator runs a command to see reaction data
+  3. Moderator receives data visualizations from bot
+
+</details>
+
+```mermaid
+
+sequenceDiagram
+    participant Moderator as Moderator
+    participant Discord as Discord Server
+    participant BeRealBot as BeReal Bot
+    participant Database as Configuration Database
+
+    Moderator ->> Discord: Log into Discord
+    activate Discord
+    Moderator ->> Discord: Run command to request reaction data in CSV format
+    Discord ->> BeRealBot: Send data view command
+    BeRealBot ->> Database: Retrieve reaction data
+    activate BeRealBot
+    Database -->> BeRealBot: Reaction data in CSV format
+    BeRealBot -->> Discord: Provide reaction data in CSV format
+    Discord -->> Moderator: Display reaction data CSV
+    deactivate BeRealBot
+    Moderator ->> Moderator: Exports reaction data for further analysis (if needed)
+    deactivate Discord
+
+```
+<br/><br/>
 
 ![Sequence Diagram 9](https://cdn.discordapp.com/attachments/1158176482569494568/1158246744417640588/image.png?ex=651b8cd7&is=651a3b57&hm=82005351873047d440493d7523197f984992051a6aee5cebcfba722b27dddc51&)
 

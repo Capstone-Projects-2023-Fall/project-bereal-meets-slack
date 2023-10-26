@@ -3,6 +3,25 @@ const { Client, Collection, Events, GatewayIntentBits } = require('discord.js');
 const path = require('node:path');
 const fs = require('fs');
 const registrar = require('./commandregistrar'); 
+const cron = require('node-cron');
+const moment = require('moment-timezone');
+const notifyMods = require('./.github/utils/notifyMods');
+const http = require('http');
+
+//for cloud run, serverless application needs a server to listen.
+const port = 8080;
+
+const server = http.createServer((req, res) => {
+// Set the response HTTP header with HTTP status and Content type
+res.writeHead(200, {'Content-Type': 'text/plain'});
+// Send the response body "Hello World"
+res.end('BeRealBot lives here\n');
+});
+
+server.listen(port, () => {
+console.log('Hello world listening on port', port);
+});
+
 
 const TOKEN = process.env.DISCORD_TOKEN;
 
@@ -32,18 +51,40 @@ for (const file of commandFiles) {
 }
 
 client.on('ready', () => {
-  console.log(`Logged in as ${client.user.tag}!`);
-  //make sure commands are synced & registered
-  registrar.registercommands();
-}); // when client is ready to listen, log.
+    console.log(`Logged in as ${client.user.tag}!`);
+    
+    const now = moment().tz("America/New_York");
+    if (now.hour() > 12) {// If the bot is started before 12 PM EST, try to schedule for today
+		console.log("Since I was started after 12 PM EST, I might wait till the next day to start") //have this become a message sent into the discord channel
+        schedulePost();
+    }
+    //scheduling for the scheduled post
+    cron.schedule('* 12 * * *', schedulePost, {
+        scheduled: true,
+        timezone: "America/New_York"
+    });
+    registrar.registercommands();
+});
+
 
 client.on('messageCreate', async msg => {
 	if (msg.author.bot) { return; }
+
+    if (msg.channel.id === process.env.DISCORD_SUBMISSION_CHANNEL_ID){
+        try{
+            await notifyMods(msg.guild, msg.content, msg.author, msg.attachments);
+        } catch (error){
+            console.error(`Error notifying moderator:`, error);
+        }
+    }
+    
     if (msg.content === 'ping') {
         msg.reply('pong');
     }
+    else if(msg.content === 'are you alive?'){
+        msg.reply('what gives you that impression?')
+    }
   }); //listens for "ping"
-
 
 //check for ping command.
 client.on(Events.InteractionCreate, async interaction => {
@@ -67,7 +108,26 @@ client.on(Events.InteractionCreate, async interaction => {
 		}
 	}
 });
+function getRandomHour() {
+    return Math.floor(Math.random() * (24 - 14) + 14);
+}
 
-//make sure this line is the last line
-client.login(TOKEN); //login bot using token
+function schedulePost() {
+    const targetHour = getRandomHour();
+    const now = moment().tz("America/New_York");
+    const targetTime = now.clone().hour(targetHour).minute(0).second(0);
+
+    if (now.isAfter(targetTime)) {
+        console.log("Bot was added to discord or started to late, skipping today and only today")
+    }
+
+    const timeDifference = targetTime.diff(now);
+    console.log(`Scheduling post for ${targetHour}:00 EST`);
+
+    setTimeout(() => {
+        console.log("Time to make a post!");
+    }, timeDifference);
+}
+// Make sure this line is the last line
+client.login(TOKEN);
 

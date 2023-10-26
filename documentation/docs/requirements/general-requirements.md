@@ -3,4 +3,4 @@ sidebar_position: 3
 ---
 
 # General Requirements
-1. Slack account
+1. Discord account
