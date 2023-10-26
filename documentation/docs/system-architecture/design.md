@@ -247,14 +247,16 @@ sequenceDiagram
     participant Moderator as Moderator
     participant Database as Response Database
 
-    User ->> User: Receive BeReal bot prompt notification
-    User ->> User: Respond to prompt by taking a picture
+    User ->> BeRealBot: Receive BeReal bot prompt notification
+    activate User
+    User ->> BeRealBot: Respond to prompt by taking a picture
     User ->> BeRealBot: Reply to the BeReal bot with the image
     BeRealBot ->> Moderator: Send user's response to moderator
     Moderator ->> Database: Review user's response
     Database -->> Moderator: Response approval status
     Moderator -->> BeRealBot: Send approval status
     BeRealBot -->> User: Display approval status
+    deactivate User
 
 ```
 <br/><br/>
@@ -276,10 +278,13 @@ sequenceDiagram
     participant BeRealBot as BeReal Bot
     participant User as Discord User
 
+    activate BeRealBot
     BeRealBot ->> BeRealBot: Wait until timeout
     BeRealBot ->> User: Send a notification
+    activate User
     User ->> User: Receive notification
     User -->> BeRealBot: Acknowledge notification
+    deactivate User
     BeRealBot ->> BeRealBot: Recognize user's failure to respond
     BeRealBot ->> User: Send a reminder notification
 
@@ -317,7 +322,6 @@ sequenceDiagram
     BeRealBot ->> BeRealBot: Log emoji reactions, threaded replies, and comments
     BeRealBot ->> Server: Send logs
 
-
 ```
 <br/><br/>
 
@@ -348,7 +352,6 @@ sequenceDiagram
     Moderator -->> BeRealBot: Approves the resubmitted image
     BeRealBot -->> User: Notifies the user that the post was approved and posted
 
-
 ```
 <br/><br/>
 
@@ -371,26 +374,123 @@ sequenceDiagram
     participant BeRealBot as BeReal Bot
     participant Community as Discord Community
 
+    activate User
     User ->> BeRealBot: Receives a new post notification
-    User ->> Discord: Opens Discord to view the post
+    User ->> Discord: Opens Discord to view the response
     BeRealBot -->> User: Displays the new post in the Discord channel
     User ->> BeRealBot: Interacts with the post (e.g., leaves a comment or reacts with emojis)
     BeRealBot ->> Community: Updates the post with user interactions
     Community -->> BeRealBot: Views reactions and comments on the post
     BeRealBot ->> BeRealBot: Collects data on reactions and comments
-
-
+    deactivate User
 
 ```
 <br/><br/>
 
-![Sequence Diagram 6](https://cdn.discordapp.com/attachments/1158176482569494568/1158237782037237820/Screen_Shot_2023-10-01_at_11.03.21_PM.png?ex=651b847e&is=651a32fe&hm=fcf069c658390ca156bbed7c35e4d62131da2d5c69a67afddb15c99c53fef0b3&)
+**Use Case #7**: User ignores New Post Notification
+<details>
+<summary>
+Use Case 7 Discription
+</summary>
+  
+  1. A user in the Discord community goes to the settings of the BeReal bot
+  2. User chooses an option to turn off new post notifications.
+  3. The user is no longer sent another post notification.
 
-![Sequence Diagram 7](https://cdn.discordapp.com/attachments/1158176482569494568/1158237840665227344/Screen_Shot_2023-10-01_at_11.03.36_PM.png?ex=651b848c&is=651a330c&hm=75954aae53a176a0f42a28b76db1fb4b644b5962383e82667911f434ef2c8822&)
 
-![Sequence Diagram 8](https://cdn.discordapp.com/attachments/1158176482569494568/1158237977969958982/Screen_Shot_2023-10-01_at_11.04.09_PM.png?ex=651b84ac&is=651a332c&hm=2c6a27091a0c972aeb5d295fafa13e9a426058b1e21895359df799a3e3c86fe9&)
+</details>
 
-![Sequence Diagram 8 Alt](https://cdn.discordapp.com/attachments/1158176482569494568/1158238081594433686/Screen_Shot_2023-10-01_at_11.04.35_PM.png?ex=651b84c5&is=651a3345&hm=3a33061f226553ef3a82bb64ef9ebd11026cda3ea08b63fea1d7ecd5cdd712c1&)
+```mermaid
+
+sequenceDiagram
+    participant User as Discord User
+    participant DiscordInterface as Discord Interface
+    participant BeRealBot as BeReal Bot
+    participant NotificationSettings as Notification Settings
+
+    User ->> DiscordInterface: Opens BeReal Bot settings
+    DiscordInterface -->> User: Notification viewed
+    User ->> DiscordInterface: Accesses Settings
+    DiscordInterface ->> NotificationSettings: Turn Off Notification settings
+    NotificationSettings -->> BeRealBot: Sends updated notification settings
+    BeRealBot -->> DiscordInterface: Forwards the updated settings (OFF)
+    DiscordInterface -->> User: Sent the new notification settings
+    Note over DiscordInterface: User views notifications
+
+```
+<br/><br/>
+
+**Use Case #8**: Moderator Accesses Reaction Data in Database
+<details>
+<summary>
+Use Case 8 Discription
+</summary>
+Normal Flow:
+
+  1. Moderator logs into Discord
+  2. Moderator runs a command to request reaction data in csv format
+  3. Moderator exports reaction data for further analysis, if needed
+
+</details>
+
+```mermaid
+
+sequenceDiagram
+    participant Moderator as Moderator
+    participant Discord as Discord Server
+    participant BeRealBot as BeReal Bot
+    participant Database as Configuration Database
+
+    Moderator ->> Discord: Log into Discord
+    activate Discord
+    Moderator ->> Discord: Run command to request reaction data in CSV format
+    Discord ->> BeRealBot: Send data view command
+    BeRealBot ->> Database: Retrieve reaction data
+    activate BeRealBot
+    Database -->> BeRealBot: Reaction data
+    BeRealBot -->> Discord: Provide reaction data
+    Discord -->> Moderator: Display reaction data
+    deactivate BeRealBot
+    Moderator ->> Moderator: Exports reaction data for further analysis (if needed)
+    deactivate Discord
+
+```
+<details>
+<summary>
+Use Case 8 Alternate Discription
+</summary>
+  
+Alternate Flow:
+
+  1. Moderator logs into Discord
+  2. Moderator runs a command to see reaction data
+  3. Moderator receives data visualizations from bot
+
+</details>
+
+```mermaid
+
+sequenceDiagram
+    participant Moderator as Moderator
+    participant Discord as Discord Server
+    participant BeRealBot as BeReal Bot
+    participant Database as Configuration Database
+
+    Moderator ->> Discord: Log into Discord
+    activate Discord
+    Moderator ->> Discord: Run command to request reaction data in CSV format
+    Discord ->> BeRealBot: Send data view command
+    BeRealBot ->> Database: Retrieve reaction data
+    activate BeRealBot
+    Database -->> BeRealBot: Reaction data in CSV format
+    BeRealBot -->> Discord: Provide reaction data in CSV format
+    Discord -->> Moderator: Display reaction data CSV
+    deactivate BeRealBot
+    Moderator ->> Moderator: Exports reaction data for further analysis (if needed)
+    deactivate Discord
+
+```
+<br/><br/>
 
 ![Sequence Diagram 9](https://cdn.discordapp.com/attachments/1158176482569494568/1158246744417640588/image.png?ex=651b8cd7&is=651a3b57&hm=82005351873047d440493d7523197f984992051a6aee5cebcfba722b27dddc51&)
 
