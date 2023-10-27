@@ -29,6 +29,7 @@
     "luxon": "^3.4.3",
     "moment-timezone": "^0.5.43",
     "node-cron": "^3.0.2",
+    "node-localstorage": "^3.0.5",
     "nodemon": "^3.0.1"
   },
   "devDependencies": {
