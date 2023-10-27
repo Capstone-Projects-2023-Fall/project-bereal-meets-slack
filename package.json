@@ -23,13 +23,15 @@
   },
   "homepage": "https://github.com/Capstone-Projects-2023-Fall/project-bereal-meets-slack#readme",
   "dependencies": {
+    "@google-cloud/cloud-sql-connector": "^1.1.0",
     "axios": "^1.5.1",
     "dotenv": "^16.3.1",
     "fs": "^0.0.1-security",
-    "node-localstorage": "^3.0.5",
     "luxon": "^3.4.3",
     "moment-timezone": "^0.5.43",
+    "mysql2": "^3.6.2",
     "node-cron": "^3.0.2",
+    "node-localstorage": "^3.0.5",
     "nodemon": "^3.0.1"
   },
   "devDependencies": {
