@@ -34,15 +34,15 @@ function setTimeRange(interaction) {
     const startTime = interaction.options.getString('start-time');
     const endTime = interaction.options.getString('end-time');
 
-    localStorage.setItem('activeHours_${guild.id}', JSON.stringify ({startTime, endTime}));
+    localStorage.setItem('activeHours', JSON.stringify ({startTime, endTime}));
 
     //response to the user with a confirmation message
-    const reply = 'Active hours set from ${startTime} to ${endTime}'
+    const reply = `Active hours set from ${startTime} to ${endTime}`;
     interaction.reply(reply);
 }
 
 //exports the time range command data 
 module.exports= {
-    data: timeRangeCommand.toJSON(),
+    data: timeRangeCommand,
     execute: setTimeRange,
 };
