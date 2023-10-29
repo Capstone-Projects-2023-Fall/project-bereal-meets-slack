@@ -53,11 +53,12 @@ client.on('ready', () => {
     console.log(`Logged in as ${client.user.tag}!`);
     const now = moment().tz("America/New_York");
     if (now.hour() > 12) {// If the bot is started before 12 PM EST, try to schedule for today
-        client.channels.cache.get(process.env.DISCORD_SUBMISSION_CHANNEL_ID).send("Since I was started after 12 PM EST, I might wait till the next day to start")
-        schedulePost();
+        //client.channels.cache.get(process.env.DISCORD_SUBMISSION_CHANNEL_ID).send("It's after 12PM, Scheduling post tomorrow.")
+        console.log("scheduling post tomorrow");
+        //schedulePost();
     }
     //scheduling for the scheduled post
-    cron.schedule('* 12 * * *', schedulePost, {
+    cron.schedule('0 12 * * *', schedulePost, {
         scheduled: true,
         timezone: "America/New_York"
     });
@@ -74,13 +75,6 @@ client.on('messageCreate', async msg => {
         } catch (error){
             console.error(`Error notifying moderator:`, error);
         }
-    }
-    
-    if (msg.content === 'ping') {
-        msg.reply('pong');
-    }
-    else if(msg.content === 'are you alive?'){
-        msg.reply('what gives you that impression?')
     }
   }); //listens for "ping"
 
