@@ -8,10 +8,12 @@ module.exports = {
 		.setName('blacklist')
 		.setDescription('Blacklist a user from using the bot')
         .addSubcommand(command => command.setName('add').setDescription('Add user to the blacklist').addStringOption(option => option.setName('user').setDescription('The user ID you want to blacklist').setRequired(true)))
-        .addSubcommand(command => command.setName('remove').setDescription('Remove user from the blacklist').addStringOption(option => option.setName('user').setDescription('The user ID you want to remove from the blacklist').setRequired(true))),
+        .addSubcommand(command => command.setName('remove').setDescription('Remove user from the blacklist').addStringOption(option => option.setName('user').setDescription('The user ID you want to remove from the blacklist').setRequired(true)))
+        .addSubcommand(command => command.setName('list').setDescription('List users in the blacklist')),
         async execute (interaction){
             const {options} = interaction;
-            if (interaction.user.id !== '514962222674477066') return await interaction.reply({ content: 'Only **moderators** can use this command', ephemeral: true});
+            const modRole = interaction.guild.roles.cache.find(role => role.name === 'bot mod');
+            if (!(interaction.member.roles.cache.has(modRole.id))) return await interaction.reply({ content: 'Only **moderators** can use this command', ephemeral: true});
 
             const user = options.getString('user');
             const sub = options.getSubcommand();
@@ -47,7 +49,7 @@ module.exports = {
                 }
                 break;
 
-                default:
+                case 'list':
                 //Print the contents of the blacklistSet
                 const blacklistArray = Array.from(blacklistSet);
                  if (blacklistArray.length === 0) {
