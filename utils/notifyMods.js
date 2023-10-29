@@ -6,7 +6,7 @@ async function notifyMods(guild, content, author, attachments) {
 
     //Get role for mods
     //const modRole = guild.roles.cache.find(role => role.name === 'mod all');
-    const modRole = guild.roles.cache.find(role => role.name === 'administrator'); //maybe admin
+    const modRole = guild.roles.cache.find(role => role.name === 'bot mod'); //the current role name is bot mod for testing purpsoes
     await guild.members.fetch();
 
     if (!modRole) {
