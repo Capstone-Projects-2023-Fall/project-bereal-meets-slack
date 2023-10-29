@@ -22,7 +22,6 @@ server.listen(port, () => {
 console.log('Hello world listening on port', port);
 });
 
-
 const TOKEN = process.env.DISCORD_TOKEN;
 
 const client = new Client({ 
@@ -52,10 +51,9 @@ for (const file of commandFiles) {
 
 client.on('ready', () => {
     console.log(`Logged in as ${client.user.tag}!`);
-    
     const now = moment().tz("America/New_York");
     if (now.hour() > 12) {// If the bot is started before 12 PM EST, try to schedule for today
-		console.log("Since I was started after 12 PM EST, I might wait till the next day to start") //have this become a message sent into the discord channel
+        client.channels.cache.get(process.env.DISCORD_SUBMISSION_CHANNEL_ID).send("Since I was started after 12 PM EST, I might wait till the next day to start")
         schedulePost();
     }
     //scheduling for the scheduled post
@@ -118,14 +116,14 @@ function schedulePost() {
     const targetTime = now.clone().hour(targetHour).minute(0).second(0);
 
     if (now.isAfter(targetTime)) {
-        console.log("Bot was added to discord or started to late, skipping today and only today")
+        client.channels.cache.get(process.env.DISCORD_SUBMISSION_CHANNEL_ID).send("Bot was added to discord or started too late, skipping today and only today")  
     }
 
     const timeDifference = targetTime.diff(now);
     console.log(`Scheduling post for ${targetHour}:00 EST`);
 
     setTimeout(() => {
-        console.log("Time to make a post!");
+        client.channels.cache.get(process.env.DISCORD_SUBMISSION_CHANNEL_ID).send("Time to make a post!")       
     }, timeDifference);
 }
 // Make sure this line is the last line
