@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, Embed } = require('discord.js');
+const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 
 // Create a Set to store blacklisted user IDs
 const blacklistSet = new Set();
@@ -11,7 +11,6 @@ module.exports = {
         .addSubcommand(command => command.setName('remove').setDescription('Remove user from the blacklist').addStringOption(option => option.setName('user').setDescription('The user ID you want to remove from the blacklist').setRequired(true))),
         async execute (interaction){
             const {options} = interaction;
-             // Check if the user invoking the command is a moderator
             if (interaction.user.id !== '514962222674477066') return await interaction.reply({ content: 'Only **moderators** can use this command', ephemeral: true});
 
             const user = options.getString('user');
