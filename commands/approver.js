@@ -1,5 +1,5 @@
 const { AttachmentBuilder, ComponentType, SlashCommandBuilder } = require('discord.js');
-const notifyMods = require('../notifyMods.js')
+const notifyMods = require('../utils/notifyMods.js')
 
 module.exports = {
 	data: new SlashCommandBuilder()
