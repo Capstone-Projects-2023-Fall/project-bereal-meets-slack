@@ -1,5 +1,6 @@
 const { SlashCommandBuilder, Embed } = require('discord.js');
 
+// Create a Set to store blacklisted user IDs
 const blacklistSet = new Set();
 
 module.exports = {
@@ -10,6 +11,7 @@ module.exports = {
         .addSubcommand(command => command.setName('remove').setDescription('Remove user from the blacklist').addStringOption(option => option.setName('user').setDescription('The user ID you want to remove from the blacklist').setRequired(true))),
         async execute (interaction){
             const {options} = interaction;
+             // Check if the user invoking the command is a moderator
             if (interaction.user.id !== '514962222674477066') return await interaction.reply({ content: 'Only **moderators** can use this command', ephemeral: true});
 
             const user = options.getString('user');
@@ -17,7 +19,7 @@ module.exports = {
             
             switch(sub) {
                 case 'add':
-                
+                // Check if the user is not in the blacklist
                 if(!blacklistSet.has(user)){
                     blacklistSet.add(user);
 
@@ -32,7 +34,7 @@ module.exports = {
 
                 break;
                 case 'remove':
-                
+                // Check if the user is not in the blacklist
                 if (blacklistSet.has(user)) {
                     blacklistSet.delete(user);
 
@@ -45,6 +47,15 @@ module.exports = {
                     return await interaction.reply({ content: `The user \`${user}\` is not on the blacklist.`, ephemeral: true });
                 }
                 break;
+
+                default:
+                //Print the contents of the blacklistSet
+                const blacklistArray = Array.from(blacklistSet);
+                 if (blacklistArray.length === 0) {
+                await interaction.reply({ content: 'The blacklist is empty.', ephemeral: true });
+                 } else {
+                     await interaction.reply({ content: `Users on the blacklist: ${blacklistArray.join(', ')}`, ephemeral: true });
+                    }
             }
         }
 };
