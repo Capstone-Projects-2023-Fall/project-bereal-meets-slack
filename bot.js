@@ -5,7 +5,7 @@ const fs = require('fs');
 const registrar = require('./commandregistrar'); 
 const cron = require('node-cron');
 const moment = require('moment-timezone');
-const notifyMods = require('.//utils/notifyMods');
+const notifyMods = require('./utils/notifyMods');
 const http = require('http');
 
 //for cloud run, serverless application needs a server to listen.
