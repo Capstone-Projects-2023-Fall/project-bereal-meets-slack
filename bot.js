@@ -5,7 +5,7 @@ const fs = require('fs');
 const registrar = require('./commandregistrar'); 
 const cron = require('node-cron');
 const moment = require('moment-timezone');
-const notifyMods = require('./.github/utils/notifyMods');
+const notifyMods = require('./utils/notifyMods');
 const http = require('http');
 
 //for cloud run, serverless application needs a server to listen.
@@ -21,7 +21,6 @@ res.end('BeRealBot lives here\n');
 server.listen(port, () => {
 console.log('Hello world listening on port', port);
 });
-
 
 const TOKEN = process.env.DISCORD_TOKEN;
 
@@ -52,14 +51,14 @@ for (const file of commandFiles) {
 
 client.on('ready', () => {
     console.log(`Logged in as ${client.user.tag}!`);
-    
     const now = moment().tz("America/New_York");
     if (now.hour() > 12) {// If the bot is started before 12 PM EST, try to schedule for today
-		console.log("Since I was started after 12 PM EST, I might wait till the next day to start") //have this become a message sent into the discord channel
-        schedulePost();
+        //client.channels.cache.get(process.env.DISCORD_SUBMISSION_CHANNEL_ID).send("It's after 12PM, Scheduling post tomorrow.")
+        console.log("scheduling post tomorrow");
+        //schedulePost();
     }
     //scheduling for the scheduled post
-    cron.schedule('* 12 * * *', schedulePost, {
+    cron.schedule('0 12 * * *', schedulePost, {
         scheduled: true,
         timezone: "America/New_York"
     });
@@ -76,13 +75,6 @@ client.on('messageCreate', async msg => {
         } catch (error){
             console.error(`Error notifying moderator:`, error);
         }
-    }
-    
-    if (msg.content === 'ping') {
-        msg.reply('pong');
-    }
-    else if(msg.content === 'are you alive?'){
-        msg.reply('what gives you that impression?')
     }
   }); //listens for "ping"
 
@@ -118,14 +110,14 @@ function schedulePost() {
     const targetTime = now.clone().hour(targetHour).minute(0).second(0);
 
     if (now.isAfter(targetTime)) {
-        console.log("Bot was added to discord or started to late, skipping today and only today")
+        client.channels.cache.get(process.env.DISCORD_SUBMISSION_CHANNEL_ID).send("Bot was added to discord or started too late, skipping today and only today")  
     }
 
     const timeDifference = targetTime.diff(now);
     console.log(`Scheduling post for ${targetHour}:00 EST`);
 
     setTimeout(() => {
-        console.log("Time to make a post!");
+        client.channels.cache.get(process.env.DISCORD_SUBMISSION_CHANNEL_ID).send("Time to make a post!")       
     }, timeDifference);
 }
 // Make sure this line is the last line

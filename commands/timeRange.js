@@ -35,7 +35,6 @@ function setTimeRange(interaction) {
     const endTime = interaction.options.getString('end-time');
 
     localStorage.setItem(`activeHours_${guild.id}`, JSON.stringify ({startTime, endTime}));
-
     //response to the user with a confirmation message
     const reply = `Active hours set from ${startTime} to ${endTime}`
     interaction.reply(reply);

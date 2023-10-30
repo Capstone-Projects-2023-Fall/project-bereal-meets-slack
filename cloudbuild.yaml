@@ -35,30 +35,47 @@ steps:
       - -c
       - touch app/Dockerfile
 
-  # Step 4: fill out DockerFile
+  # Step 6: fill out DockerFile
   - name: 'gcr.io/cloud-builders/gcloud'
     entrypoint: 'bash'
     args:
       - -c
-      - echo -e "FROM node:18\n\nCOPY package.json /app/package.json\nWORKDIR /app\nRUN npm install\n\nCOPY . /app\n\nCMD [\"npm\", \"run\", \"startdev\"]" > app/Dockerfile
+      - echo -e "FROM node:18\n\nCOPY package.json /app/package.json\nWORKDIR /app\nRUN npm install\n\nCOPY . /app\n\nCMD [\"npm\", \"start\"]" > app/Dockerfile
 
-  # Step 5: Build a docker image using the code.  
+  # Step 7: Build a docker image using the code.  
   - name: 'gcr.io/cloud-builders/docker'
     args: ['build', '-t', 'us-central1-docker.pkg.dev/berealbot/berealbotdeploy/deployimage', '.']
     dir: 'app'
     
-  # Step 6: Push the Docker container to Google Container Registry
+  # Step 8: Push the Docker container to Google Container Registry
   - name: 'gcr.io/cloud-builders/docker'
     args: ['push', 'us-central1-docker.pkg.dev/berealbot/berealbotdeploy/deployimage']
+  
+  # Step 9: Update deployment
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk:slim'
+    args:
+      - run
+      - services
+      - update
+      - berealbot
+      - '--platform=managed'
+      - >-
+        --image=us-central1-docker.pkg.dev/berealbot/berealbotdeploy/deployimage
+      - '--region=us-central1'
+      - '--quiet'
+    id: Deploy
+    entrypoint: gcloud
 
 
 options:
    logging: CLOUD_LOGGING_ONLY
+
+availableSecrets:
+  secretManager:
+  - versionName: projects/berealbot/secrets/env/versions/latest
+    env: 'env'
 
 images:
    - 'us-central1-docker.pkg.dev/berealbot/berealbotdeploy/deployimage'
-
-options:
-   logging: CLOUD_LOGGING_ONLY
 
 timeout: '900s'  # Set a timeout for the build in seconds
