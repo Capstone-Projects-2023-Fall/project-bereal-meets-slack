@@ -1,13 +1,36 @@
 const { SlashCommandBuilder } = require('discord.js');
 const { LocalStorage } = require('node-localstorage');
+const dbconn = require('../utils/dbconn.js');
 
 const localStorage = new LocalStorage('./data');
 const promptArray = JSON.parse(localStorage.getItem('prompts')) || [];
 
+const pool = dbconn.createConnectionPoolLocal();
+
+function fetchPromptsList(callback) {
+  pool.query("SELECT prompt_text FROM bot.prompts", (err, data) => {
+    if (err) {
+      console.error(err);
+      return;
+    }
+    dbprompts = data;
+    if (callback) {
+      callback(dbprompts);
+    }
+  });
+}
+
 function addPrompt(prompt) {
   promptArray.push(prompt);
   localStorage.setItem('prompts', JSON.stringify(promptArray));
-  return `Prompt "${prompt}" has been added to the list. Current prompts: ${promptArray.join(', ')}`;
+
+  pool.query(`INSERT INTO bot.prompts (prompt_text)VALUES('${prompt}')`, (err) => {
+    if(err) {
+      console.error(err);
+      return;
+    }
+  });
+  return `Prompt "${prompt}" has been added to the list.`;
 }
 
 function deletePrompt(promptToDelete, isDeletePrompt = true) {

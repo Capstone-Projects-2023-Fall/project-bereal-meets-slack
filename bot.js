@@ -52,13 +52,13 @@ for (const file of commandFiles) {
 client.on('ready', () => {
     console.log(`Logged in as ${client.user.tag}!`);
     const now = moment().tz("America/New_York");
-    if (now.hour() > 12) {// If the bot is started before 12 PM EST, try to schedule for today
-        //client.channels.cache.get(process.env.DISCORD_SUBMISSION_CHANNEL_ID).send("It's after 12PM, Scheduling post tomorrow.")
+    if (now.hour() > 8) {// If the bot is started before 12 PM EST, try to schedule for today
+        //client.channels.cache.get(process.env.DISCORD_SUBMISSION_CHANNEL_ID).send("It's after 8AM, Scheduling post tomorrow.")
         console.log("scheduling post tomorrow");
         //schedulePost();
     }
     //scheduling for the scheduled post
-    cron.schedule('0 12 * * *', schedulePost, {
+    cron.schedule('0 8 * * *', schedulePost, {
         scheduled: true,
         timezone: "America/New_York"
     });
@@ -117,8 +117,9 @@ function schedulePost() {
     console.log(`Scheduling post for ${targetHour}:00 EST`);
 
     setTimeout(() => {
-        client.channels.cache.get(process.env.DISCORD_SUBMISSION_CHANNEL_ID).send("Time to make a post!")       
+        client.channels.cache.get(process.env.DISCORD_SUBMISSION_CHANNEL_ID).send("@userx {prompt} use /submit to post your submission");
     }, timeDifference);
+
 }
 // Make sure this line is the last line
 client.login(TOKEN);
