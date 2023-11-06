@@ -104,6 +104,13 @@ function getRandomHour() {
     return Math.floor(Math.random() * (24 - 14) + 14);
 }
 
+//this is a function to send a notification to the users in a channel
+function sendNotification(channelId, message) {
+    const channel = client.channels.cache.get(channelId);
+    if (channel) {
+      channel.send(message);
+    }
+  }
 function schedulePost() {
     const targetHour = getRandomHour();
     const now = moment().tz("America/New_York");
@@ -117,7 +124,8 @@ function schedulePost() {
     console.log(`Scheduling post for ${targetHour}:00 EST`);
 
     setTimeout(() => {
-        client.channels.cache.get(process.env.DISCORD_SUBMISSION_CHANNEL_ID).send("Time to make a post!")       
+        client.channels.cache.get(process.env.DISCORD_SUBMISSION_CHANNEL_ID).send("Time to make a post!")   
+        sendNotification(process.env.DISCORD_SUBMISSION_CHANNEL_ID, "New submission is posted!")    
     }, timeDifference);
 }
 // Make sure this line is the last line
