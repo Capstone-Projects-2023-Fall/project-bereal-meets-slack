@@ -24,6 +24,30 @@ console.log('Hello world listening on port', port);
 
 const TOKEN = process.env.DISCORD_TOKEN;
 
+class Timer {
+    constructor() {
+        this.startTime = null;
+        this.endTime = null;
+    }
+    start() {
+        this.startTime = Date.now();
+        this.endTime = null; // Reset the end time in case start is called again before stop
+    }
+    stop() {
+        if (this.startTime === null) {
+            throw new Error("Timer was stopped without being started.");
+        }
+        this.endTime = Date.now();
+        const elapsedSeconds = (this.endTime - this.startTime) / 1000;
+        this.startTime = null; // Reset the start time for the next use
+        return elapsedSeconds;
+    }
+    isRunning() {
+        return this.startTime !== null;
+    }
+}
+const timer = new Timer(); //create a timer object
+
 const client = new Client({ 
     intents: [
     GatewayIntentBits.Guilds,
@@ -52,11 +76,6 @@ for (const file of commandFiles) {
 client.on('ready', () => {
     console.log(`Logged in as ${client.user.tag}!`);
     const now = moment().tz("America/New_York");
-    if (now.hour() > 12) {// If the bot is started before 12 PM EST, try to schedule for today
-        //client.channels.cache.get(process.env.DISCORD_SUBMISSION_CHANNEL_ID).send("It's after 12PM, Scheduling post tomorrow.")
-        console.log("scheduling post tomorrow");
-        //schedulePost();
-    }
     //scheduling for the scheduled post
     cron.schedule('0 12 * * *', schedulePost, {
         scheduled: true,
@@ -64,19 +83,6 @@ client.on('ready', () => {
     });
     registrar.registercommands();
 });
-
-
-client.on('messageCreate', async msg => {
-	if (msg.author.bot) { return; }
-
-    if (msg.channel.id === process.env.DISCORD_SUBMISSION_CHANNEL_ID){
-        try{
-            await notifyMods(msg.guild, msg.content, msg.author, msg.attachments);
-        } catch (error){
-            console.error(`Error notifying moderator:`, error);
-        }
-    }
-  }); //listens for "ping"
 
 //check for ping command.
 client.on(Events.InteractionCreate, async interaction => {
@@ -116,10 +122,35 @@ function schedulePost() {
     const timeDifference = targetTime.diff(now);
     console.log(`Scheduling post for ${targetHour}:00 EST`);
 
-    setTimeout(() => {
-        client.channels.cache.get(process.env.DISCORD_SUBMISSION_CHANNEL_ID).send("Time to make a post!")       
+    setTimeout(() => {  
+        client.sendMessageWithTimer(process.env.DISCORD_SUBMISSION_CHANNEL_ID, "Time to make a post!"); //sendMessageWithTimer allows you to keep track of when you want the timer to start and end by the next bot message
     }, timeDifference);
 }
+
+client.sendMessageWithTimer = async (channelId, content) => {
+    timer.start(); // Ensure the timer starts when the message is sent
+    const channel = await client.channels.cache.get(channelId);
+    if (!channel) {
+        throw new Error("Channel not found");
+    }
+    await channel.send(content);
+    console.log("Message sent and timer started.");
+};
+
+client.on('messageCreate', async msg => {
+    // Check if the message is from the bot itself
+    if (msg.author.id === client.user.id) {
+        // Check if the message is in the specified channel
+        if (msg.channel.id === process.env.DISCORD_SUBMISSION_CHANNEL_ID) {
+            // If the timer is running, stop it and log the time
+            if (timer.isRunning()) {
+                const elapsedSeconds = timer.stop();
+                console.log(`timeToRespond: ${elapsedSeconds} seconds.`); //TODO: Make this fill into the DB as timeToRespond
+            }
+        }
+    }
+});
+
 // Make sure this line is the last line
 client.login(TOKEN);
 
