@@ -108,9 +108,24 @@ function getRandomHour() {
 function sendNotification(channelId, message) {
     const channel = client.channels.cache.get(channelId);
     if (channel) {
-      channel.send(message);
+        // this should fetch the server members
+        channel.guild.members.fetch().then((members) => {
+            const memberIds = members.map((member) => member.user.id);
+
+            // this should now mention all members in the message
+            const mentions = memberIds.map((userId) => `<@${userId}>`).join(' ');
+            // this should send out a noti
+            channel.send(`${mentions} ${message}`).then((sentMessage) => {
+                console.log(`Notification sent to channel ${channel.name}: ${sentMessage.content}`);
+            })
+            .catch((error) => {
+                console.error(`Error sending notification: ${error}`);
+            });
+        });
+    } else {
+        console.error(`Channel with ID ${channelId} not found in cache.`);
     }
-  }
+}
 function schedulePost() {
     const targetHour = getRandomHour();
     const now = moment().tz("America/New_York");
@@ -124,8 +139,8 @@ function schedulePost() {
     console.log(`Scheduling post for ${targetHour}:00 EST`);
 
     setTimeout(() => {
-        client.channels.cache.get(process.env.DISCORD_SUBMISSION_CHANNEL_ID).send("Time to make a post!")   
-        sendNotification(process.env.DISCORD_SUBMISSION_CHANNEL_ID, "New submission is posted!")    
+        client.channels.cache.get(process.env.DISCORD_SUBMISSION_CHANNEL_ID).send("Time to make a post!")
+        sendNotification(process.env.DISCORD_SUBMISSION_CHANNEL_ID, "New submission is posted!")
     }, timeDifference);
 }
 // Make sure this line is the last line
