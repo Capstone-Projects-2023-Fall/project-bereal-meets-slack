@@ -18,6 +18,10 @@ module.exports = {
             const user = options.getString('user');
             const sub = options.getSubcommand();
             
+            if(blacklistSet.has(user)){
+                return await interaction.reply({content: `\`${user}\` you are blacklisted and cannot use this command`, ephemeral: true});
+            }
+
             switch(sub) {
                 case 'add':
                 // Check if the user is not in the blacklist
