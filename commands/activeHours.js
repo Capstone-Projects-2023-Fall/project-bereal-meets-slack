@@ -1,30 +1,35 @@
 const {SlashCommandBuilder} = require ('discord.js');
-const {LocalStorage} = require ('node-localstorage');
+const {Pool} = require ('pg');
 
-const localStorage = new LocalStorage('./data');
+const pool = new Pool({
+    connectionString: process.env.INSTANCE_CONNECTION_NAME
+});
 
 //new slash command to view active hours 
 const activeHoursCommand = new SlashCommandBuilder()
     .setName('activehours')
-    .setDescription('view active hours for prompts');
+    .setDescription('View active hours for prompts');
 
 //function for viewing active hours
-function getActiveHours(interaction) {
+async function getActiveHours(interaction) {
     const guildId = interaction.guild.id;
-    //this will get the active hours
-    const activeHours = JSON.parse (localStorage.getItem(`activeHours_${guildId}`));
+    //this will get the active hours from DB
+    const queryText = 'SELECT start_time, end_time FROM operating_hours WHERE guild_id = $1';
+    try{
+        const res = await pool.query(queryText, [guildId]);
+        //If no active hours are set
+        if (res.rows.length === 0) {
+            await interaction.reply("No Active Hours Set");
+            return;
+        }
 
-    //incase no active hours are set
-    if (!activeHours) {
-        const reply = "No Active Hours SET";
-        interaction.reply(reply);
-        return;
+        const {start_time, end_time} = res.rows[0];
+        //Active hours
+        await interaction.reply(`Active hours are set from ${start-time} to ${end-time}`);
+    } catch (error) {
+        console.error('Failed to retrieve active hours:', error);
+        await interaction.reply('Failed to retrieve active hours.');
     }
-
-    const { startTime, endTime } = activeHours;
-    //will state the active hours
-    const reply = `Active hours are set from ${startTime} to ${endTime}`;
-    interaction.repl(reply);
 }
 
 //will export command data
