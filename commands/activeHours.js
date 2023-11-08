@@ -1,8 +1,11 @@
 const {SlashCommandBuilder} = require ('discord.js');
 const {Pool} = require ('pg');
 
+//connection string
+const connectionString = `postgresql://${process.env.DB_USER}:${process.env.DB_PASS}@${process.env.DB_HOST}/${process.env.DB_NAME}`;
+
 const pool = new Pool({
-    connectionString: process.env.INSTANCE_CONNECTION_NAME
+    connectionString: connectionString
 });
 
 //new slash command to view active hours 
