@@ -55,12 +55,12 @@ for (const file of commandFiles) {
 client.on('ready', async () => {
     console.log(`Logged in as ${client.user.tag}!`);
     
-    /*
-    This is to test that the bot @Random User
+    
+    //This is to test that the bot @Random User
     const list = client.guilds.cache.get(process.env.DISCORD_GUILD_ID);
     const userRand = await outputUsers(list);
-    client.channels.cache.get(process.env.DISCORD_SUBMISSION_CHANNEL_ID).send(`Random User: <@${userRand}>`);
-    */
+    client.channels.cache.get(process.env.DISCORD_SUBMISSION_CHANNEL_ID).send(`<@${userRand}> It is time to make a post!`);
+    
 
     const now = moment().tz("America/New_York");
     if (now.hour() > 12) {// If the bot is started before 12 PM EST, try to schedule for today
@@ -130,7 +130,7 @@ function schedulePost() {
     setTimeout(() => {
         const list = client.guilds.cache.get(process.env.DISCORD_GUILD_ID);
         const userRand = outputUsers(list);
-        client.channels.cache.get(process.env.DISCORD_SUBMISSION_CHANNEL_ID).send(`Random User: <@${userRand}>`);
+        client.channels.cache.get(process.env.DISCORD_SUBMISSION_CHANNEL_ID).send(`<@${userRand}> It is time to make a post!`);
                
     }, timeDifference);
 }
