@@ -1,5 +1,5 @@
 require('dotenv').config(); //initialize dotenv
-const { Client, Collection, Events, GatewayIntentBits } = require('discord.js');
+const { Client, Collection, Events, GatewayIntentBits, channelLink } = require('discord.js');
 const path = require('node:path');
 const fs = require('fs');
 const registrar = require('./commandregistrar'); 
@@ -7,6 +7,9 @@ const cron = require('node-cron');
 const moment = require('moment-timezone');
 const notifyMods = require('./utils/notifyMods');
 const http = require('http');
+const { checkServerIdentity } = require('node:tls');
+const { channel } = require('node:diagnostics_channel');
+const outputUsers = require('./utils/promptRandom');
 
 //for cloud run, serverless application needs a server to listen.
 const port = 8080;
@@ -49,8 +52,16 @@ for (const file of commandFiles) {
 	}
 }
 
-client.on('ready', () => {
+client.on('ready', async () => {
     console.log(`Logged in as ${client.user.tag}!`);
+    
+    /*
+    This is to test that the bot @Random User
+    const list = client.guilds.cache.get(process.env.DISCORD_GUILD_ID);
+    const userRand = await outputUsers(list);
+    client.channels.cache.get(process.env.DISCORD_SUBMISSION_CHANNEL_ID).send(`Random User: <@${userRand}>`);
+    */
+
     const now = moment().tz("America/New_York");
     if (now.hour() > 12) {// If the bot is started before 12 PM EST, try to schedule for today
         //client.channels.cache.get(process.env.DISCORD_SUBMISSION_CHANNEL_ID).send("It's after 12PM, Scheduling post tomorrow.")
@@ -117,7 +128,10 @@ function schedulePost() {
     console.log(`Scheduling post for ${targetHour}:00 EST`);
 
     setTimeout(() => {
-        client.channels.cache.get(process.env.DISCORD_SUBMISSION_CHANNEL_ID).send("Time to make a post!")       
+        const list = client.guilds.cache.get(process.env.DISCORD_GUILD_ID);
+        const userRand = outputUsers(list);
+        client.channels.cache.get(process.env.DISCORD_SUBMISSION_CHANNEL_ID).send(`Random User: <@${userRand}>`);
+               
     }, timeDifference);
 }
 // Make sure this line is the last line
