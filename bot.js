@@ -7,6 +7,8 @@ const cron = require('node-cron');
 const moment = require('moment-timezone');
 const notifyMods = require('./utils/notifyMods');
 const http = require('http');
+const database = require('./utils/databasePrompts');
+
 
 //for cloud run, serverless application needs a server to listen.
 const port = 8080;
@@ -104,7 +106,7 @@ function getRandomHour() {
     return Math.floor(Math.random() * (24 - 14) + 14);
 }
 
-function schedulePost() {
+async function schedulePost() {
     const targetHour = getRandomHour();
     const now = moment().tz("America/New_York");
     const targetTime = now.clone().hour(targetHour).minute(0).second(0);
@@ -115,6 +117,15 @@ function schedulePost() {
 
     const timeDifference = targetTime.diff(now);
     console.log(`Scheduling post for ${targetHour}:00 EST`);
+
+    //this should fetch a random prompt from database
+    const randomPrompt = await database.getRandomPrompt();
+    
+    if (randomPrompt) {
+        client.channels.cache.get(process.env.DISCORD_SUBMISSION_CHANNEL_ID).send(`**Random Prompt:**\n${randomPrompt}`);
+    } else {
+        console.error(`Error fetching random prompt from the database.`);
+    }
 
     setTimeout(() => {
         client.channels.cache.get(process.env.DISCORD_SUBMISSION_CHANNEL_ID).send("Time to make a post!")       
