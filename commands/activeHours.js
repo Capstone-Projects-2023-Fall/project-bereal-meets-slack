@@ -1,12 +1,8 @@
 const {SlashCommandBuilder} = require ('discord.js');
-const {Pool} = require ('pg');
+const {createConnectionPoolLocal} = require('./dbconn');
 
-//connection string
-const connectionString = `postgresql://${process.env.DB_USER}:${process.env.DB_PASS}@${process.env.DB_HOST}/${process.env.DB_NAME}`;
-
-const pool = new Pool({
-    connectionString: connectionString
-});
+//Create connection from dbconn
+const pool = createConnectionPoolLocal();
 
 //new slash command to view active hours 
 const activeHoursCommand = new SlashCommandBuilder()
@@ -19,19 +15,30 @@ async function getActiveHours(interaction) {
     //this will get the active hours from DB
     const queryText = 'SELECT start_time, end_time FROM operating_hours WHERE guild_id = $1';
     try{
-        const res = await pool.query(queryText, [guildId]);
+        const [rows] = await pool.promise().execute(queryText, [guildId]);
         //If no active hours are set
-        if (res.rows.length === 0) {
+        if (rows.length === 0) {
             await interaction.reply("No Active Hours Set");
             return;
         }
 
-        const {start_time, end_time} = res.rows[0];
+        const {start_time, end_time} = rows[0];
         //Active hours
-        await interaction.reply(`Active hours are set from ${start-time} to ${end-time}`);
+        await interaction.reply(`Active hours are set from ${start_time} to ${end_time}`);
     } catch (error) {
         console.error('Failed to retrieve active hours:', error);
         await interaction.reply('Failed to retrieve active hours.');
+    }
+}
+
+async function storeOperatingHours(guildId, startTime, endTime){
+    const queryText = 'INSERT INTO operating_hours (guild_id, start_time, end_time) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE start_time = VALUES(start_time), end_time = VALUES(end_time)';
+    try {
+        await pool.promise().execute(queryText, [guildId, startTime, endTime]);
+        console.log('Operating hours have been set successfully.');
+    } catch (error){
+        console.error('Error storing operating hours:', error);
+        throw error;
     }
 }
 
@@ -39,4 +46,5 @@ async function getActiveHours(interaction) {
 module.exports= {
     data: activeHoursCommand,
     execute: getActiveHours,
+    storeOperatingHours,
 };
