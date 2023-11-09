@@ -77,7 +77,7 @@ client.on('ready', () => {
     console.log(`Logged in as ${client.user.tag}!`);
     const now = moment().tz("America/New_York");
     //scheduling for the scheduled post
-    cron.schedule('0 12 * * *', schedulePost, {
+    cron.schedule('0 8 * * *', schedulePost, {
         scheduled: true,
         timezone: "America/New_York"
     });
@@ -125,6 +125,7 @@ function schedulePost() {
     setTimeout(() => {  
         client.sendMessageWithTimer(process.env.DISCORD_SUBMISSION_CHANNEL_ID, "Time to make a post!"); //sendMessageWithTimer allows you to keep track of when you want the timer to start and end by the next bot message
     }, timeDifference);
+
 }
 
 client.sendMessageWithTimer = async (channelId, content) => {
