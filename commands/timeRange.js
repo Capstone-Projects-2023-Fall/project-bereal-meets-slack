@@ -6,9 +6,7 @@
 
 
 const {SlashCommandBuilder} = require ('discord.js');
-const {LocalStorage} = require ('node-localstorage');
-
-const localStorage = new LocalStorage('./data');
+const {storeOperatingHours} = require ('./activeHours')
 
 //main time range command
 const timeRangeCommand = new SlashCommandBuilder ()
@@ -29,15 +27,22 @@ const timeRangeCommand = new SlashCommandBuilder ()
         );
 
 //function to handle the time range command
-function setTimeRange(interaction) {
+async function setTimeRange(interaction) {
     const guildId = interaction.guild.id;
     const startTime = interaction.options.getString('start-time');
     const endTime = interaction.options.getString('end-time');
 
-    localStorage.setItem(`activeHours_${guild.id}`, JSON.stringify ({startTime, endTime}));
-    //response to the user with a confirmation message
-    const reply = `Active hours set from ${startTime} to ${endTime}`
-    interaction.reply(reply);
+    try {
+        //store active hours in database
+        await storeOperatingHours(guildId, startTime, endTime);
+
+        //confirmation message
+        const reply = `Active hours set from ${startTime} to ${endTime}`;
+        await interaction.reply(reply);
+    } catch (error){
+        console.error('Failed to set active hours:', error);
+        await interaction.reply('There was an error setting active hours.');
+    }
 }
 
 //exports the time range command data 
