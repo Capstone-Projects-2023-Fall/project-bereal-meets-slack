@@ -7,6 +7,7 @@ const cron = require('node-cron');
 const moment = require('moment-timezone');
 const notifyMods = require('./utils/notifyMods');
 const http = require('http');
+const { ChannelType } = require('discord.js');
 
 //for cloud run, serverless application needs a server to listen.
 const port = 8080;
@@ -81,7 +82,13 @@ client.on('ready', () => {
         scheduled: true,
         timezone: "America/New_York"
     });
-    registrar.registercommands();
+    registrar.registercommands(); 
+    console.log(process.env.DISCORD_SUBMISSION_CHANNEL_ID)
+    getReactionCount(client, process.env.DISCORD_SUBMISSION_CHANNEL_ID).then(totalReactions => {
+        console.log(`Total reactions: ${totalReactions}`);
+    }).catch(error => {
+        console.error('Failed to get reaction count:', error);
+    });
 });
 
 //check for ping command.
@@ -145,12 +152,70 @@ client.on('messageCreate', async msg => {
             // If the timer is running, stop it and log the time
             if (timer.isRunning()) {
                 const elapsedSeconds = timer.stop();
-                console.log(`timeToRespond: ${elapsedSeconds} seconds.`); //TODO: Make this fill into the DB as timeToRespond
+                console.log(`timeToRespond: ${elapsedSeconds} seconds.`); //TODO: BMS-99 TODO: Make this fill into the DB as timeToRespond
             }
         }
     }
 });
 
+// Discords way of letting us see the most recent message in a channel, use this to get a specific message you want data on
+
+function fetchMostRecentMessageId(client, channelId) {
+    // Make sure the client is logged in and ready
+    if (!client.isReady()) {
+        console.error('Client is not ready');
+        return;
+    }
+    // Get the channel from the client's channels cache
+    const channel = client.channels.cache.get(channelId);
+    // Check if the channel exists and is a text channel
+    if (!channel || channel.type !== ChannelType.GuildText) { // Change this line
+        console.error('The channel was not found or it is not a text channel.');
+        return;
+    }
+    // Fetch the most recent messages from the channel
+    channel.messages.fetch({ limit: 1 })
+        .then(messages => {
+        if (messages.size > 0) {
+            // The first message in the collection will be the most recent
+            const recentMessageId = messages.first().id;
+            console.log(`The most recent message ID is: ${recentMessageId}`);
+        } else {
+            console.log('No messages found in the channel.');
+        }
+        })
+        .catch(error => {
+            console.error('Error fetching messages: ', error);
+        });
+}
+
+function getReactionCount(client, channelId) {
+    return fetchMostRecentMessageId(client, channelId).then(messageId => {
+        // Fetch the channel using the client
+        return client.channels.fetch(channelId).then(channel => {
+            // Ensure the channel exists and is a text channel
+            if (!channel || channel.type !== 'GUILD_TEXT') {
+                throw new Error('The channel was not found or is not a text channel.');
+            }
+
+            // Fetch the message using the message ID
+            return channel.messages.fetch(messageId).then(message => {
+                // Calculate the total number of reactions
+                let totalReactions = 0;
+                message.reactions.cache.forEach(reaction => {
+                    totalReactions += reaction.count;
+                });
+                // Return the total number of reactions
+                return totalReactions;
+            });
+        });
+    }).catch(error => {
+        console.error('An error occurred while fetching the reaction count:', error);
+        throw error; // Rethrow the error for the calling function to handle
+    });
+}
+
 // Make sure this line is the last line
 client.login(TOKEN);
+
 
