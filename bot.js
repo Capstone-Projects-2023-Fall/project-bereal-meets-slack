@@ -7,6 +7,8 @@ const cron = require('node-cron');
 const moment = require('moment-timezone');
 const notifyMods = require('./utils/notifyMods');
 const http = require('http');
+const timeRange = require('./commands/timeRange');
+const activeHours = require('./activeHours');
 
 //for cloud run, serverless application needs a server to listen.
 const port = 8080;
@@ -73,16 +75,16 @@ for (const file of commandFiles) {
 	}
 }
 
-client.on('ready', () => {
-    console.log(`Logged in as ${client.user.tag}!`);
-    const now = moment().tz("America/New_York");
-    //scheduling for the scheduled post
-    cron.schedule('0 12 * * *', schedulePost, {
-        scheduled: true,
-        timezone: "America/New_York"
-    });
-    registrar.registercommands();
-});
+// client.on('ready', () => {
+//     console.log(`Logged in as ${client.user.tag}!`);
+//     const now = moment().tz("America/New_York");
+//     //scheduling for the scheduled post
+//     cron.schedule('0 12 * * *', schedulePost, {
+//         scheduled: true,
+//         timezone: "America/New_York"
+//     });
+//     registrar.registercommands();
+// });
 
 //check for ping command.
 client.on(Events.InteractionCreate, async interaction => {
@@ -110,22 +112,60 @@ function getRandomHour() {
     return Math.floor(Math.random() * (24 - 14) + 14);
 }
 
-function schedulePost() {
-    const targetHour = getRandomHour();
+client.on('ready', async () => {
+    console.log(`Logged in as ${client.user.tag}!`);
+    registrar.registercommands();
+
+    //try to schedule post
+    try{
+        await schedulePost();
+    } catch (error) {
+        console.error('Error scheduling post', error);
+    }
+});
+
+async function schedulePost(){
+    //fecth active hours from database
+    const activeHoursData = await activeHours.fetchActiveHoursFromDB();
+
+    //get random hour within active hours
+    const targetHour = await timeRange.getRandomHourWithinActiveHours(activeHoursData);
+
     const now = moment().tz("America/New_York");
     const targetTime = now.clone().hour(targetHour).minute(0).second(0);
 
-    if (now.isAfter(targetTime)) {
-        client.channels.cache.get(process.env.DISCORD_SUBMISSION_CHANNEL_ID).send("Bot was added to discord or started too late, skipping today and only today")  
+    if(now.isAfter(targetTime)){
+        //if current time is after target time, schedule for next day
+        console.log("Current time is past target posting time. Scheduling for next time.");
+    } else {
+        const timeDifference = targetTime.diff(now);
+
+        setTimeout(async () => {
+            await client.sendMessageWithTimer(process.env.DISCORD_SUBMISSION_CHANNEL_ID, "Time to make a post!");
+            //schedule next post 
+            schedulePost();
+        }, timeDifference);
     }
-
-    const timeDifference = targetTime.diff(now);
-    console.log(`Scheduling post for ${targetHour}:00 EST`);
-
-    setTimeout(() => {  
-        client.sendMessageWithTimer(process.env.DISCORD_SUBMISSION_CHANNEL_ID, "Time to make a post!"); //sendMessageWithTimer allows you to keep track of when you want the timer to start and end by the next bot message
-    }, timeDifference);
 }
+
+// function schedulePost() {
+//     const targetHour = timeRange.getRandomHourWithinActiveHours();
+//     const now = moment().tz("America/New_York");
+//     const targetTime = now.clone().hour(targetHour).minute(0).second(0);
+
+//     if (now.isAfter(targetTime)) {
+//         client.channels.cache.get(process.env.DISCORD_SUBMISSION_CHANNEL_ID).send("Bot was added to discord or started too late, skipping today and only today")  
+//     }
+
+//     const timeDifference = targetTime.diff(now);
+//     console.log(`Scheduling post for ${targetHour}:00 EST`);
+
+//     setTimeout(() => {  
+//         client.sendMessageWithTimer(process.env.DISCORD_SUBMISSION_CHANNEL_ID, "Time to make a post!"); //sendMessageWithTimer allows you to keep track of when you want the timer to start and end by the next bot message
+//     }, timeDifference);
+// }
+
+
 
 client.sendMessageWithTimer = async (channelId, content) => {
     timer.start(); // Ensure the timer starts when the message is sent
