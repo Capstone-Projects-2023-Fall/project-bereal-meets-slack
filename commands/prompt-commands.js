@@ -1,67 +1,52 @@
 const { SlashCommandBuilder } = require('discord.js');
-const { LocalStorage } = require('node-localstorage');
 const dbconn = require('../utils/dbconn.js');
 
-const localStorage = new LocalStorage('./data');
-const promptArray = JSON.parse(localStorage.getItem('prompts')) || [];
-
 const pool = dbconn.createConnectionPoolLocal();
+const promisepool = pool.promise();
 
-function fetchPromptsList(callback) {
-  pool.query("SELECT prompt_text FROM bot.prompts", (err, data) => {
-    if (err) {
-      console.error(err);
-      return;
+async function getPrompts(){
+  [rows, fields] = await promisepool.query({sql: "SELECT prompt_text FROM bot.prompts", rowsAsArray: true});
+  promptArray = rows;
+  return promptArray;
+}
+
+async function addPrompt(prompt) {
+ await promisepool.query(`INSERT INTO bot.prompts (prompt_text)VALUES('${prompt}')`);
+ return `Prompt "${prompt}" has been added to the list.`;
+}
+
+async function deletePrompt(promptToDelete) {
+  [rows, fields] = await promisepool.query({sql: `SELECT prompt_id, prompt_text FROM bot.prompts WHERE prompt_text LIKE "%${promptToDelete}%"`, rowsAsArray: true});
+  promptArray = rows;
+  const fullMatches = promptArray.filter(prompt => prompt[1] === promptToDelete);
+  const partialMatches = promptArray.filter(prompt => prompt[1].includes(promptToDelete));
+
+  if(fullMatches.length > 0){
+    try{
+      await promisepool.query(`DELETE FROM bot.prompts WHERE prompt_id = ${fullMatches[0][0]}`);
+      return `${fullMatches[0][1]} was deleted`
     }
-    dbprompts = data;
-    if (callback) {
-      callback(dbprompts);
-    }
-  });
+    catch(error){return "There was an error deleting the specified prompt!"}
+
+  }
+  else if(partialMatches.length > 0){
+    return `Did not find specified prompt, did you mean: ${partialMatches.join(", ")}`
+  }
+  else{ return "Prompt Not Found."}
+
 }
 
-function addPrompt(prompt) {
-  promptArray.push(prompt);
-  localStorage.setItem('prompts', JSON.stringify(promptArray));
-
-  pool.query(`INSERT INTO bot.prompts (prompt_text)VALUES('${prompt}')`, (err) => {
-    if(err) {
-      console.error(err);
-      return;
-    }
-  });
-  return `Prompt "${prompt}" has been added to the list.`;
+async function listPrompts() {
+  promptArray = await getPrompts();
+  return `Current Prompts: ${promptArray.join(', ')}`;
 }
 
-function deletePrompt(promptToDelete, isDeletePrompt = true) {
-  const fullMatches = promptArray.filter((prompt) => prompt === promptToDelete);
-  const partialMatches = promptArray.filter(prompt => prompt.includes(promptToDelete) && !fullMatches.includes(prompt));
+async function searchPrompts(query) {
+  promptArray = await getPrompts();
+  console.log(promptArray);
+  const partialMatches = promptArray.filter(prompt => prompt[0].includes(query));
 
-  return isDeletePrompt
-    ? fullMatches.length === 1
-
-      ? (() => {
-        const index = promptArray.indexOf(fullMatches[0]);
-        promptArray.splice(index, 1);
-        localStorage.setItem('prompts', JSON.stringify(promptArray));
-        return `Prompt "${fullMatches[0]}" has been deleted. Current prompts: ${promptArray.join(', ')}`;
-      })()
-      : fullMatches.length === 0 && partialMatches.length > 0
-        ? `Prompt(s) that partially match "${promptToDelete}":\n${partialMatches.join('\n')}`
-        : `No prompts found that match "${promptToDelete}"\nall prompts: ${promptArray}`
-
-    : partialMatches.length > 0
-      ? `Matching prompts for "${promptToDelete}": ${partialMatches.join(', ')}`
-      : `No prompts found that match "${promptToDelete}"`;
-}
-
-function listPrompts() {
-  return `Current prompts: ${promptArray.join(', ')}`;
-}
-
-function searchPrompts(query) {
-
-  const partialMatches = promptArray.filter(prompt => prompt.includes(query));
+  console.log(partialMatches);
 
   return partialMatches.length === 0
     ? `No prompts found that match "${query}"\nall prompts: ${promptArray}`
@@ -114,27 +99,28 @@ module.exports = {
     ),
   async execute(interaction) {
     const subcommand = interaction.options.getSubcommand();
+    await interaction.deferReply();
     let reply = '';
 
-    reply = subcommand === 'add'
-      ? (() => {
-        const prompt = interaction.options.getString('prompt');
-        return addPrompt(prompt);
+     reply = subcommand === 'add'
+    ? await (async () => {
+      const prompt = interaction.options.getString('prompt');
+      return await addPrompt(prompt);
+    })()
+    : subcommand === 'delete'
+    ? await (async () => {
+        const promptToDelete = interaction.options.getString('prompt');
+        return await deletePrompt(promptToDelete, subcommand === 'delete');
+     })()
+    : subcommand === 'list'
+      ? await listPrompts()
+    : subcommand === 'search'
+      ? await (async () => {
+        const query = interaction.options.getString('search-term');
+        return await searchPrompts(query);
       })()
-      : subcommand === 'delete'
-        ? (() => {
-          const promptToDelete = interaction.options.getString('prompt');
-          return deletePrompt(promptToDelete, subcommand === 'delete');
-        })()
-        : subcommand === 'list'
-          ? listPrompts()
-        : subcommand === 'search'
-          ? (() => {
-            const query = interaction.options.getString('search-term');
-            return searchPrompts(query);
-          })()
-          : '';
-
-    await interaction.reply(reply);
+    : '';
+  
+      await interaction.followUp(reply);
   },
 };
