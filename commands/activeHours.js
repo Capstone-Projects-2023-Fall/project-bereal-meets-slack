@@ -1,5 +1,5 @@
 const {SlashCommandBuilder} = require ('discord.js');
-const {createConnectionPoolLocal} = require('utils\dbconn.js');
+const {createConnectionPoolLocal} = require('./utils/dbconn.js');
 
 //Create connection from dbconn
 const pool = createConnectionPoolLocal();
