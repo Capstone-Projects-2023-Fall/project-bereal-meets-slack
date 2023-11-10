@@ -7,6 +7,10 @@ steps:
   - name: 'gcr.io/cloud-builders/git'
     args: ['clone', 'https://github.com/Capstone-Projects-2023-Fall/project-bereal-meets-slack.git', 'app']
 
+  - name: 'gcr.io/cloud-builders/git'
+    args: ['checkout', 'BMS-71-hosted-database-access']
+    dir: 'app'
+
   # Step 2: Install Node.js and npm
   - name: 'gcr.io/cloud-builders/npm'
     args: ['install']
