@@ -1,6 +1,4 @@
 const dbconn = require('../utils/dbconn.js');
-require('dotenv').config();
-
 
 promisepool = dbconn.createPromiseConnectionPool(); 
 
