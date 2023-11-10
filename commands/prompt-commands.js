@@ -45,7 +45,7 @@ module.exports = {
     ),
   async execute(interaction) {
     const subcommand = interaction.options.getSubcommand();
-    //await interaction.deferReply();
+    await interaction.deferReply();
     let reply = '';
 
      reply = subcommand === 'add'

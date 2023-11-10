@@ -3,7 +3,6 @@ const mysqlpromise = require('mysql2/promise')
 require('dotenv').config();
 
 function createConnectionPoolLocal(){ //use this one for local calls when testing.
-
 const dboptions = {
   connectionLimit : 10, 
   host     : process.env.DB_HOST,
@@ -27,7 +26,22 @@ async function createConnectionPoolCloud(){
   return await mysqlpromise.createPool(dboptions);
 };
 
+function createPromiseConnectionPool(){
+  var flag = process.env.PROD_FLAG;
+  if(flag === "CLOUD"){
+    console.log("CLOUD check");
+    promisepool = createConnectionPoolCloud();
+  }
+  else if(flag === "LOCAL"){
+    console.log("LOCAL check");
+    const pool = createConnectionPoolLocal();
+    promisepool = pool.promise();
+  }
+  return promisepool;
+};
+
 module.exports = {
   createConnectionPoolLocal,
-  createConnectionPoolCloud
+  createConnectionPoolCloud,
+  createPromiseConnectionPool
 };

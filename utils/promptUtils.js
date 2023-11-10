@@ -1,18 +1,10 @@
 const dbconn = require('../utils/dbconn.js');
 require('dotenv').config();
 
-var flag = process.env.PROD_FLAG;
 
-let promisepool;
-if(flag === "CLOUD"){
-  console.log("CLOUD check");
-  promisepool = await dbconn.createConnectionPoolCloud();
-}
-else if(flag === "LOCAL"){
-  console.log("LOCAL check");
-  const pool = dbconn.createConnectionPoolLocal();
-  promisepool = pool.promise();
-}
+promisepool = dbconn.createPromiseConnectionPool(); 
+
+
 
 
 async function getPrompts(){
