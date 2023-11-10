@@ -20,6 +20,7 @@ async function createConnectionPoolCloud(){
     user     : process.env.DB_USER,
     password : process.env.DB_PASS,
     database : process.env.DB_NAME,
+    waitForConnections: true,
     connectTimeout: 20000
   }
   return mysql.createPool(dboptions);
