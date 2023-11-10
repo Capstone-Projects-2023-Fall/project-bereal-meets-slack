@@ -1,6 +1,6 @@
 const dbconn = require('../utils/dbconn.js');
 
-const pool = dbconn.createConnectionPoolCloud();
+const pool = await dbconn.createConnectionPoolLocal();
 console.log(pool);
 const promisepool = pool.promise();
 
