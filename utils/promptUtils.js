@@ -6,7 +6,7 @@ var flag = process.env.PROD_FLAG;
 let promisepool;
 if(flag === "CLOUD"){
   console.log("CLOUD check");
-  promisepool = dbconn.createConnectionPoolCloud();
+  promisepool = await dbconn.createConnectionPoolCloud();
 }
 else if(flag === "LOCAL"){
   console.log("LOCAL check");
