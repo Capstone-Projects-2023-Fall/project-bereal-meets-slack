@@ -13,13 +13,14 @@ const dboptions = {
   return mysql.createPool(dboptions);
 };
 
-function createConnectionPoolCloud(){
+async function createConnectionPoolCloud(){
   const dboptions = {
     connectionLimit : 10,
+    socketPath: process.env.INSTANCE_UNIX_SOCKET,
     user     : process.env.DB_USER,
     password : process.env.DB_PASS,
     database : process.env.DB_NAME,
-    socketPath: process.env.INSTANCE_UNIX_SOCKET
+    connectTimeout: 20000
   }
   return mysql.createPool(dboptions);
 };
