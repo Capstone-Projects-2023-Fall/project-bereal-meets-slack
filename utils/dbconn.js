@@ -13,7 +13,7 @@ const dboptions = {
   return mysql.createPool(dboptions);
 };
 
-async function createConnectionPoolCloud(){
+function createConnectionPoolCloud(){
   const dboptions = {
     connectionLimit : 10,
     socketPath: process.env.INSTANCE_UNIX_SOCKET,
@@ -23,7 +23,7 @@ async function createConnectionPoolCloud(){
     waitForConnections: true,
     connectTimeout: 5000
   }
-  return await mysqlpromise.createPool(dboptions);
+  return mysql.createPool(dboptions);
 };
 
 function createPromiseConnectionPool(){

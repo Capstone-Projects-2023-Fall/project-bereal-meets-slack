@@ -5,8 +5,6 @@ require('dotenv').config();
 promisepool = dbconn.createPromiseConnectionPool(); 
 
 
-
-
 async function getPrompts(){
   [rows, fields] = await promisepool.query({sql: "SELECT prompt_text FROM bot.prompts", rowsAsArray: true});
   promptArray = rows;
