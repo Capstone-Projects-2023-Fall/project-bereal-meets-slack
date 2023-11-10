@@ -1,8 +1,19 @@
 const dbconn = require('../utils/dbconn.js');
+require('dotenv').config();
 
-const pool = await dbconn.createConnectionPoolLocal();
-console.log(pool);
-const promisepool = pool.promise();
+var flag = process.env.PROD_FLAG;
+
+let promisepool;
+if(flag === "CLOUD"){
+  console.log("CLOUD check");
+  promisepool = dbconn.createConnectionPoolCloud();
+}
+else if(flag === "LOCAL"){
+  console.log("LOCAL check");
+  const pool = dbconn.createConnectionPoolLocal();
+  promisepool = pool.promise();
+}
+
 
 async function getPrompts(){
   [rows, fields] = await promisepool.query({sql: "SELECT prompt_text FROM bot.prompts", rowsAsArray: true});

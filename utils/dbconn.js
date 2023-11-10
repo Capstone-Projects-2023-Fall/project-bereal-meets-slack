@@ -1,4 +1,5 @@
 const mysql = require('mysql2');
+const mysqlpromise = require('mysql2/promise')
 require('dotenv').config();
 
 function createConnectionPoolLocal(){ //use this one for local calls when testing.
@@ -23,7 +24,7 @@ async function createConnectionPoolCloud(){
     waitForConnections: true,
     connectTimeout: 5000
   }
-  return mysql.createPool(dboptions);
+  return await mysqlpromise.createPool(dboptions);
 };
 
 module.exports = {
