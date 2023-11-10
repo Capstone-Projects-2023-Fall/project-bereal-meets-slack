@@ -30,7 +30,8 @@ function createPromiseConnectionPool(){
   var flag = process.env.PROD_FLAG;
   if(flag === "CLOUD"){
     console.log("CLOUD check");
-    promisepool = createConnectionPoolCloud();
+    pool = createConnectionPoolCloud();
+    promisepool = pool.promise();
   }
   else if(flag === "LOCAL"){
     console.log("LOCAL check");
