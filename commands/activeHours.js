@@ -1,5 +1,5 @@
 const {SlashCommandBuilder} = require ('discord.js');
-const {createConnectionPoolLocal} = require('./utils/dbconn.js');
+const {createConnectionPoolLocal} = require('../utils/dbconn');
 
 //Create connection from dbconn
 const pool = createConnectionPoolLocal();
@@ -42,9 +42,24 @@ async function storeOperatingHours(guildId, startTime, endTime){
     }
 }
 
+async function fetchActiveHoursFromDB(guildId){
+    const queryText = 'SELECT start_time, end_time FROM operating_hours WHERE guild_id = ?';
+    try {
+        const[rows] = await pool.promise().execute(queryText, [guildId]);
+        if (rows.length === 0){
+            return {start_time: '09:00', end_time: '17:00'}; //Default hours
+        }
+        return rows[0];
+    } catch (error) {
+        console.error('Error fetching active hours from DB:', error);
+        throw error;
+    }
+}
+
 //will export command data
 module.exports= {
     data: activeHoursCommand,
     execute: getActiveHours,
     storeOperatingHours,
+    fetchActiveHoursFromDB,
 };

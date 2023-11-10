@@ -8,7 +8,8 @@ const moment = require('moment-timezone');
 const notifyMods = require('./utils/notifyMods');
 const http = require('http');
 const timeRange = require('./commands/timeRange');
-const activeHours = require('./activeHours');
+const activeHours = require('./commands/activeHours');
+const {fetchActiveHoursFromDB} = require('./commands/activeHours');
 
 //for cloud run, serverless application needs a server to listen.
 const port = 8080;
@@ -116,13 +117,15 @@ client.on('ready', async () => {
     console.log(`Logged in as ${client.user.tag}!`);
     registrar.registercommands();
 
+    const guildId = process.env.DISCORD_GUILD_ID;
     //try to schedule post
     try{
-        await schedulePost();
+        const activeHours = await fetchActiveHoursFromDB(guildId);
     } catch (error) {
         console.error('Error scheduling post', error);
     }
 });
+
 
 async function schedulePost(){
     //fecth active hours from database
