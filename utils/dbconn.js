@@ -13,7 +13,7 @@ const dboptions = {
   return mysql.createPool(dboptions);
 };
 
-function createConnectionpoolCloud(){
+function createConnectionPoolCloud(){
   const dboptions = {
     connectionLimit : 10, 
     host     : process.env.DB_HOST,
@@ -27,5 +27,5 @@ function createConnectionpoolCloud(){
 
 module.exports = {
   createConnectionPoolLocal,
-  createConnectionpoolCloud
+  createConnectionPoolCloud
 };
