@@ -162,13 +162,29 @@ erDiagram
 Prompts {
   Int prompt_id PK
   String text
+  Int guild_id
 }
 
 Responses {
   Int response_id PK
-  Int numReaction
+  String response_image
+  Int numReactions
+  Int numReplies
   Int timetoRespond
   Int prompt_id FK
+}
+
+Blacklist{
+  Int blacklist_id PK
+  Int user_id
+  Int guild_id
+}
+
+Hours{
+  Int hour_id PK
+  Int start_time
+  Int end_time
+  Int guild_id
 }
 
 Prompts ||--|{ Responses : ""
@@ -499,30 +515,3 @@ sequenceDiagram
 ![Sequence Diagram 11](https://cdn.discordapp.com/attachments/1158176482569494568/1158245675163734056/Screen_Shot_2023-10-01_at_11.34.45_PM.png?ex=651b8bd8&is=651a3a58&hm=7a1811a5cce04fe5100a891d4a4a89bca843f9cebf120e10a66cb7b74b3e298a&)
 
 ![Sequence Diagram 11 Alt](https://cdn.discordapp.com/attachments/1158176482569494568/1158245708969811978/Screen_Shot_2023-10-01_at_11.34.53_PM.png?ex=651b8be0&is=651a3a60&hm=ea1ae6eebd6fdb5bce2dec8cd0e381bfd76e20541e8c73b85a343c59da5cd075&)
-
-
-## Document Requirements
-
-**Purpose**
-
-The Design Document - Part I Architecture describes the software architecture and how the requirements are mapped into the design. This document will be a combination of diagrams and text that describes what the diagrams are showing.
-
-**Requirements**
-
-In addition to the general requirements the Design Document - Part I Architecture will contain:
-
-A description the different components and their interfaces. For example: client, server, database.
-
-For each component provide class diagrams showing the classes to be developed (or used) and their relationship.
-
-Sequence diagrams showing the data flow for _all_ use cases. One sequence diagram corresponds to one use case and different use cases should have different corresponding sequence diagrams.
-
-Describe algorithms employed in your project, e.g. neural network paradigm, training and training data set, etc.
-
-If there is a database:
-
-Entity-relation diagram.
-
-Table design.
-
-A check list for architecture design is attached here [architecture\_design\_checklist.pdf](https://templeu.instructure.com/courses/106563/files/16928870/download?wrap=1 "architecture_design_checklist.pdf")  and should be used as a guidance.

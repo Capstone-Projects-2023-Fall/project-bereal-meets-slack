@@ -20,7 +20,7 @@ module.exports = {
 		await interaction.deferReply();
 
 		// console.log(interaction)
-		await interaction.editReply('b');
+		await interaction.editReply('submitted to moderators!');
 		//await interaction.channel.send('b again');
 
 		const attachment = interaction.options.getAttachment('file');
