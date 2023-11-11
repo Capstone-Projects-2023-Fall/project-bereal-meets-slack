@@ -1,51 +1,5 @@
 const { SlashCommandBuilder } = require('discord.js');
-const { LocalStorage } = require('node-localstorage');
-
-const localStorage = new LocalStorage('./data');
-const promptArray = JSON.parse(localStorage.getItem('prompts')) || [];
-
-function addPrompt(prompt) {
-  promptArray.push(prompt);
-  localStorage.setItem('prompts', JSON.stringify(promptArray));
-  return `Prompt "${prompt}" has been added to the list. Current prompts: ${promptArray.join(', ')}`;
-}
-
-function deletePrompt(promptToDelete, isDeletePrompt = true) {
-  const fullMatches = promptArray.filter((prompt) => prompt === promptToDelete);
-  const partialMatches = promptArray.filter(prompt => prompt.includes(promptToDelete) && !fullMatches.includes(prompt));
-
-  return isDeletePrompt
-    ? fullMatches.length === 1
-
-      ? (() => {
-        const index = promptArray.indexOf(fullMatches[0]);
-        promptArray.splice(index, 1);
-        localStorage.setItem('prompts', JSON.stringify(promptArray));
-        return `Prompt "${fullMatches[0]}" has been deleted. Current prompts: ${promptArray.join(', ')}`;
-      })()
-      : fullMatches.length === 0 && partialMatches.length > 0
-        ? `Prompt(s) that partially match "${promptToDelete}":\n${partialMatches.join('\n')}`
-        : `No prompts found that match "${promptToDelete}"\nall prompts: ${promptArray}`
-
-    : partialMatches.length > 0
-      ? `Matching prompts for "${promptToDelete}": ${partialMatches.join(', ')}`
-      : `No prompts found that match "${promptToDelete}"`;
-}
-
-function listPrompts() {
-  return `Current prompts: ${promptArray.join(', ')}`;
-}
-
-function searchPrompts(query) {
-
-  const partialMatches = promptArray.filter(prompt => prompt.includes(query));
-
-  return partialMatches.length === 0
-    ? `No prompts found that match "${query}"\nall prompts: ${promptArray}`
-    : `Search results for "${query}":\n${partialMatches.join('\n')}`;
-}
-
-
+const {addPrompt, listPrompts, searchPrompts, deletePrompt} = require('../utils/promptUtils.js')
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -91,27 +45,28 @@ module.exports = {
     ),
   async execute(interaction) {
     const subcommand = interaction.options.getSubcommand();
+    await interaction.deferReply();
     let reply = '';
 
-    reply = subcommand === 'add'
-      ? (() => {
-        const prompt = interaction.options.getString('prompt');
-        return addPrompt(prompt);
+     reply = subcommand === 'add'
+    ? await (async () => {
+      const prompt = interaction.options.getString('prompt');
+      return await addPrompt(prompt);
+    })()
+    : subcommand === 'delete'
+    ? await (async () => {
+        const promptToDelete = interaction.options.getString('prompt');
+        return await deletePrompt(promptToDelete, subcommand === 'delete');
+     })()
+    : subcommand === 'list'
+      ? await listPrompts()
+    : subcommand === 'search'
+      ? await (async () => {
+        const query = interaction.options.getString('search-term');
+        return await searchPrompts(query);
       })()
-      : subcommand === 'delete'
-        ? (() => {
-          const promptToDelete = interaction.options.getString('prompt');
-          return deletePrompt(promptToDelete, subcommand === 'delete');
-        })()
-        : subcommand === 'list'
-          ? listPrompts()
-        : subcommand === 'search'
-          ? (() => {
-            const query = interaction.options.getString('search-term');
-            return searchPrompts(query);
-          })()
-          : '';
-
-    await interaction.reply(reply);
+    : '';
+  
+      await interaction.followUp(reply);
   },
 };
