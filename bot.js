@@ -113,6 +113,13 @@ function getRandomHour() {
     return Math.floor(Math.random() * (24 - 14) + 14);
 }
 
+client.on('guildCreate', guild => {
+    //Default active hours for new guild
+    activeHours.storeOperatingHours(guild.id, '09:00', '17:00')
+    .then(() => console.log(`Default active hours set for guild ${guild.id}`))
+    .catch(error => console.error(`Error setting default active hours for guild ${guild.id}:`, error));
+});
+
 client.on('ready', async () => {
     console.log(`Logged in as ${client.user.tag}!`);
     registrar.registercommands();
@@ -120,14 +127,15 @@ client.on('ready', async () => {
     const guildId = process.env.DISCORD_GUILD_ID;
     //try to schedule post
     try{
-        const activeHours = await fetchActiveHoursFromDB(guildId);
+        const activeHoursData = await fetchActiveHoursFromDB(guildId);
+        await schedulePost(activeHoursData);
     } catch (error) {
         console.error('Error scheduling post', error);
     }
 });
 
 
-async function schedulePost(){
+async function schedulePost(activeHoursData){
     //fecth active hours from database
     const activeHoursData = await activeHours.fetchActiveHoursFromDB();
 

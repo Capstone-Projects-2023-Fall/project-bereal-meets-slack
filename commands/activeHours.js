@@ -13,7 +13,7 @@ const activeHoursCommand = new SlashCommandBuilder()
 async function getActiveHours(interaction) {
     const guildId = interaction.guild.id;
     //this will get the active hours from DB
-    const queryText = 'SELECT start_time, end_time FROM operating_hours WHERE guild_id = $1';
+    const queryText = 'SELECT start_time, end_time FROM operating_hours WHERE guild_id = ?';
     try{
         const [rows] = await pool.promise().execute(queryText, [guildId]);
         //If no active hours are set
@@ -35,10 +35,9 @@ async function storeOperatingHours(guildId, startTime, endTime){
     const queryText = 'INSERT INTO operating_hours (guild_id, start_time, end_time) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE start_time = VALUES(start_time), end_time = VALUES(end_time)';
     try {
         await pool.promise().execute(queryText, [guildId, startTime, endTime]);
-        console.log('Operating hours have been set successfully.');
+        console.log(`Operating hours set for guild ${guildId}: ${startTime} - ${endTime}`);
     } catch (error){
-        console.error('Error storing operating hours:', error);
-        throw error;
+        console.error(`Error storing operating hours for ${guildId}:`, error);
     }
 }
 
