@@ -1,7 +1,7 @@
 const dbconn = require('../utils/dbconn.js');
 
-const pool = dbconn.createConnectionPoolLocal();
-const promisepool = pool.promise();
+promisepool = dbconn.createPromiseConnectionPool(); 
+
 
 async function getPrompts(){
   [rows, fields] = await promisepool.query({sql: "SELECT prompt_text FROM bot.prompts", rowsAsArray: true});
