@@ -7,6 +7,7 @@
 
 const {SlashCommandBuilder} = require ('discord.js');
 const {storeOperatingHours} = require ('./activeHours')
+const moment = require('moment');
 
 //main time range command
 const timeRangeCommand = new SlashCommandBuilder ()
@@ -45,8 +46,24 @@ async function setTimeRange(interaction) {
     }
 }
 
+function getRandomHourWithinActiveHours(activeHoursData){
+    const startTime = moment(activeHoursData.start_time, "HH:mm");
+    const endTime = moment(activeHoursData.end_time, "HH:mm");
+
+    if (endTime.isBefore(startTime)){
+        endTime.add(1, 'day');
+    }
+
+    const diffMinutes = endTime.diff(startTime, 'minutes');
+    const randomMinute = Math.floor(Math.random() * diffMinutes);
+    const randomTime = startTime.add(randomMinute, 'minutes');
+
+    return randomTime.format("HH:mm");
+}
+
 //exports the time range command data 
 module.exports= {
     data: timeRangeCommand,
     execute: setTimeRange,
+    getRandomHourWithinActiveHours,
 };
