@@ -32,7 +32,6 @@ async function setTimeRange(interaction) {
     const guildId = interaction.guild.id;
     const startTime = interaction.options.getString('start-time');
     const endTime = interaction.options.getString('end-time');
-
     try {
         //store active hours in database
         await storeOperatingHours(guildId, startTime, endTime);

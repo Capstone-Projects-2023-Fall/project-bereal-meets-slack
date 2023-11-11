@@ -1,12 +1,13 @@
 require('dotenv').config(); //initialize dotenv
-const { Client, Collection, Events, GatewayIntentBits } = require('discord.js');
+const { Client, Collection, Events, GatewayIntentBits, channelLink } = require('discord.js');
 const path = require('node:path');
 const fs = require('fs');
 const registrar = require('./commandregistrar'); 
 const cron = require('node-cron');
 const moment = require('moment-timezone');
-const notifyMods = require('./utils/notifyMods');
 const http = require('http');
+const database = require('./utils/databasePrompts');
+const outputUsers = require('./utils/promptRandom');
 const timeRange = require('./commands/timeRange');
 const activeHours = require('./commands/activeHours');
 const {fetchActiveHoursFromDB} = require('./commands/activeHours');
@@ -77,6 +78,7 @@ for (const file of commandFiles) {
 	}
 }
 
+
 // client.on('ready', () => {
 //     console.log(`Logged in as ${client.user.tag}!`);
 //     const now = moment().tz("America/New_York");
@@ -114,12 +116,14 @@ function getRandomHour() {
     return Math.floor(Math.random() * (24 - 14) + 14);
 }
 
+
 client.on('guildCreate', guild => {
     //Default active hours for new guild
     activeHours.storeOperatingHours(guild.id, '09:00', '17:00')
     .then(() => console.log(`Default active hours set for guild ${guild.id}`))
     .catch(error => console.error(`Error setting default active hours for guild ${guild.id}:`, error));
 });
+
 
 client.on('ready', async () => {
     console.log(`Logged in as ${client.user.tag}!`);
@@ -137,7 +141,6 @@ client.on('ready', async () => {
 
 
 async function schedulePost(activeHoursData){
-
     //get random hour within active hours
     const targetHour = getRandomHourWithinActiveHours(activeHoursData);
     const [hour, minute] = targetHour.split(':');
@@ -153,7 +156,10 @@ async function schedulePost(activeHoursData){
         const timeDifference = targetTime.diff(now);
 
         setTimeout(async () => {
-            await client.sendMessageWithTimer(process.env.DISCORD_SUBMISSION_CHANNEL_ID, "Time to make a post!");
+          const list = client.guilds.cache.get(process.env.DISCORD_GUILD_ID);
+          const userRand = await outputUsers(list);
+          const randomPrompt = await database.getRandomPrompt();
+          client.sendMessageWithTimer(process.env.DISCORD_SUBMISSION_CHANNEL_ID, `<@${userRand}> Use /submit to submit your post! \n **Prompt:**\n${randomPrompt}`);
             //schedule next post 
             const nextActiveHoursData = await activeHours.fetchActiveHoursFromDB(process.env.DISCORD_GUILD_ID);
             schedulePost(nextActiveHoursData);
