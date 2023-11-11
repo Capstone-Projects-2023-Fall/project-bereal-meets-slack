@@ -5,12 +5,8 @@ const fs = require('fs');
 const registrar = require('./commandregistrar'); 
 const cron = require('node-cron');
 const moment = require('moment-timezone');
-const notifyMods = require('./utils/notifyMods');
 const http = require('http');
 const database = require('./utils/databasePrompts');
-
-const { checkServerIdentity } = require('node:tls');
-const { channel } = require('node:diagnostics_channel');
 const outputUsers = require('./utils/promptRandom');
 
 //for cloud run, serverless application needs a server to listen.
@@ -80,17 +76,8 @@ for (const file of commandFiles) {
 
 client.on('ready', async () => {
     console.log(`Logged in as ${client.user.tag}!`);
-    
-    
-    //This is to test that the bot @Random User
-    const list = client.guilds.cache.get(process.env.DISCORD_GUILD_ID);
-    const userRand = await outputUsers(list);
-    client.channels.cache.get(process.env.DISCORD_SUBMISSION_CHANNEL_ID).send(`<@${userRand}> It is time to make a post!`);
-    
-
-    const now = moment().tz("America/New_York");
     //scheduling for the scheduled post
-    cron.schedule('0 8 * * *', schedulePost, {
+    cron.schedule('0 0 8 * * *', schedulePost, {
         scheduled: true,
         timezone: "America/New_York"
     });
@@ -135,10 +122,12 @@ async function schedulePost() {
     const timeDifference = targetTime.diff(now);
     console.log(`Scheduling post for ${targetHour}:00 EST`);
 
-    setTimeout(() => {
+    setTimeout(async() => {
         const list = client.guilds.cache.get(process.env.DISCORD_GUILD_ID);
-        const userRand = outputUsers(list);
-        client.sendMessageWithTimer(process.env.DISCORD_SUBMISSION_CHANNEL_ID, `<@${userRand}> It is time to make a post!`); //sendMessageWithTimer allows you to keep track of when you want the timer to start and end by the next bot message
+        const userRand = await outputUsers(list);
+        const randomPrompt = await database.getRandomPrompt();
+        client.sendMessageWithTimer(process.env.DISCORD_SUBMISSION_CHANNEL_ID, `<@${userRand}> Use /submit to submit your post! \n **Prompt:**\n${randomPrompt}`); //sendMessageWithTimer allows you to keep track of when you want the timer to start and end by the next bot message
+        // this should fetch a random prompt from the database        
     }, timeDifference);
 
 }
