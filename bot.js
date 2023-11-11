@@ -137,7 +137,7 @@ client.on('ready', async () => {
 
 
 async function schedulePost(activeHoursData){
-    
+
     //get random hour within active hours
     const targetHour = getRandomHourWithinActiveHours(activeHoursData);
     const [hour, minute] = targetHour.split(':');
@@ -155,7 +155,7 @@ async function schedulePost(activeHoursData){
         setTimeout(async () => {
             await client.sendMessageWithTimer(process.env.DISCORD_SUBMISSION_CHANNEL_ID, "Time to make a post!");
             //schedule next post 
-            const nextActiveHoursData = await activeHours.fetchActiveHoursFromDB();
+            const nextActiveHoursData = await activeHours.fetchActiveHoursFromDB(process.env.DISCORD_GUILD_ID);
             schedulePost(nextActiveHoursData);
         }, timeDifference);
 }
