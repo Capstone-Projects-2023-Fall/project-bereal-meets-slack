@@ -10,6 +10,7 @@ const http = require('http');
 const timeRange = require('./commands/timeRange');
 const activeHours = require('./commands/activeHours');
 const {fetchActiveHoursFromDB} = require('./commands/activeHours');
+const {getRandomHourWithinActiveHours} = require('./commands/timeRange');
 
 //for cloud run, serverless application needs a server to listen.
 const port = 8080;
@@ -136,27 +137,27 @@ client.on('ready', async () => {
 
 
 async function schedulePost(activeHoursData){
-    //fecth active hours from database
-    const activeHoursData = await activeHours.fetchActiveHoursFromDB();
-
+    
     //get random hour within active hours
-    const targetHour = await timeRange.getRandomHourWithinActiveHours(activeHoursData);
+    const targetHour = getRandomHourWithinActiveHours(activeHoursData);
+    const [hour, minute] = targetHour.split(':');
 
     const now = moment().tz("America/New_York");
-    const targetTime = now.clone().hour(targetHour).minute(0).second(0);
+    const targetTime = now.clone().hour(hour).minute(minute).second(0);
 
     if(now.isAfter(targetTime)){
         //if current time is after target time, schedule for next day
         console.log("Current time is past target posting time. Scheduling for next time.");
-    } else {
+        targetTime.add(1, 'day');
+    }
         const timeDifference = targetTime.diff(now);
 
         setTimeout(async () => {
             await client.sendMessageWithTimer(process.env.DISCORD_SUBMISSION_CHANNEL_ID, "Time to make a post!");
             //schedule next post 
-            schedulePost();
+            const nextActiveHoursData = await activeHours.fetchActiveHoursFromDB();
+            schedulePost(nextActiveHoursData);
         }, timeDifference);
-    }
 }
 
 // function schedulePost() {
