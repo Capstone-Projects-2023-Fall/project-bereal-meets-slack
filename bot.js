@@ -1,12 +1,13 @@
 require('dotenv').config(); //initialize dotenv
-const { Client, Collection, Events, GatewayIntentBits } = require('discord.js');
+const { Client, Collection, Events, GatewayIntentBits, channelLink } = require('discord.js');
 const path = require('node:path');
 const fs = require('fs');
 const registrar = require('./commandregistrar'); 
 const cron = require('node-cron');
 const moment = require('moment-timezone');
-const notifyMods = require('./utils/notifyMods');
 const http = require('http');
+const database = require('./utils/databasePrompts');
+const outputUsers = require('./utils/promptRandom');
 
 //for cloud run, serverless application needs a server to listen.
 const port = 8080;
@@ -73,11 +74,10 @@ for (const file of commandFiles) {
 	}
 }
 
-client.on('ready', () => {
+client.on('ready', async () => {
     console.log(`Logged in as ${client.user.tag}!`);
-    const now = moment().tz("America/New_York");
     //scheduling for the scheduled post
-    cron.schedule('0 12 * * *', schedulePost, {
+    cron.schedule('0 0 8 * * *', schedulePost, {
         scheduled: true,
         timezone: "America/New_York"
     });
@@ -110,7 +110,7 @@ function getRandomHour() {
     return Math.floor(Math.random() * (24 - 14) + 14);
 }
 
-function schedulePost() {
+async function schedulePost() {
     const targetHour = getRandomHour();
     const now = moment().tz("America/New_York");
     const targetTime = now.clone().hour(targetHour).minute(0).second(0);
@@ -122,9 +122,14 @@ function schedulePost() {
     const timeDifference = targetTime.diff(now);
     console.log(`Scheduling post for ${targetHour}:00 EST`);
 
-    setTimeout(() => {  
-        client.sendMessageWithTimer(process.env.DISCORD_SUBMISSION_CHANNEL_ID, "Time to make a post!"); //sendMessageWithTimer allows you to keep track of when you want the timer to start and end by the next bot message
+    setTimeout(async() => {
+        const list = client.guilds.cache.get(process.env.DISCORD_GUILD_ID);
+        const userRand = await outputUsers(list);
+        const randomPrompt = await database.getRandomPrompt();
+        client.sendMessageWithTimer(process.env.DISCORD_SUBMISSION_CHANNEL_ID, `<@${userRand}> Use /submit to submit your post! \n **Prompt:**\n${randomPrompt}`); //sendMessageWithTimer allows you to keep track of when you want the timer to start and end by the next bot message
+        // this should fetch a random prompt from the database        
     }, timeDifference);
+
 }
 
 client.sendMessageWithTimer = async (channelId, content) => {
