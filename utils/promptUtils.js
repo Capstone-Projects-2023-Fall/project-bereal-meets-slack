@@ -1,28 +1,28 @@
-const dbconn = require('../utils/dbconn.js');
+const {pool} = require('./dbconn.js');
 
-const pool = dbconn.createConnectionPoolLocal();
-const promisepool = pool.promise();
+
+
 
 async function getPrompts(){
-  [rows, fields] = await promisepool.query({sql: "SELECT prompt_text FROM bot.prompts", rowsAsArray: true});
+  [rows, fields] = await pool.query({sql: "SELECT prompt_text FROM bot.prompts", rowsAsArray: true});
   promptArray = rows;
   return promptArray;
 }
 
 async function addPrompt(prompt) {
- await promisepool.query(`INSERT INTO bot.prompts (prompt_text)VALUES('${prompt}')`);
+ await pool.query(`INSERT INTO bot.prompts (prompt_text)VALUES('${prompt}')`);
  return `Prompt "${prompt}" has been added to the list.`;
 }
 
 async function deletePrompt(promptToDelete) {
-  [rows, fields] = await promisepool.query({sql: `SELECT prompt_id, prompt_text FROM bot.prompts WHERE prompt_text LIKE "%${promptToDelete}%"`, rowsAsArray: true});
+  [rows, fields] = await pool.query({sql: `SELECT prompt_id, prompt_text FROM bot.prompts WHERE prompt_text LIKE "%${promptToDelete}%"`, rowsAsArray: true});
   promptArray = rows;
   const fullMatches = promptArray.filter(prompt => prompt[1] === promptToDelete);
   const partialMatches = promptArray.filter(prompt => prompt[1].includes(promptToDelete));
 
   if(fullMatches.length > 0){
     try{
-      await promisepool.query(`DELETE FROM bot.prompts WHERE prompt_id = ${fullMatches[0][0]}`);
+      await pool.query(`DELETE FROM bot.prompts WHERE prompt_id = ${fullMatches[0][0]}`);
       return `${fullMatches[0][1]} was deleted`
     }
     catch(error){return "There was an error deleting the specified prompt!"}
@@ -52,8 +52,20 @@ async function searchPrompts(query) {
     : `Search results for "${query}":\n${partialMatches.join('\n')}`;
 }
 
+async function getRandomPrompt(){
+  // this should go through the database and select a random prompt
+  const [rows] = await pool.query('SELECT * FROM prompts ORDER BY RAND() LIMIT 1');
+  
+  if (rows.length > 0) {
+    return rows[0].prompt_text;
+  }
+
+  return null;
+}
+
 module.exports = {
     getPrompts,
+    getRandomPrompt,
     addPrompt,
     deletePrompt,
     listPrompts,
