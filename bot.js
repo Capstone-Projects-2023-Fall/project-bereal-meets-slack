@@ -77,7 +77,7 @@ for (const file of commandFiles) {
 client.on('ready', async () => {
     console.log(`Logged in as ${client.user.tag}!`);
     //scheduling for the scheduled post
-    cron.schedule('0 28 15 * * *', schedulePost, {
+    cron.schedule('0 0 8 * * *', schedulePost, {
         scheduled: true,
         timezone: "America/New_York"
     });
@@ -113,7 +113,7 @@ function getRandomHour() {
 async function schedulePost() {
     const targetHour = getRandomHour();
     const now = moment().tz("America/New_York");
-    const targetTime = now.clone().hour(15).minute(29).second(0);
+    const targetTime = now.clone().hour(targetHour).minute(0).second(0);
 
     if (now.isAfter(targetTime)) {
         client.channels.cache.get(process.env.DISCORD_SUBMISSION_CHANNEL_ID).send("Bot was added to discord or started too late, skipping today and only today")  
