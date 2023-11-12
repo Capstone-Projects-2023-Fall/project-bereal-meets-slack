@@ -112,6 +112,8 @@ client.on(Events.InteractionCreate, async interaction => {
 		}
 	}
 });
+
+
 function getRandomHour() {
     return Math.floor(Math.random() * (24 - 14) + 14);
 }
