@@ -168,7 +168,7 @@ client.on('messageCreate', async msg => {
                 console.log(`timeToRespond: ${elapsedSeconds} seconds.`); //TODO: Make this fill into the DB as timeToRespond
             }
         }
-    }
+    } 
 });
 
 // Make sure this line is the last line
