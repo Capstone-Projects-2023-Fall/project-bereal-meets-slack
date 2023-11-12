@@ -134,7 +134,7 @@ client.on('ready', async () => {
 
     //setup cron
 
-    cron.schedule('* * 8/14 * * *', async () => {
+    cron.schedule('* * 8 * * *', async () => {
     //try to schedule post 
     try{
         const activeHoursData = await activeHoursUtils.fetchActiveHoursFromDB(guildId);
