@@ -161,8 +161,8 @@ async function schedulePost(activeHoursData){
           const randomPrompt = await database.getRandomPrompt();
           client.sendMessageWithTimer(process.env.DISCORD_SUBMISSION_CHANNEL_ID, `<@${userRand}> Use /submit to submit your post! \n **Prompt:**\n${randomPrompt}`);
             //schedule next post 
-            const nextActiveHoursData = await activeHours.fetchActiveHoursFromDB(process.env.DISCORD_GUILD_ID);
-            schedulePost(nextActiveHoursData);
+            //const nextActiveHoursData = await activeHours.fetchActiveHoursFromDB(process.env.DISCORD_GUILD_ID);
+           // schedulePost(nextActiveHoursData);
         }, timeDifference);
 }
 

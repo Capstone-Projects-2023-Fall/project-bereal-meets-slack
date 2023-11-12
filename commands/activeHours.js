@@ -1,8 +1,8 @@
 const {SlashCommandBuilder} = require ('discord.js');
-const {createConnectionPoolLocal} = require('../utils/dbconn');
+const {createPromiseConnectionPool} = require('../utils/dbconn');
 
 //Create connection from dbconn
-const pool = createConnectionPoolLocal();
+const pool = createPromiseConnectionPool();
 
 //new slash command to view active hours 
 const activeHoursCommand = new SlashCommandBuilder()
@@ -15,7 +15,7 @@ async function getActiveHours(interaction) {
     //this will get the active hours from DB
     const queryText = 'SELECT start_time, end_time FROM operating_hours WHERE guild_id = ?';
     try{
-        const [rows] = await pool.promise().execute(queryText, [guildId]);
+        const [rows] = await pool.execute(queryText, [guildId]);
         //If no active hours are set
         if (rows.length === 0) {
             await interaction.reply("No Active Hours Set");
@@ -35,7 +35,7 @@ async function getActiveHours(interaction) {
 async function storeOperatingHours(guildId, startTime, endTime){
     const queryText = 'INSERT INTO operating_hours (guild_id, start_time, end_time) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE start_time = VALUES(start_time), end_time = VALUES(end_time)';
     try {
-        await pool.promise().execute(queryText, [guildId, startTime, endTime]);
+        await pool.execute(queryText, [guildId, startTime, endTime]);
         console.log(`Operating hours set for guild ${guildId}: ${startTime} - ${endTime}`);
     } catch (error){
         console.error(`Error storing operating hours for ${guildId}:`, error);
@@ -45,7 +45,7 @@ async function storeOperatingHours(guildId, startTime, endTime){
 async function fetchActiveHoursFromDB(guildId){
     const queryText = 'SELECT start_time, end_time FROM operating_hours WHERE guild_id = ?';
     try {
-        const[rows] = await pool.promise().execute(queryText, [guildId]);
+        const[rows] = await pool.execute(queryText, [guildId]);
         if (rows.length === 0){
             return {start_time: '09:00', end_time: '17:00'}; //Default hours
         }
