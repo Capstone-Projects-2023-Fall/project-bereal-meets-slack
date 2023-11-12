@@ -5,7 +5,7 @@
 //This will then send a confirm message to the user
 
 const {SlashCommandBuilder} = require('discord.js');
-const timeRangeUtils = require('../utils/timeRangeUtils');
+const activeHoursUtils = require('../utils/activeHoursUtils');
 
 const timeRangeCommand = new SlashCommandBuilder()
     .setName('timerange')
@@ -21,7 +21,7 @@ async function setTimeRange(interaction){
     const endTime = interaction.options.getString('end-time');
 
     try{
-        await timeRangeUtils.storeOperatingHours(guildId, startTime, endTime);
+        await activeHoursUtils.storeOperatingHours(guildId, startTime, endTime);
         await interaction.reply(`Active hours set from ${startTime} to ${endTime}`);
     } catch (error){
         console.error('Failed to set active hours:', error);
@@ -31,7 +31,7 @@ async function setTimeRange(interaction){
 
 module.exports = {
     data: timeRangeCommand,
-    execute: setTimeRange
+    execute: setTimeRange,
 };
 
 

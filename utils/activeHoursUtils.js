@@ -14,5 +14,5 @@ async function storeOperatingHours(guildId, startTime, endTime) {
 
 module.exports = {
     fetchActiveHoursFromDB,
-    storeOperatingHours
+    storeOperatingHours,
 };

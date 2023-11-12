@@ -19,5 +19,5 @@ function getRandomHourWithinActiveHours(activeHoursData){
 }
 
 module.exports = {
-    getRandomHourWithinActiveHours
+    getRandomHourWithinActiveHours,
 };
