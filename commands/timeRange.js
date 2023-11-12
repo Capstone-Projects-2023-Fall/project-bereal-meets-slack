@@ -13,13 +13,13 @@ async function setTimeRange(interaction){
     const guildId = interaction.guild.id;
     const startTime = interaction.options.getString('start-time');
     const endTime = interaction.options.getString('end-time');
-
+    await interaction.deferReply();
     try{
         await activeHoursUtils.storeOperatingHours(guildId, startTime, endTime);
-        await interaction.reply(`Active hours set from ${startTime} to ${endTime}`);
+        await interaction.followUp(`Active hours set from ${startTime} to ${endTime}`);
     } catch (error){
         console.error('Failed to set active hours:', error);
-        await interaction.reply('There was an error setting active hours.');
+        await interaction.followUp('There was an error setting active hours.');
     }
 }
 
