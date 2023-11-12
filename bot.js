@@ -9,8 +9,7 @@ const http = require('http');
 const database = require('./utils/databasePrompts');
 const outputUsers = require('./utils/promptRandom');
 const timeRange = require('./commands/timeRange');
-const activeHours = require('./commands/activeHours');
-const {fetchActiveHoursFromDB} = require('./commands/activeHours');
+const activeHoursUtils = require('./utils/activeHoursUtils');
 const {getRandomHourWithinActiveHours} = require('./commands/timeRange');
 
 //for cloud run, serverless application needs a server to listen.
@@ -134,7 +133,7 @@ client.on('ready', async () => {
     const guildId = process.env.DISCORD_GUILD_ID;
     //try to schedule post
     try{
-        const activeHoursData = await fetchActiveHoursFromDB(guildId);
+        const activeHoursData = await activeHoursUtils.fetchActiveHoursFromDB(guildId);
         await schedulePost(activeHoursData);
     } catch (error) {
         console.error('Error scheduling post', error);
