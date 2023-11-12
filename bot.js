@@ -83,12 +83,6 @@ client.on('ready', () => {
         timezone: "America/New_York"
     });
     registrar.registercommands(); 
-    console.log(process.env.DISCORD_SUBMISSION_CHANNEL_ID)
-    getReactionCount(client, process.env.DISCORD_SUBMISSION_CHANNEL_ID).then(totalReactions => {
-        console.log(`Total reactions: ${totalReactions}`);
-    }).catch(error => {
-        console.error('Failed to get reaction count:', error);
-    });
 });
 
 //check for ping command.
@@ -125,10 +119,8 @@ function schedulePost() {
     if (now.isAfter(targetTime)) {
         client.channels.cache.get(process.env.DISCORD_SUBMISSION_CHANNEL_ID).send("Bot was added to discord or started too late, skipping today and only today")  
     }
-
     const timeDifference = targetTime.diff(now);
     console.log(`Scheduling post for ${targetHour}:00 EST`);
-
     setTimeout(() => {  
         client.sendMessageWithTimer(process.env.DISCORD_SUBMISSION_CHANNEL_ID, "Time to make a post!"); //sendMessageWithTimer allows you to keep track of when you want the timer to start and end by the next bot message
     }, timeDifference);
@@ -158,64 +150,136 @@ client.on('messageCreate', async msg => {
     }
 });
 
-// Discords way of letting us see the most recent message in a channel, use this to get a specific message you want data on
-
-function fetchMostRecentMessageId(client, channelId) {
-    // Make sure the client is logged in and ready
+async function fetchMessagesUntilPrompt(client, channelId) {
     if (!client.isReady()) {
         console.error('Client is not ready');
-        return;
+        return [];
     }
-    // Get the channel from the client's channels cache
     const channel = client.channels.cache.get(channelId);
-    // Check if the channel exists and is a text channel
-    if (!channel || channel.type !== ChannelType.GuildText) { // Change this line
+    if (!channel || channel.type !== ChannelType.GuildText) {
         console.error('The channel was not found or it is not a text channel.');
-        return;
+        return [];
     }
-    // Fetch the most recent messages from the channel
-    channel.messages.fetch({ limit: 1 })
-        .then(messages => {
-        if (messages.size > 0) {
-            // The first message in the collection will be the most recent
-            const recentMessageId = messages.first().id;
-            console.log(`The most recent message ID is: ${recentMessageId}`);
-        } else {
-            console.log('No messages found in the channel.');
+    let lastId;
+    const messagesList = [];
+    let foundPrompt = false;
+    while (!foundPrompt) {
+        const options = { limit: 100 };
+        if (lastId) {
+            options.before = lastId;
         }
-        })
-        .catch(error => {
-            console.error('Error fetching messages: ', error);
-        });
-}
-
-function getReactionCount(client, channelId) {
-    return fetchMostRecentMessageId(client, channelId).then(messageId => {
-        // Fetch the channel using the client
-        return client.channels.fetch(channelId).then(channel => {
-            // Ensure the channel exists and is a text channel
-            if (!channel || channel.type !== 'GUILD_TEXT') {
-                throw new Error('The channel was not found or is not a text channel.');
+        try {
+            const messages = await channel.messages.fetch(options);
+            if (messages.size === 0) {
+                break; // No more messages left to fetch
             }
-
-            // Fetch the message using the message ID
-            return channel.messages.fetch(messageId).then(message => {
-                // Calculate the total number of reactions
-                let totalReactions = 0;
-                message.reactions.cache.forEach(reaction => {
-                    totalReactions += reaction.count;
-                });
-                // Return the total number of reactions
-                return totalReactions;
-            });
-        });
-    }).catch(error => {
-        console.error('An error occurred while fetching the reaction count:', error);
-        throw error; // Rethrow the error for the calling function to handle
-    });
+            for (const message of messages.values()) {
+                if (message.content.includes("Prompt")) {
+                    foundPrompt = true;
+                    break; // Stop if we find the "Prompt"
+                }
+                messagesList.push(message); // Add the message to our list
+                lastId = message.id; // Set the last ID for the next fetch
+            }
+        } catch (error) {
+            console.error('Error fetching messages: ', error);
+            break; // Exit the loop in case of API error
+        }
+    }
+    return messagesList;
 }
 
+function countReactions(message) {
+    // Check if the message has reactions
+    if (message.reactions.cache.size > 0) {
+        // Reduce the reactions to a total count
+        const totalReactions = message.reactions.cache.reduce((acc, reaction) => acc + reaction.count, 0);
+        return totalReactions;
+    } else {
+        // If there are no reactions, return 0
+        return 0;
+    }
+}
+
+async function countRepliesToMessage(message) {
+    // Ensure the message object has the necessary properties
+    if (!message.channel || !message.id) {
+        throw new Error('The provided message object is missing required properties.');
+    }
+    // Fetch all messages in the channel that came after the message in question
+    const options = { after: message.id };
+    let repliesCount = 0;
+    let lastID;
+    while (true) {
+        if (lastID) {
+            options.after = lastID;
+        }
+        const messages = await message.channel.messages.fetch(options);
+        if (messages.size === 0) {
+            // No more messages left to fetch
+            break;
+        }
+        // Count messages that are a direct reply to the original message
+        const replies = messages.filter(m => m.reference && m.reference.messageId === message.id);
+        repliesCount += replies.size;
+        // Prepare for the next batch
+        lastID = messages.last().id;
+    }
+    return repliesCount;
+}
+
+function getImageLinkFromMessage(message) {
+    // Initialize the image link variable
+    let imageLink = null;
+    // Check for attachments in the message
+    message.attachments.forEach(attachment => {
+        // Check if the attachment is an image based on its content type
+        if (attachment.contentType && attachment.contentType.startsWith('image/')) {
+            // Set the image link
+            imageLink = attachment.url;
+        }
+    });
+    // If no image was found in attachments, check embeds as Discord automatically embeds some image links
+    if (!imageLink) {
+        message.embeds.forEach(embed => {
+            if (embed.type === 'image' && embed.url) {
+                imageLink = embed.url;
+            }
+            // Some embeds might contain an image within them rather than being of type 'image'
+            else if (embed.image && embed.image.url) {
+                imageLink = embed.image.url;
+            }
+        });
+    }
+    return imageLink;
+}
+
+async function saveDB(client, channelId) {
+    try {
+        const messagesList = await fetchMessagesUntilPrompt(client, channelId);
+        const messagesData = [];
+
+        // Loop through each message and get the number of reactions
+        for (const message of messagesList) {
+            const numOfReactions = message.reactions.cache.reduce((acc, reaction) => acc + reaction.count, 0);
+            // Create an object with the message ID and the number of reactions
+            const messageData = {
+                messageId: message.id,
+                numOfReactions: numOfReactions,
+                numOfReplies: numOfReplies,
+                response_image: getImageLinkFromMessage
+            };
+            //Add the object to our array
+            messagesData.push(messageData);
+        }
+        //TODO: Loop through messageData element by element, extract data out of it, insert data into database
+        //  Also keep in mind you will need to add the time onto each element from that array (you will write a method to do this)
+        //      TODO: write a method to find the earliest prompt message, then have it get the time stamp of that message and do the math to calculate the time diff and return that
+
+    } catch (error) {
+        console.error('Error in saveDB:', error);
+        throw error;
+    }
+}
 // Make sure this line is the last line
 client.login(TOKEN);
-
-
