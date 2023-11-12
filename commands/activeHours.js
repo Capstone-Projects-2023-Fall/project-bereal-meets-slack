@@ -29,7 +29,7 @@ module.exports = {
 
                 async execute(interaction) {
                     const subcommand = interaction.options.getSubcommand();
-                    const guildID = interaction.guild.id;
+                    const guildId = interaction.guild.id;
 
                     if(subcommand === 'set') {
                         const startTime = interaction.options.getString('start-time');
