@@ -1,9 +1,3 @@
-//Discription: 
-//This command is called by /timerange
-//This will allow users to set active hours for prompt posts.
-//The time will be stored in LocalStorage for each guild
-//This will then send a confirm message to the user
-
 const {SlashCommandBuilder} = require('discord.js');
 const activeHoursUtils = require('../utils/activeHoursUtils');
 
