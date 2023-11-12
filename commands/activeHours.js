@@ -24,7 +24,7 @@ function getActiveHours(interaction) {
     const { startTime, endTime } = activeHours;
     //will state the active hours
     const reply = `Active hours are set from ${startTime} to ${endTime}`;
-    interaction.repl(reply);
+    interaction.reply(reply);
 }
 
 //will export command data
