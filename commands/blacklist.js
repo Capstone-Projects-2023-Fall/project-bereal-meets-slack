@@ -1,21 +1,6 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
-const mysql = require('mysql');
-
-const connection = mysql.createConnection({
-    host: '34.29.242.181',
-    user: 'root',
-    password: 'l,2did/uc&O?izJv',
-    database: 'bot'
-});
-
-connection.connect((err) => {
-    if(err){
-        console.error('Error connecting to MySQL:', err);
-        process.exit(1);
-    }
-    console.log('Connected to MySQL');
-});
-
+const dbconn = require('../utils/dbconn.js');
+const pool = dbconn.createPromiseConnectionPool();
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -34,39 +19,41 @@ module.exports = {
             
             switch(sub) {
                 case 'add':
-                const checkQuery = `SELECT * FROM bot.blacklist WHERE user_id = '${user}' AND guild_id = '${interaction.guild.id}'`;
-                connection.query(checkQuery, (err, results) => {
-                    if (err){
-                        console.error('Error checking blacklist', err);
-                        return;
+                    const checkQuery = `SELECT * FROM bot.blacklist WHERE user_id = '${user}' AND guild_id = '${interaction.guild.id}'`;
+                    try{
+                        [rows, fields] = await pool.query(checkQuery);
+                        const results = rows;
+                        if (results.length === 0) {
+                            (async function(){
+                                const insertQuery = `INSERT INTO bot.blacklist (user_id, guild_id) VALUES ('${user}', '${interaction.guild.id}')`;
+                                try{
+                                await pool.query(insertQuery);
+                                    const embed = new EmbedBuilder()
+                                    .setColor("Green")
+                                    .setDescription(`The user \'${user}\` has been blacklisted from this bot`);
+    
+                                    interaction.reply({embeds: [embed], ephemeral: true});
+                                }
+                                catch(error){
+                                    console.error('Error checking the blacklist:', err);
+                                    return;
+                                }
+                            })();
+                        } else {
+                            interaction.reply({content: `The user \`${user}\` has already been blacklisted`, ephemeral:true });
+                        }
                     }
-                    if (results.length === 0) {
-                        const insertQuery = `INSERT INTO bot.blacklist (user_id, guild_id) VALUES ('${user}', '${interaction.guild.id}')`;
-                        connection.query(insertQuery, (err) => {
-                            if(err) {
-                                console.error('Error adding to the blacklist:', err);
-                                return;
-                            }
-                            const embed = new EmbedBuilder()
-                            .setColor("Green")
-                            .setDescription(`The user \'${user}\` has been blacklisted from this bot`);
-
-                            interaction.reply({embeds: [embed], ephemeral: true});
-
-                        });
-                    } else {
-                        interaction.reply({content: `The user \`${user}\` has already been blacklisted`, ephemeral:true });
+                    catch(err){
+                        console.error('Error checking the blacklist:', err);
+                       return;
                     }
-                });
                 break;
 
                 case 'remove':
                     const deleteQuery = `DELETE FROM bot.blacklist WHERE user_id = '${user}' AND guild_id = '${interaction.guild.id}'`;
-                    connection.query(deleteQuery, (err, results) => {
-                        if(err){
-                            console.error('Error removing from blacklist:', err);
-                            return;
-                        }
+                    try{
+                        [rows, fields] = await pool.query(deleteQuery);
+                        const results = rows;
                         if (results.affectedRows > 0) {
                             const embed = new EmbedBuilder()
                             .setColor("Green")
@@ -76,25 +63,31 @@ module.exports = {
                         } else {
                             interaction.reply({content: `The user \`${user}\` is not on the blacklist`, ephemeral: true});
                         }
-                    });
+
+                    }
+                    catch(err){
+                        console.error('Error deleting from the blacklist', err);
+                        return;
+                    }
                     break;
 
                 case 'list':
                     const listQuery = `SELECT user_id FROM bot.blacklist WHERE guild_id = '${interaction.guild.id}'`;
-                    connection.query(listQuery, (err, results) => {
-                        if(err){
-                            console.error('Error fetching blacklist:', err);
-                            return;
-                        }
+                    try{
+                        [rows, fields] = await pool.query(listQuery);
+                        const results = rows;
                         const blacklistArray = results.map(row => row.user_id);
                         if (blacklistArray.length === 0){
                             interaction.reply({content: 'The blacklist is empty', ephemeral:true});
                         } else {
                             interaction.reply({content: `Users on the blacklist: ${blacklistArray.join (', ')}`, ephemeral: true});
                         }
-                    });
+                    }
+                    catch(err){
+                        console.error('Error deleting from the blacklist', err);
+                        return;
+                    }
                     break;
-
             }
         }
 };
