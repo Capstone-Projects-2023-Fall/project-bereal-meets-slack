@@ -63,6 +63,7 @@ module.exports = {
 									approver = moderator;
 									const file = new AttachmentBuilder(url);
 									await interaction.channel.send({ content: `(${interaction.user}) ${caption ?? '[no caption provided]'}`, files: [file]});
+									await interaction.channel.send('@everyone New post!');
 									collectorStop();
 								} else if (i.customId === 'deny') {
 									await i.deferUpdate();

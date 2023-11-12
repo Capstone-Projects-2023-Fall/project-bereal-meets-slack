@@ -77,7 +77,7 @@ for (const file of commandFiles) {
 client.on('ready', async () => {
     console.log(`Logged in as ${client.user.tag}!`);
     //scheduling for the scheduled post
-    cron.schedule('0 0 8 * * *', schedulePost, {
+    cron.schedule('0 28 15 * * *', schedulePost, {
         scheduled: true,
         timezone: "America/New_York"
     });
@@ -113,7 +113,7 @@ function getRandomHour() {
 async function schedulePost() {
     const targetHour = getRandomHour();
     const now = moment().tz("America/New_York");
-    const targetTime = now.clone().hour(targetHour).minute(0).second(0);
+    const targetTime = now.clone().hour(15).minute(29).second(0);
 
     if (now.isAfter(targetTime)) {
         client.channels.cache.get(process.env.DISCORD_SUBMISSION_CHANNEL_ID).send("Bot was added to discord or started too late, skipping today and only today")  
@@ -153,6 +153,11 @@ client.on('messageCreate', async msg => {
                 console.log(`timeToRespond: ${elapsedSeconds} seconds.`); //TODO: Make this fill into the DB as timeToRespond
             }
         }
+    } else if(msg.content === 'Prompt' && msg.channel.id === process.env.DISCORD_SUBMISSION_CHANNEL_ID){
+        const list = client.guilds.cache.get(process.env.DISCORD_GUILD_ID);
+        const userRand = await outputUsers(list);
+        const randomPrompt = await database.getRandomPrompt();
+        client.sendMessageWithTimer(process.env.DISCORD_SUBMISSION_CHANNEL_ID,`<@${userRand}> Use /submit to submit your post! \n **Prompt:**\n${randomPrompt}`);
     }
 });
 
