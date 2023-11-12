@@ -10,9 +10,10 @@ module.exports = {
         .addSubcommand(command => command.setName('remove').setDescription('Remove user from the blacklist').addStringOption(option => option.setName('user').setDescription('The user ID you want to remove from the blacklist').setRequired(true)))
         .addSubcommand(command => command.setName('list').setDescription('List users in the blacklist')),
         async execute (interaction){
+            await interaction.deferReply();
             const {options} = interaction;
             const modRole = interaction.guild.roles.cache.find(role => role.name === 'bot mod');
-            if (!(interaction.member.roles.cache.has(modRole.id))) return await interaction.reply({ content: 'Only **moderators** can use this command', ephemeral: true});
+            if (!(interaction.member.roles.cache.has(modRole.id))) return await interaction.followUp({ content: 'Only **moderators** can use this command', ephemeral: true});
 
             const user = options.getString('user');
             const sub = options.getSubcommand();
