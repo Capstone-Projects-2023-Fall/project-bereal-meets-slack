@@ -131,7 +131,11 @@ client.on('ready', async () => {
     registrar.registercommands();
 
     const guildId = process.env.DISCORD_GUILD_ID;
-    //try to schedule post
+
+    //setup cron
+
+    cron.schedule('* * 8/14 * * *', async () => {
+    //try to schedule post 
     try{
         const activeHoursData = await activeHoursUtils.fetchActiveHoursFromDB(guildId);
         await schedulePost(activeHoursData);
@@ -139,7 +143,7 @@ client.on('ready', async () => {
         console.error('Error scheduling post', error);
     }
 });
-
+});
 
 async function schedulePost(activeHoursData){
     //get random hour within active hours
