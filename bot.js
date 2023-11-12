@@ -169,12 +169,6 @@ client.on('messageCreate', async msg => {
             }
         }
     }
-	else if(msg.content === 'Prompt' && msg.channel.id === process.env.DISCORD_SUBMISSION_CHANNEL_ID){
-		const list = client.guilds.cache.get(process.env.DISCORD_GUILD_ID);
-        const userRand = await outputUsers(list);
-        const randomPrompt = await promptUtils.getRandomPrompt();
-        client.sendMessageWithTimer(process.env.DISCORD_SUBMISSION_CHANNEL_ID, `<@${userRand}> Use /submit to submit your post! \n **Prompt:**\n${randomPrompt}`);
-	}
 });
 
 // Make sure this line is the last line
