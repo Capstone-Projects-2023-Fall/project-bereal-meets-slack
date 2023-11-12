@@ -1,8 +1,9 @@
-const moment = require('moment');
+const moment = require('moment-timezone');
+
 
 function getRandomHourWithinActiveHours(activeHoursData){
 
-    const now = moment().tz("America/New York");
+    const now = moment().tz("America/New_York");
     const startTime = moment(activeHoursData.start_time, "HH:mm");
     const endTime = moment(activeHoursData.end_time, "HH:mm");
 
@@ -17,7 +18,7 @@ function getRandomHourWithinActiveHours(activeHoursData){
     endTime.set({
         year: now.year(),
         month: now.month(),
-        date: now
+        date: now.date()
     });
 
     if(endTime.isBefore(startTime)){
@@ -26,11 +27,11 @@ function getRandomHourWithinActiveHours(activeHoursData){
 
     //if current time is before start time, set random time after start time 
     //else, set random time after current time
-    const referenceTime = now.isBefore(startTime) ? startTime : now;
+    const referenceTime = now.isBefore(startTime) ? startTime : now.add(1, 'minutes');
 
-    const diffMinutes = endTime.diff(startTime, 'minutes');
+    const diffMinutes = endTime.diff(referenceTime, 'minutes');
     const randomMinute = Math.floor(Math.random() * diffMinutes);
-    const randomTime = startTime.add(randomMinute, 'minutes');
+    const randomTime = referenceTime.add(randomMinute, 'minutes');
 
     //Format for random time
     return randomTime.format("HH:mm");

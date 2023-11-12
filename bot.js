@@ -132,6 +132,9 @@ client.on('ready', async () => {
 
     const guildId = process.env.DISCORD_GUILD_ID;
 
+    const activeHoursData = await activeHoursUtils.fetchActiveHoursFromDB(guildId);
+    await schedulePost(activeHoursData);
+
     //setup cron
 
     cron.schedule('* * 8 * * *', async () => {
@@ -167,7 +170,7 @@ async function schedulePost(activeHoursData){
           client.sendMessageWithTimer(process.env.DISCORD_SUBMISSION_CHANNEL_ID, `<@${userRand}> Use /submit to submit your post! \n **Prompt:**\n${randomPrompt}`);
             //schedule next post 
             //const nextActiveHoursData = await activeHoursUtils.fetchActiveHoursFromDB(process.env.DISCORD_GUILD_ID);
-           // schedulePost(nextActiveHoursData);
+            //schedulePost(nextActiveHoursData);
         }, timeDifference);
 }
 
