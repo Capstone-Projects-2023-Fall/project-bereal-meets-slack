@@ -151,7 +151,7 @@ async function schedulePost(activeHoursData){
 
     if(now.isAfter(targetTime)){
         //if current time is after target time, schedule for next day
-        console.log("Current time is past target posting time. Scheduling for next time.");
+        console.log("Current time is past target posting time. Scheduling for next available slot.");
         targetTime.add(1, 'day');
     }
         const timeDifference = targetTime.diff(now);
