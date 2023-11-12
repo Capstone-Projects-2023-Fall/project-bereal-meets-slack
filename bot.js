@@ -10,7 +10,7 @@ const database = require('./utils/databasePrompts');
 const outputUsers = require('./utils/promptRandom');
 const activeHoursUtils = require('./utils/activeHoursUtils');
 const {getRandomHourWithinActiveHours} = require('./utils/timeRangeUtils');
-client.toggles = new Collection();
+
 //for cloud run, serverless application needs a server to listen.
 const port = 8080;
 
@@ -63,6 +63,7 @@ const client = new Client({
 	]
 }); //create new client
 
+client.toggles = new Collection(); 
 client.commands = new Collection(); // set up commands list
 
 const commandsPath = path.join(__dirname, 'commands');
@@ -180,11 +181,11 @@ client.on(Events.MessageCreate, async msg => {
     if (msg.author.id === client.user.id) {
         // Check if the message is in the specified channel
         if (msg.channel.id === process.env.DISCORD_SUBMISSION_CHANNEL_ID) {
-
-            if (msg.content.includes('Prompt:')) {
-				//message has prompt 
+            if (!msg.content.includes('\n **Prompt:**\n')) {
+				// bot posted an approved submission 
 				return;
 			}
+
             // If the timer is running, stop it and log the time
             if (timer.isRunning()) {
                 const elapsedSeconds = timer.stop();
