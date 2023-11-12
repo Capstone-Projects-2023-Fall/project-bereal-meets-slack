@@ -10,7 +10,7 @@ const database = require('./utils/databasePrompts');
 const outputUsers = require('./utils/promptRandom');
 const timeRange = require('./commands/timeRange');
 const activeHoursUtils = require('./utils/activeHoursUtils');
-const {getRandomHourWithinActiveHours} = require('./commands/timeRange');
+const {getRandomHourWithinActiveHours} = require('./utils/timeRangeUtils');
 
 //for cloud run, serverless application needs a server to listen.
 const port = 8080;
@@ -120,7 +120,7 @@ function getRandomHour() {
 
 client.on('guildCreate', guild => {
     //Default active hours for new guild
-    activeHours.storeOperatingHours(guild.id, '09:00', '17:00')
+    activeHoursUtils.storeOperatingHours(guild.id, '09:00', '17:00')
     .then(() => console.log(`Default active hours set for guild ${guild.id}`))
     .catch(error => console.error(`Error setting default active hours for guild ${guild.id}:`, error));
 });
@@ -162,7 +162,7 @@ async function schedulePost(activeHoursData){
           const randomPrompt = await database.getRandomPrompt();
           client.sendMessageWithTimer(process.env.DISCORD_SUBMISSION_CHANNEL_ID, `<@${userRand}> Use /submit to submit your post! \n **Prompt:**\n${randomPrompt}`);
             //schedule next post 
-            //const nextActiveHoursData = await activeHours.fetchActiveHoursFromDB(process.env.DISCORD_GUILD_ID);
+            //const nextActiveHoursData = await activeHoursUtils.fetchActiveHoursFromDB(process.env.DISCORD_GUILD_ID);
            // schedulePost(nextActiveHoursData);
         }, timeDifference);
 }

@@ -4,10 +4,10 @@
 //The time will be stored in LocalStorage for each guild
 //This will then send a confirm message to the user
 
-const {SlashCommmandBuilder} = require('discord.js');
+const {SlashCommandBuilder} = require('discord.js');
 const timeRangeUtils = require('../utils/timeRangeUtils');
 
-const timeRangeCommand = new SlashCommmandBuilder()
+const timeRangeCommand = new SlashCommandBuilder()
     .setName('timerange')
     .setDescription('Set active hours for prompt posts')
     .addStringOption(option =>

@@ -1,11 +1,23 @@
-const{createPromiseConnectionPool} = require('./dbconn');
-const pool = createPromiseConnectionPool();
+const moment = require('moment');
 
-async function storeOperatingHours (guildId, startTime, endTime){
-    const queryText = 'INSERT INTO operating_hours (guild_id, start_time, end_time) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE start_time = VALUES(start_time), end_time = VALUES(end_time)';
-    await pool.execute(queryText, [guildId, startTime, endTime]);
+function getRandomHourWithinActiveHours(activeHoursData){
+
+    const startTime = moment(activeHoursData.start_time, "HH:mm");
+    const endTime = moment(activeHoursData.end_time, "HH:mm");
+
+    if(endTime.isBefore(startTime)){
+        endTime.add(1, 'day');
+    }
+
+    const diffMinutes = endTime.diff(startTime, 'minutes');
+
+    const randomMinute = Math.floor(Math.random() * diffMinutes);
+
+    const randomTime = startTime.add(randomMinute, 'minutes');
+
+    return randomTime.format("HH:mm");
 }
 
 module.exports = {
-    storeOperatingHours
+    getRandomHourWithinActiveHours
 };
