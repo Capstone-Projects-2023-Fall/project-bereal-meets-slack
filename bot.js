@@ -2,14 +2,13 @@ require('dotenv').config(); //initialize dotenv
 const { AttachmentBuilder, ChannelType, Client, Collection, ComponentType, Events, GatewayIntentBits, channelLink, Partials } = require('discord.js');
 const path = require('node:path');
 const fs = require('fs');
-const registrar = require('./commandregistrar'); 
+const registrar = require('./utils/commandregistrar'); 
 const cron = require('node-cron');
 const moment = require('moment-timezone');
 const http = require('http');
-const database = require('./utils/databasePrompts');
+const promptUtils = require('./utils/promptUtils');
 const outputUsers = require('./utils/promptRandom');
 const activeHoursUtils = require('./utils/activeHoursUtils');
-const {getRandomHourWithinActiveHours} = require('./utils/timeRangeUtils');
 const notifyMods = require('./utils/notifyMods.js');
 
 //for cloud run, serverless application needs a server to listen.
@@ -130,7 +129,7 @@ client.on(Events.ClientReady, async () => {
 
 async function schedulePost(activeHoursData) {
     //get random hour within active hours
-    const targetHour = getRandomHourWithinActiveHours(activeHoursData);
+    const targetHour = activeHoursUtils.getRandomHourWithinActiveHours(activeHoursData);
     const [hour, minute] = targetHour.split(':');
 
     const now = moment().tz("America/New_York");
@@ -143,7 +142,7 @@ async function schedulePost(activeHoursData) {
     }
         const timeDifference = targetTime.diff(now);
 
-        setTimeout(async () => {
+    setTimeout(async () => {
 			const list = client.guilds.cache.get(process.env.DISCORD_GUILD_ID);
 			const userRand = await outputUsers(list);
 			userID = userRand.id;
@@ -162,8 +161,7 @@ async function schedulePost(activeHoursData) {
 				// private
 				userRand.send(message);
 			}
-        
-        }, timeDifference);
+    }, timeDifference);
         
 }
 
@@ -193,6 +191,7 @@ client.on(Events.MessageCreate, async msg => {
                 console.log(`timeToRespond: ${elapsedSeconds} seconds.`); //TODO: Make this fill into the DB as timeToRespond
             }
         }
+
     } else {
         // the user has dm'd the bot
 
@@ -296,6 +295,7 @@ client.on(Events.MessageCreate, async msg => {
 			console.log('NO ATTACHMENT');
 		}
 	}
+
 });
 
 

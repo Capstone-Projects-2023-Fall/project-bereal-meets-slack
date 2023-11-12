@@ -75,10 +75,10 @@ module.exports = {
 									}
 									const file = new AttachmentBuilder(url);
 									await interaction.channel.send({ content: `(${interaction.user}) ${caption ?? '[no caption provided]'}`, files: [file]});
+                  await interaction.channel.send('@everyone New post!');
 								}
-								
 								// checks if someone  press deny
-								else if (i.customId === 'deny') {
+                 else if (i.customId === 'deny') {
 									await i.deferUpdate();
 									console.log(`${moderator} denied`);
 									await i.editReply({ content: '**DENIED**', components: [] }); 

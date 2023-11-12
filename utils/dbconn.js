@@ -3,7 +3,7 @@ require('dotenv').config();
 
 function createConnectionPoolLocal(){ //use this one for local calls when testing.
 const dboptions = {
-  connectionLimit : 10, 
+  connectionLimit : 15, 
   host     : process.env.DB_HOST,
   user     : process.env.DB_USER,
   password : process.env.DB_PASS,
@@ -14,7 +14,7 @@ const dboptions = {
 
 function createConnectionPoolCloud(){
   const dboptions = {
-    connectionLimit : 10,
+    connectionLimit : 15,
     socketPath: process.env.INSTANCE_UNIX_SOCKET,
     user     : process.env.DB_USER,
     password : process.env.DB_PASS,
@@ -40,8 +40,8 @@ function createPromiseConnectionPool(){
   return promisepool;
 };
 
+const pool = createPromiseConnectionPool();
+
 module.exports = {
-  createConnectionPoolLocal,
-  createConnectionPoolCloud,
-  createPromiseConnectionPool
+  pool
 };
