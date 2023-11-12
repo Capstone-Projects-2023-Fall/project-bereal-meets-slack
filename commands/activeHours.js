@@ -7,43 +7,21 @@ module.exports = {
         .setName('activehours')
         .setDescription('View active hours for prompts')
         .addSubcommand(subcommand =>
-            subcommand
-                .setName('set')
-                .setDescription('Set active hours.')
-                .addStringOption(option =>
-                    option.setName('start-time')
-                        .setDescription('Enter start time (HH:MM)')
-                        .setRequired(true)
-                        )
-                        .addStringOption(option => 
-                            option.setName('end-time')
-                                .setDescription('Enter end time (HH:MM)')
-                                .setRequired(true)
-                                )
-                        )
-                        .addSubcommand(subcommand =>
-                           subcommand
-                           .setName('view')
-                           .setDescription('View active hours.')
-                        ),
-
-                async execute(interaction) {
-                    const subcommand = interaction.options.getSubcommand();
-                    const guildId = interaction.guild.id;
-
-                    if(subcommand === 'set') {
-                        const startTime = interaction.options.getString('start-time');
-                        const endTime = interaction.options.getString('end-time');
-                        await activeHoursUtils.storeOperatingHours(guildId, startTime, endTime);
-                        await interaction.reply(`Active hours set from ${startTime} to ${endTime}`);
-                    }
-                    else if (subcommand === 'view'){
-                        const hours = await activeHoursUtils.fetchActiveHoursFromDB(guildId);
-                        await interaction.reply(`Active hours are from ${hours.start_time} to ${hours.end_time}`);
-                    }
+            subcommand.setName('view').setDescription('View active hours.')
+        ),
+        async execute(interaction){
+            const guildId = interaction.guild.id;
+            if (interaction.options.getSubcommand() === 'view'){
+                try{
+                    const hours = await activeHoursUtils.fetchActiveHoursFromDB(guildId);
+                    await interaction.reply(`Active hoursare from ${hours.start_time} to ${hours.end_time}`);
+                } catch (error){
+                    console.error('Failed to retrieve active hours:', error);
+                    await interaction.reply('Failed to retrieve active hours.');
                 }
-
-};
+            }
+        }
+    };
 
 
 // //new slash command to view active hours 
