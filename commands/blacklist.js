@@ -1,7 +1,6 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
-
-// Create a Set to store blacklisted user IDs
-const blacklistSet = new Set();
+const dbconn = require('../utils/dbconn.js');
+const pool = dbconn.createPromiseConnectionPool();
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -20,43 +19,75 @@ module.exports = {
             
             switch(sub) {
                 case 'add':
-                // Check if the user is not in the blacklist
-                if(!blacklistSet.has(user)){
-                    blacklistSet.add(user);
-
-                    const embed = new EmbedBuilder()
-                    .setColor("Green")
-                    .setDescription(`The user \`${user}\` has been blacklisted from this bot`)
-
-                    await interaction.reply({embeds: [embed], ephemeral: true});
-                } else if (blacklistSet.has(user)) {
-                    return await interaction.reply({ content: `The user \`${user}\` has already been blacklisted,`, ephemeral: true});
-                }
-
+                    const checkQuery = `SELECT * FROM bot.blacklist WHERE user_id = '${user}' AND guild_id = '${interaction.guild.id}'`;
+                    try{
+                        [rows, fields] = await pool.query(checkQuery);
+                        const results = rows;
+                        if (results.length === 0) {
+                            (async function(){
+                                const insertQuery = `INSERT INTO bot.blacklist (user_id, guild_id) VALUES ('${user}', '${interaction.guild.id}')`;
+                                try{
+                                await pool.query(insertQuery);
+                                    const embed = new EmbedBuilder()
+                                    .setColor("Green")
+                                    .setDescription(`The user \'${user}\` has been blacklisted from this bot`);
+    
+                                    interaction.reply({embeds: [embed], ephemeral: true});
+                                }
+                                catch(error){
+                                    console.error('Error checking the blacklist:', err);
+                                    return;
+                                }
+                            })();
+                        } else {
+                            interaction.reply({content: `The user \`${user}\` has already been blacklisted`, ephemeral:true });
+                        }
+                    }
+                    catch(err){
+                        console.error('Error checking the blacklist:', err);
+                       return;
+                    }
                 break;
+
                 case 'remove':
-                // Check if the user is not in the blacklist
-                if (blacklistSet.has(user)) {
-                    blacklistSet.delete(user);
+                    const deleteQuery = `DELETE FROM bot.blacklist WHERE user_id = '${user}' AND guild_id = '${interaction.guild.id}'`;
+                    try{
+                        [rows, fields] = await pool.query(deleteQuery);
+                        const results = rows;
+                        if (results.affectedRows > 0) {
+                            const embed = new EmbedBuilder()
+                            .setColor("Green")
+                            .setDescription(`The user \`${user}\` has been removed from the blacklist`);
 
-                    const embed = new EmbedBuilder()
-                    .setColor("Green")
-                    .setDescription(`The user \`${user}\` has been removed from the blacklist`)
+                            interaction.reply({embeds: [embed], ephemeral: true});
+                        } else {
+                            interaction.reply({content: `The user \`${user}\` is not on the blacklist`, ephemeral: true});
+                        }
 
-                    await interaction.reply({embeds: [embed], ephemeral: true});
-                } else {
-                    return await interaction.reply({ content: `The user \`${user}\` is not on the blacklist.`, ephemeral: true });
-                }
-                break;
+                    }
+                    catch(err){
+                        console.error('Error deleting from the blacklist', err);
+                        return;
+                    }
+                    break;
 
                 case 'list':
-                //Print the contents of the blacklistSet
-                const blacklistArray = Array.from(blacklistSet);
-                 if (blacklistArray.length === 0) {
-                await interaction.reply({ content: 'The blacklist is empty.', ephemeral: true });
-                 } else {
-                     await interaction.reply({ content: `Users on the blacklist: ${blacklistArray.join(', ')}`, ephemeral: true });
+                    const listQuery = `SELECT user_id FROM bot.blacklist WHERE guild_id = '${interaction.guild.id}'`;
+                    try{
+                        [rows, fields] = await pool.query(listQuery);
+                        const results = rows;
+                        const blacklistArray = results.map(row => row.user_id);
+                        if (blacklistArray.length === 0){
+                            interaction.reply({content: 'The blacklist is empty', ephemeral:true});
+                        } else {
+                            interaction.reply({content: `Users on the blacklist: ${blacklistArray.join (', ')}`, ephemeral: true});
+                        }
                     }
+                    catch(err){
+                        console.error('Error deleting from the blacklist', err);
+                        return;
+                    }
+                    break;
             }
         }
 };
