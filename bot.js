@@ -2,14 +2,13 @@ require('dotenv').config(); //initialize dotenv
 const { Client, Collection, Events, GatewayIntentBits, channelLink } = require('discord.js');
 const path = require('node:path');
 const fs = require('fs');
-const registrar = require('./commandregistrar'); 
+const registrar = require('./utils/commandregistrar'); 
 const cron = require('node-cron');
 const moment = require('moment-timezone');
 const http = require('http');
-const database = require('./utils/databasePrompts');
+const promptUtils = require('./utils/promptUtils');
 const outputUsers = require('./utils/promptRandom');
 const activeHoursUtils = require('./utils/activeHoursUtils');
-const {getRandomHourWithinActiveHours} = require('./utils/timeRangeUtils');
 
 //for cloud run, serverless application needs a server to listen.
 const port = 8080;
@@ -125,7 +124,7 @@ client.on('ready', async () => {
 
 async function schedulePost(activeHoursData){
     //get random hour within active hours
-    const targetHour = getRandomHourWithinActiveHours(activeHoursData);
+    const targetHour = activeHoursUtils.getRandomHourWithinActiveHours(activeHoursData);
     const [hour, minute] = targetHour.split(':');
 
     const now = moment().tz("America/New_York");
@@ -141,7 +140,7 @@ async function schedulePost(activeHoursData){
         setTimeout(async () => {
           const list = client.guilds.cache.get(process.env.DISCORD_GUILD_ID);
           const userRand = await outputUsers(list);
-          const randomPrompt = await database.getRandomPrompt();
+          const randomPrompt = await promptUtils.getRandomPrompt();
           client.sendMessageWithTimer(process.env.DISCORD_SUBMISSION_CHANNEL_ID, `<@${userRand}> Use /submit to submit your post! \n **Prompt:**\n${randomPrompt}`);
         }, timeDifference);
 }
