@@ -10,6 +10,7 @@ const database = require('./utils/databasePrompts');
 const outputUsers = require('./utils/promptRandom');
 const activeHoursUtils = require('./utils/activeHoursUtils');
 const {getRandomHourWithinActiveHours} = require('./utils/timeRangeUtils');
+const notifyMods = require('./utils/notifyMods.js');
 
 //for cloud run, serverless application needs a server to listen.
 const port = 8080;
