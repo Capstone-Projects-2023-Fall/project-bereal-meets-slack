@@ -37,6 +37,10 @@ module.exports = {
 
 					const caption = interaction.options.getString('caption');
 
+					const lastMessages = await interaction.channel.messages.fetch({ limit: 2 });
+                    const content = lastMessages.last().content;
+					console.log(content);
+
 					const { responses, moderators } = await notifyMods(interaction.guild, test, interaction.user, [attachment]);
 				
 					const collectorFilter = i => moderators.has(i.user.id);
@@ -64,7 +68,7 @@ module.exports = {
 									approved = true;
 									approver = moderator;
 									const file = new AttachmentBuilder(url);
-									await interaction.channel.send({ content: `(${interaction.user}) ${test}`, files: [file]});
+									await interaction.channel.send({ content: `(${interaction.user}) ${test}\"`, files: [file]});
 									await interaction.channel.send('@everyone New post');
 									collectorStop();
 								} else if (i.customId === 'deny') {
