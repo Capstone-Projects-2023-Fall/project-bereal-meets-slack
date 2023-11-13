@@ -8,6 +8,7 @@ const moment = require('moment-timezone');
 const notifyMods = require('./utils/notifyMods');
 const http = require('http');
 const { ChannelType } = require('discord.js');
+const saveDB = require('./utils/saveDB');
 
 //for cloud run, serverless application needs a server to listen.
 const port = 8080;
@@ -126,7 +127,7 @@ function schedulePost() {
     }, timeDifference);
 }
 
-client.sendMessageWithTimer = async (channelId, content) => {
+client.sendMessageWithTimer = async (channelId, content) => { //this is deprecated however still use for demo purposes so that functionality is maintained
     timer.start(); // Ensure the timer starts when the message is sent
     const channel = await client.channels.cache.get(channelId);
     if (!channel) {
@@ -137,7 +138,6 @@ client.sendMessageWithTimer = async (channelId, content) => {
 };
 
 client.on('messageCreate', async msg => {
-    // Check if the message is from the bot itself
     if (msg.author.id === client.user.id) {
         // Check if the message is in the specified channel
         if (msg.channel.id === process.env.DISCORD_SUBMISSION_CHANNEL_ID) {
@@ -150,136 +150,5 @@ client.on('messageCreate', async msg => {
     }
 });
 
-async function fetchMessagesUntilPrompt(client, channelId) {
-    if (!client.isReady()) {
-        console.error('Client is not ready');
-        return [];
-    }
-    const channel = client.channels.cache.get(channelId);
-    if (!channel || channel.type !== ChannelType.GuildText) {
-        console.error('The channel was not found or it is not a text channel.');
-        return [];
-    }
-    let lastId;
-    const messagesList = [];
-    let foundPrompt = false;
-    while (!foundPrompt) {
-        const options = { limit: 100 };
-        if (lastId) {
-            options.before = lastId;
-        }
-        try {
-            const messages = await channel.messages.fetch(options);
-            if (messages.size === 0) {
-                break; // No more messages left to fetch
-            }
-            for (const message of messages.values()) {
-                if (message.content.includes("Prompt")) {
-                    foundPrompt = true;
-                    break; // Stop if we find the "Prompt"
-                }
-                messagesList.push(message); // Add the message to our list
-                lastId = message.id; // Set the last ID for the next fetch
-            }
-        } catch (error) {
-            console.error('Error fetching messages: ', error);
-            break; // Exit the loop in case of API error
-        }
-    }
-    return messagesList;
-}
-
-function countReactions(message) {
-    // Check if the message has reactions
-    if (message.reactions.cache.size > 0) {
-        // Reduce the reactions to a total count
-        const totalReactions = message.reactions.cache.reduce((acc, reaction) => acc + reaction.count, 0);
-        return totalReactions;
-    } else {
-        // If there are no reactions, return 0
-        return 0;
-    }
-}
-
-async function countRepliesToMessage(message) {
-    // Ensure the message object has the necessary properties
-    if (!message.channel || !message.id) {
-        throw new Error('The provided message object is missing required properties.');
-    }
-    // Fetch all messages in the channel that came after the message in question
-    const options = { after: message.id };
-    let repliesCount = 0;
-    let lastID;
-    while (true) {
-        if (lastID) {
-            options.after = lastID;
-        }
-        const messages = await message.channel.messages.fetch(options);
-        if (messages.size === 0) {
-            // No more messages left to fetch
-            break;
-        }
-        // Count messages that are a direct reply to the original message
-        const replies = messages.filter(m => m.reference && m.reference.messageId === message.id);
-        repliesCount += replies.size;
-        // Prepare for the next batch
-        lastID = messages.last().id;
-    }
-    return repliesCount;
-}
-
-function getImageLinkFromMessage(message) {
-    // Initialize the image link variable
-    let imageLink = null;
-    // Check for attachments in the message
-    message.attachments.forEach(attachment => {
-        // Check if the attachment is an image based on its content type
-        if (attachment.contentType && attachment.contentType.startsWith('image/')) {
-            // Set the image link
-            imageLink = attachment.url;
-        }
-    });
-    // If no image was found in attachments, check embeds as Discord automatically embeds some image links
-    if (!imageLink) {
-        message.embeds.forEach(embed => {
-            if (embed.type === 'image' && embed.url) {
-                imageLink = embed.url;
-            }
-            // Some embeds might contain an image within them rather than being of type 'image'
-            else if (embed.image && embed.image.url) {
-                imageLink = embed.image.url;
-            }
-        });
-    }
-    return imageLink;
-}
-
-async function saveDB(client, channelId) {
-    try {
-        const messagesList = await fetchMessagesUntilPrompt(client, channelId);
-        const messagesData = [];
-
-        // Loop through each message and get the number of reactions
-        for (const message of messagesList) {
-            const numOfReactions = message.reactions.cache.reduce((acc, reaction) => acc + reaction.count, 0);
-            // Create an object with the message ID and the number of reactions
-            const messageData = {
-                messageId: message.id,
-                numOfReactions: numOfReactions,
-                numOfReplies: numOfReplies,
-                response_image: getImageLinkFromMessage
-            };
-            //Add the object to our array
-            messagesData.push(messageData);
-        }
-        //TODO: Loop through messageData element by element, extract data out of it, insert data into database
-        //  Also keep in mind you will need to add the time onto each element from that array (you will write a method to do this)
-        //      TODO: write a method to find the earliest prompt message, then have it get the time stamp of that message and do the math to calculate the time diff and return that
-
-    } catch (error) {
-        console.error('Error in saveDB:', error);
-        throw error;
-    }
-}
 // Make sure this line is the last line
 client.login(TOKEN);
