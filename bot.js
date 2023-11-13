@@ -104,15 +104,10 @@ client.on(Events.InteractionCreate, async interaction => {
 client.on('ready', async () => {
     console.log(`Logged in as ${client.user.tag}!`);
     registrar.registercommands();
-
     const guildId = process.env.DISCORD_GUILD_ID;
 
-    const activeHoursData = await activeHoursUtils.fetchActiveHoursFromDB(guildId);
-    await schedulePost(activeHoursData);
-
     // setup cron
-    cron.schedule('* * 8 * * *', async () => {
-
+    cron.schedule('0 0 8 * * *', async () => {
     //try to schedule post 
     try{
         const activeHoursData = await activeHoursUtils.fetchActiveHoursFromDB(guildId);
@@ -124,7 +119,7 @@ client.on('ready', async () => {
 });
 
 
-async function schedulePost(activeHoursData, immediate = false){
+async function schedulePost(activeHoursData){
     //get random hour within active hours
     const targetHour = activeHoursUtils.getRandomHourWithinActiveHours(activeHoursData);
     const [hour, minute] = targetHour.split(':');
@@ -137,14 +132,11 @@ async function schedulePost(activeHoursData, immediate = false){
         console.log("Current time is past target posting time. Scheduling for next available slot.");
         targetTime.add(1, 'day');
     }
-    
-    const timeDifference = targetTime.diff(now);
+        const timeDifference = targetTime.diff(now);
 
-    if(immediate){
-        postPrompt();
-    }else{
-        setTimeout(postPrompt, timeDifference);
-    }
+        setTimeout(async () => {
+          await postPrompt();
+        }, timeDifference);
 }
 
 async function postPrompt(){
@@ -157,7 +149,7 @@ async function postPrompt(){
 async function triggerImmediatePost(){
     try{
         const activeHoursData = await activeHoursUtils.fetchActiveHoursFromDB(process.env.DISCORD_GUILD_ID);
-        await schedulePost(activeHoursData, true); //true for immediate
+        await postPrompt(); //true for immediate
     }catch (error){
         console.error('Failed to trigger immediate post:', error);
     }
