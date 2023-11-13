@@ -1,5 +1,5 @@
 require('dotenv').config(); //initialize dotenv
-const { Client, Collection, Events, GatewayIntentBits, channelLink } = require('discord.js');
+const { Client, Collection, Events, GatewayIntentBits, channelLink,  ChannelType } = require('discord.js');
 const path = require('node:path');
 const fs = require('fs');
 const registrar = require('./utils/commandregistrar'); 
@@ -119,8 +119,7 @@ client.on('ready', async () => {
     } catch (error) {
         console.error('Error scheduling post', error);
     }
-});
-});
+  }
 
 async function schedulePost(activeHoursData, immediate = false){
     //get random hour within active hours
@@ -167,7 +166,6 @@ async function triggerImmediatePost(){
     }
 }
 
-
 client.sendMessageWithTimer = async (channelId, content) => {
     timer.start(); // Ensure the timer starts when the message is sent
     const channel = await client.channels.cache.get(channelId);
@@ -190,7 +188,7 @@ client.on('messageCreate', async msg => {
             // If the timer is running, stop it and log the time
             if (timer.isRunning()) {
                 const elapsedSeconds = timer.stop();
-                console.log(`timeToRespond: ${elapsedSeconds} seconds.`); //TODO: Make this fill into the DB as timeToRespond
+                console.log(`timeToRespond: ${elapsedSeconds} seconds.`); //TODO: BMS-99 TODO: Make this fill into the DB as timeToRespond
             }
         }
     } 
@@ -199,4 +197,3 @@ client.on('messageCreate', async msg => {
 
 // Make sure this line is the last line
 client.login(TOKEN);
-
