@@ -42,12 +42,8 @@ module.exports = {
                     const promptMatch = content.match(/\*\*Prompt:\*\*([\s\S]+)/);
                     const promptContent = promptMatch && promptMatch[1] ? promptMatch[1].trim() : null;
 
-					console.log(content);
-					console.log(promptContent);
-					console.log(promptMatch);
-
-					const { responses, moderators } = await notifyMods(interaction.guild, test, interaction.user, [attachment]);
-				
+                    const { responses, moderators } = await notifyMods(interaction.guild, promptContent, interaction.user, [attachment]);
+									
 					const collectorFilter = i => moderators.has(i.user.id);
 
 					// const zip = (a, b) => a.map((k, i) => [k, Array.from(b)[i][1].user.globalName]);
@@ -73,8 +69,8 @@ module.exports = {
 									approved = true;
 									approver = moderator;
 									const file = new AttachmentBuilder(url);
-									await interaction.channel.send({ content: `(${interaction.user}) ${test}\"`, files: [file]});
-									await interaction.channel.send('@everyone New post');
+                                    await interaction.channel.send({ content: `(${interaction.user}) responded to \"${promptContent}\"`, files: [file]});
+									await interaction.channel.send('@everyone New post!');
 									collectorStop();
 								} else if (i.customId === 'deny') {
 									await i.deferUpdate();
