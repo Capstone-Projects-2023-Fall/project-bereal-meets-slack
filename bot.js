@@ -112,14 +112,15 @@ client.on('ready', async () => {
 
     // setup cron
     cron.schedule('* * 8 * * *', async () => {
-        // try to schedule post 
-        try {
-            const activeHoursData = await activeHoursUtils.fetchActiveHoursFromDB(guildId);
-            await schedulePost(activeHoursData);
-        } catch (error) {
-            console.error('Error scheduling post', error);
-        }
-    });
+
+    //try to schedule post 
+    try{
+        const activeHoursData = await activeHoursUtils.fetchActiveHoursFromDB(guildId);
+        await schedulePost(activeHoursData);
+    } catch (error) {
+        console.error('Error scheduling post', error);
+    }
+  });
 });
 
 
