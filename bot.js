@@ -175,6 +175,7 @@ client.sendMessageWithTimer = async (channelId, content) => {
     if (!channel) {
         throw new Error("Channel not found");
     }
+    
     await channel.send(content);
     console.log("Message sent and timer started.");
 };
