@@ -167,9 +167,6 @@ client.sendMessageWithTimer = async (channelId, content) => {
 
 client.on('messageCreate', async msg => {
 
-    if(msg.content === "!demoTrigger"){ //&& msg.author.id === process.env.ADMIN_USER_ID
-        await triggerImmediatePost();
-    }
     // Check if the message is from the bot itself
     if (msg.author.id === client.user.id) {
         // Check if the message is in the specified channel
@@ -181,6 +178,9 @@ client.on('messageCreate', async msg => {
             }
         }
     } 
+    else if(msg.content === "!demoTrigger"){ //&& msg.author.id === process.env.ADMIN_USER_ID
+        await triggerImmediatePost();
+    }
 });
 
 
