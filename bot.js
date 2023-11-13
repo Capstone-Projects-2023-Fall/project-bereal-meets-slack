@@ -139,17 +139,26 @@ async function schedulePost(activeHoursData){
         }, timeDifference);
 }
 
-async function postPrompt(){
-    const list = client.guilds.cache.get(process.env.DISCORD_GUILD_ID);
-    const userRand = await outputUsers(list);
+async function postPrompt(callingUser){
     const randomPrompt = await promptUtils.getRandomPrompt();
-    client.sendMessageWithTimer(process.env.DISCORD_SUBMISSION_CHANNEL_ID, `<@${userRand}> Use /submit to submit your post! \n **Prompt:**\n${randomPrompt}`);
+    if(callingUser){
+        client.sendMessageWithTimer(process.env.DISCORD_SUBMISSION_CHANNEL_ID, `${callingUser} Use /submit to submit your post! \n **Prompt:**\n${randomPrompt}`);
+    }
+    else{
+        const list = client.guilds.cache.get(process.env.DISCORD_GUILD_ID);
+        const userRand = await outputUsers(list);
+        client.sendMessageWithTimer(process.env.DISCORD_SUBMISSION_CHANNEL_ID, `<@${userRand}> Use /submit to submit your post! \n **Prompt:**\n${randomPrompt}`);
+    }
 }
 
-async function triggerImmediatePost(){
+async function triggerImmediatePost(callingUser){
     try{
-        const activeHoursData = await activeHoursUtils.fetchActiveHoursFromDB(process.env.DISCORD_GUILD_ID);
-        await postPrompt(); //true for immediate
+        if(callingUser){
+            await postPrompt(callingUser); //true for immediate
+        }
+        else{
+            await postPrompt();
+        }
     }catch (error){
         console.error('Failed to trigger immediate post:', error);
     }
@@ -180,6 +189,9 @@ client.on('messageCreate', async msg => {
     } 
     else if(msg.content === "!demoTrigger"){ //&& msg.author.id === process.env.ADMIN_USER_ID
         await triggerImmediatePost();
+    }
+    else if(msg.content === "Prompt me"){ //&& msg.author.id === process.env.ADMIN_USER_ID
+        await triggerImmediatePost(msg.author);
     }
 });
 
