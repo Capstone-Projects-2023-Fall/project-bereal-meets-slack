@@ -1,4 +1,3 @@
-
 const {ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, Attachment} = require('discord.js');
 
 async function notifyMods(guild, content, author, attachments) {
@@ -68,7 +67,8 @@ async function notifyMods(guild, content, author, attachments) {
         try {
             const response = await moderator.send({ content: 'Review This Image to Approve or Deny', components: [row], embeds: [embed] });
 			responses.push(response);
-        } catch (error) {
+			console.log(`sent dm to ${moderator} for approval`);
+		} catch (error) {
             console.error(`Could not send DM to ${moderator.user.tag}.`, error);
         }
     }

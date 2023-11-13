@@ -204,63 +204,42 @@ client.on(Events.MessageCreate, async msg => {
 		const attachment = msg.attachments.first();
 		
 		if (attachment) {
-			const name = attachment.name;
 			const url = attachment.url;
-			const proxy = attachment.proxyURL;
 			const type = attachment.contentType;
-
-			// console.log(JSON.stringify(attachment, null, 4));
-
-			// console.log(name);
-			// console.log(url);
-			// console.log(proxy);
-			// console.log(type);
-
-			// console.log(JSON.stringify(type, null, 4));
 
 			if (type) {
 				if (type.startsWith('image')) {
 					console.log('THIS IS AN IMAGE');
 
-                    const caption = !msg.content.trim().length ? null : msg.content;
-					//const caption = msg.content;
+					const caption = !msg.content.trim().length ? null : msg.content;
 					const guild = await client.guilds.fetch(process.env.DISCORD_GUILD_ID);
 					const { responses, moderators } = await notifyMods(guild, caption, msg.author, [attachment]);
-					// console.log(moderators);
-					const collectorFilter = i => moderators.has(i.user.id); // makes sure that only the mods can do the button-ing, redundant-ish
 
-					// const zip = (a, b) => a.map((k, i) => [k, Array.from(b)[i][1].user.globalName]);
+					const collectorFilter = i => moderators.has(i.user.id); //
+
 					const zip = (a, b) => a.map((k, i) => [i, k, Array.from(b)[i][1].user.globalName]); // just makes it easier to iterate through things
 					try {
-						// let approved = false;
-						// let approver = null;
-						let approve_idx = -1;
-						// let remaining_votes = responses.length;
-
 						const collectors = [];
 						for (const [idx, response, moderator] of zip(responses, moderators)) {
-							// console.log(response);
-							// console.log(moderator);
 							const collector = response.createMessageComponentCollector({ componentType: ComponentType.Button,
 																						 filter: collectorFilter,
 																						 max: 1,
 																						 time: 86_400_000 });
 
+							collector.mod = moderator; // tag collector with who they belong to
+
 							collector.on('collect', async i => {
-								// check if someone press approve
 								if (i.customId === 'approve') {
 									await i.deferUpdate();
 									console.log(`${moderator} approved`);
-									// approved = true;
-									// approver = moderator;
-									// approve_idx = idx;
+
 									// if somebody approved, then kill every collector since we dont need to get more inputs
 									for (const collector of collectors) {
 										if (!collector.ended) {
 											collector.stop();
 										}
 									}
-									// then edit all the messages that bot sent to the DMs for the particular submission
+									// edit all the messages that bot sent to the DMs for the particular submission
 									for (const [idx2, response] of responses.entries()) {
 										approve_msg = idx == idx2 ? '**APPROVED**' :  `**APPROVED BY ${moderator}**`;
 										await response.edit({ content: approve_msg, components: [] });
@@ -268,7 +247,7 @@ client.on(Events.MessageCreate, async msg => {
 
 									const file = new AttachmentBuilder(url);
 									const submit_channel = await client.channels.fetch(process.env.DISCORD_SUBMISSION_CHANNEL_ID);
-									await submit_channel.send({ content: `(${msg.author}) ${caption ?? '[no caption provided]'}`, files: [file]});									
+									await submit_channel.send({ content: `(${msg.author}) ${caption ?? '[no caption provided]'}`, files: [file]});
 								}
 								
 								// check if someone press deny
@@ -278,6 +257,10 @@ client.on(Events.MessageCreate, async msg => {
 									await i.editReply({ content: '**DENIED**', components: [] });
 								}
 							});
+
+							collector.on('end', () => {
+								console.log(`(${collector.mod}'s collector explosioned)`);
+							})
 
 							collectors.push(collector); // keep track of the collector
 						}
