@@ -12,6 +12,8 @@ module.exports = {
         async execute (interaction){
             const {options} = interaction;
             const modRole = interaction.guild.roles.cache.find(role => role.name === 'bot mod');
+            const moderators = interaction.guild.members.cache.filter(member => member.roles.cache.has(modRole.id));
+            
             if (!(interaction.member.roles.cache.has(modRole.id))) return await interaction.followUp({ content: 'Only **moderators** can use this command', ephemeral: true});
 
             const user = options.getString('user');
@@ -34,6 +36,14 @@ module.exports = {
                                     .setDescription(`The user \'${user}\` has been blacklisted from this bot`);
     
                                     interaction.followUp({embeds: [embed]});
+
+                                    for (const moderator of moderators.values()) {
+                                        try {
+                                            await moderator.send({ content: `${user} was added to the blacklist`});
+                                        } catch (error) {
+                                            console.error(`Could not send notification to ${moderator.user.tag}.`, error);
+                                        }
+                                    }
                                 }
                                 catch(error){
                                     console.error('Error checking the blacklist:', err);
