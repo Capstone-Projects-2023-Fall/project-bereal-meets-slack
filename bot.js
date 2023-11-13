@@ -119,7 +119,9 @@ client.on('ready', async () => {
     } catch (error) {
         console.error('Error scheduling post', error);
     }
-  }
+  });
+});
+
 
 async function schedulePost(activeHoursData, immediate = false){
     //get random hour within active hours
