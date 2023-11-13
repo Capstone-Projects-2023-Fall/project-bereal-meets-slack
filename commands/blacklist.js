@@ -26,7 +26,7 @@ module.exports = {
                         try {
                             await moderator.send({ content: `${user} was added to the blacklist`});
                         } catch (error) {
-                            console.error(`Could not send DM to ${moderator.user.tag}.`, error);
+                            console.error(`Could not send notification to ${moderator.user.tag}.`, error);
                         }
                     }
 
