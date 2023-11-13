@@ -1,6 +1,7 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const {pool} = require('../utils/dbconn.js');
 
+const moderators = guild.members.cache.filter(member => member.roles.cache.has(modRole.id));
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -20,6 +21,16 @@ module.exports = {
             switch(sub) {
                 case 'add':
                     await interaction.deferReply({ephemeral: true});
+                    for (const moderator of moderators.values()) {
+                        try {
+                            await moderator.send({ content: `${user} was added to the blacklist`});
+                        } catch (error) {
+                            console.error(`Could not send notification to ${moderator.user.tag}.`, error);
+                        }
+                    }
+
+                    
+
                     const checkQuery = `SELECT * FROM bot.blacklist WHERE user_id = '${user}' AND guild_id = '${interaction.guild.id}'`;
                     try{
                         [rows, fields] = await pool.query(checkQuery);
