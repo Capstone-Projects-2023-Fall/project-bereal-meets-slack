@@ -147,7 +147,7 @@ async function schedulePost(activeHoursData, immediate = false){
     setTimeout(async () => {
 			
       if(immediate){
-            postPrompt();
+            await postPrompt();
         }else{
             setTimeout(postPrompt, timeDifference);
         }
@@ -196,10 +196,6 @@ client.sendMessageWithTimer = async (channelId, content) => {
 };
 
 client.on(Events.MessageCreate, async msg => {
-
-    if(msg.content === "!demoTrigger"){ //&& msg.author.id === process.env.ADMIN_USER_ID
-        await triggerImmediatePost();
-    }
     // Check if the message is from the bot itself
     if (msg.author.id === client.user.id) {
         // Check if the message is in the specified channel
@@ -215,16 +211,21 @@ client.on(Events.MessageCreate, async msg => {
                 console.log(`timeToRespond: ${elapsedSeconds} seconds.`); //TODO: BMS-99 TODO: Make this fill into the DB as timeToRespond
             }
         }
-
-    } else {
-        // the user has dm'd the bot
+    
+    } 
+    else {
+        //trigger
+        if(msg.content === "!demoTrigger"){ //&& msg.author.id === process.env.ADMIN_USER_ID
+            await triggerImmediatePost();
+            return;
+        }
 
     	// make sure it is a dm
 		const channel = await client.channels.fetch(msg.channelId);
 		if (channel.type != ChannelType.DM) {
 			return;
 		}
-
+        // the user has dm'd the bot
 		const attachment = msg.attachments.first();
 		
 		if (attachment) {
@@ -305,6 +306,7 @@ client.on(Events.MessageCreate, async msg => {
 
 });
 
+}
 
 // Make sure this line is the last line
 client.login(TOKEN);
