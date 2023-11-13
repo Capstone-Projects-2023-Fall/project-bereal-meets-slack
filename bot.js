@@ -122,7 +122,7 @@ client.on('ready', async () => {
 });
 });
 
-async function schedulePost(activeHoursData){
+async function schedulePost(activeHoursData, immediate = false){
     //get random hour within active hours
     const targetHour = activeHoursUtils.getRandomHourWithinActiveHours(activeHoursData);
     const [hour, minute] = targetHour.split(':');
@@ -143,8 +143,29 @@ async function schedulePost(activeHoursData){
           const randomPrompt = await promptUtils.getRandomPrompt();
           client.sendMessageWithTimer(process.env.DISCORD_SUBMISSION_CHANNEL_ID, `<@${userRand}> Use /submit to submit your post! \n **Prompt:**\n${randomPrompt}`);
         }, timeDifference);
+
+        if(immediate){
+            postPrompt();
+        }else{
+            setTimeout(postPrompt, timeDifference);
+        }
+    
+        async function postPrompt(){
+            const list = client.guilds.cache.get(process.env.DISCORD_GUILD_ID);
+            const userRand = await outputUsers(list);
+            const randomPrompt = await database.getRandomPrompt();
+            client.sendMessageWithTimer(process.env.DISCORD_SUBMISSION_CHANNEL_ID, `<@${userRand}> Use /submit to submit your post! \n **Prompt:**\n${randomPrompt}`);
+        }
 }
 
+async function triggerImmediatePost(){
+    try{
+        const activeHoursData = await activeHoursUtils.fetchActiveHoursFromDB(process.env.DISCORD_GUILD_ID);
+        await schedulePost(activeHoursData, true); //true for immediate
+    }catch (error){
+        console.error('Failed to trigger immediate post:', error);
+    }
+}
 
 
 client.sendMessageWithTimer = async (channelId, content) => {
@@ -158,6 +179,10 @@ client.sendMessageWithTimer = async (channelId, content) => {
 };
 
 client.on('messageCreate', async msg => {
+
+    if(msg.content === "!demoTrigger"){ //&& msg.author.id === process.env.ADMIN_USER_ID
+        await triggerImmediatePost();
+    }
     // Check if the message is from the bot itself
     if (msg.author.id === client.user.id) {
         // Check if the message is in the specified channel
@@ -170,6 +195,7 @@ client.on('messageCreate', async msg => {
         }
     } 
 });
+
 
 // Make sure this line is the last line
 client.login(TOKEN);
