@@ -137,27 +137,21 @@ async function schedulePost(activeHoursData, immediate = false){
         console.log("Current time is past target posting time. Scheduling for next available slot.");
         targetTime.add(1, 'day');
     }
-        const timeDifference = targetTime.diff(now);
-
-        setTimeout(async () => {
-          const list = client.guilds.cache.get(process.env.DISCORD_GUILD_ID);
-          const userRand = await outputUsers(list);
-          const randomPrompt = await promptUtils.getRandomPrompt();
-          client.sendMessageWithTimer(process.env.DISCORD_SUBMISSION_CHANNEL_ID, `<@${userRand}> Use /submit to submit your post! \n **Prompt:**\n${randomPrompt}`);
-        }, timeDifference);
-
-        if(immediate){
-            postPrompt();
-        }else{
-            setTimeout(postPrompt, timeDifference);
-        }
     
-        async function postPrompt(){
-            const list = client.guilds.cache.get(process.env.DISCORD_GUILD_ID);
-            const userRand = await outputUsers(list);
-            const randomPrompt = await promptUtils.getRandomPrompt();
-            client.sendMessageWithTimer(process.env.DISCORD_SUBMISSION_CHANNEL_ID, `<@${userRand}> Use /submit to submit your post! \n **Prompt:**\n${randomPrompt}`);
-        }
+    const timeDifference = targetTime.diff(now);
+
+    if(immediate){
+        postPrompt();
+    }else{
+        setTimeout(postPrompt, timeDifference);
+    }
+}
+
+async function postPrompt(){
+    const list = client.guilds.cache.get(process.env.DISCORD_GUILD_ID);
+    const userRand = await outputUsers(list);
+    const randomPrompt = await promptUtils.getRandomPrompt();
+    client.sendMessageWithTimer(process.env.DISCORD_SUBMISSION_CHANNEL_ID, `<@${userRand}> Use /submit to submit your post! \n **Prompt:**\n${randomPrompt}`);
 }
 
 async function triggerImmediatePost(){
