@@ -1,14 +1,14 @@
 require('dotenv').config(); //initialize dotenv
-const { Client, Collection, Events, GatewayIntentBits } = require('discord.js');
+const { Client, Collection, Events, GatewayIntentBits, channelLink,  ChannelType } = require('discord.js');
 const path = require('node:path');
 const fs = require('fs');
-const registrar = require('./commandregistrar'); 
+const registrar = require('./utils/commandregistrar'); 
 const cron = require('node-cron');
 const moment = require('moment-timezone');
-const notifyMods = require('./utils/notifyMods');
 const http = require('http');
-const { ChannelType } = require('discord.js');
-const saveDB = require('./utils/saveDB');
+const promptUtils = require('./utils/promptUtils');
+const outputUsers = require('./utils/getRandom');
+const activeHoursUtils = require('./utils/activeHoursUtils');
 
 //for cloud run, serverless application needs a server to listen.
 const port = 8080;
@@ -75,16 +75,6 @@ for (const file of commandFiles) {
 	}
 }
 
-client.on('ready', () => {
-    console.log(`Logged in as ${client.user.tag}!`);
-    const now = moment().tz("America/New_York");
-    //scheduling for the scheduled post
-    cron.schedule('0 12 * * *', schedulePost, {
-        scheduled: true,
-        timezone: "America/New_York"
-    });
-    registrar.registercommands(); 
-});
 
 //check for ping command.
 client.on(Events.InteractionCreate, async interaction => {
@@ -108,26 +98,75 @@ client.on(Events.InteractionCreate, async interaction => {
 		}
 	}
 });
-function getRandomHour() {
-    return Math.floor(Math.random() * (24 - 14) + 14);
-}
 
-function schedulePost() {
-    const targetHour = getRandomHour();
-    const now = moment().tz("America/New_York");
-    const targetTime = now.clone().hour(targetHour).minute(0).second(0);
 
-    if (now.isAfter(targetTime)) {
-        client.channels.cache.get(process.env.DISCORD_SUBMISSION_CHANNEL_ID).send("Bot was added to discord or started too late, skipping today and only today")  
+client.on('ready', async () => {
+    console.log(`Logged in as ${client.user.tag}!`);
+    registrar.registercommands();
+
+    const guildId = process.env.DISCORD_GUILD_ID;
+
+    const activeHoursData = await activeHoursUtils.fetchActiveHoursFromDB(guildId);
+    await schedulePost(activeHoursData);
+
+    //setup cron
+
+    cron.schedule('* * 8 * * *', async () => {
+    //try to schedule post 
+    try{
+        const activeHoursData = await activeHoursUtils.fetchActiveHoursFromDB(guildId);
+        await schedulePost(activeHoursData);
+    } catch (error) {
+        console.error('Error scheduling post', error);
     }
-    const timeDifference = targetTime.diff(now);
-    console.log(`Scheduling post for ${targetHour}:00 EST`);
-    setTimeout(() => {  
-        client.sendMessageWithTimer(process.env.DISCORD_SUBMISSION_CHANNEL_ID, "Time to make a post!"); //sendMessageWithTimer allows you to keep track of when you want the timer to start and end by the next bot message
-    }, timeDifference);
+  }
+
+async function schedulePost(activeHoursData, immediate = false){
+    //get random hour within active hours
+    const targetHour = activeHoursUtils.getRandomHourWithinActiveHours(activeHoursData);
+    const [hour, minute] = targetHour.split(':');
+
+    const now = moment().tz("America/New_York");
+    const targetTime = now.clone().hour(hour).minute(minute).second(0);
+
+    if(now.isAfter(targetTime)){
+        //if current time is after target time, schedule for next day
+        console.log("Current time is past target posting time. Scheduling for next available slot.");
+        targetTime.add(1, 'day');
+    }
+        const timeDifference = targetTime.diff(now);
+
+        setTimeout(async () => {
+          const list = client.guilds.cache.get(process.env.DISCORD_GUILD_ID);
+          const userRand = await outputUsers(list);
+          const randomPrompt = await promptUtils.getRandomPrompt();
+          client.sendMessageWithTimer(process.env.DISCORD_SUBMISSION_CHANNEL_ID, `<@${userRand}> Use /submit to submit your post! \n **Prompt:**\n${randomPrompt}`);
+        }, timeDifference);
+
+        if(immediate){
+            postPrompt();
+        }else{
+            setTimeout(postPrompt, timeDifference);
+        }
+    
+        async function postPrompt(){
+            const list = client.guilds.cache.get(process.env.DISCORD_GUILD_ID);
+            const userRand = await outputUsers(list);
+            const randomPrompt = await promptUtils.getRandomPrompt();
+            client.sendMessageWithTimer(process.env.DISCORD_SUBMISSION_CHANNEL_ID, `<@${userRand}> Use /submit to submit your post! \n **Prompt:**\n${randomPrompt}`);
+        }
 }
 
-client.sendMessageWithTimer = async (channelId, content) => { //this is deprecated however still use for demo purposes so that functionality is maintained
+async function triggerImmediatePost(){
+    try{
+        const activeHoursData = await activeHoursUtils.fetchActiveHoursFromDB(process.env.DISCORD_GUILD_ID);
+        await schedulePost(activeHoursData, true); //true for immediate
+    }catch (error){
+        console.error('Failed to trigger immediate post:', error);
+    }
+}
+
+client.sendMessageWithTimer = async (channelId, content) => {
     timer.start(); // Ensure the timer starts when the message is sent
     const channel = await client.channels.cache.get(channelId);
     if (!channel) {
@@ -138,6 +177,11 @@ client.sendMessageWithTimer = async (channelId, content) => { //this is deprecat
 };
 
 client.on('messageCreate', async msg => {
+
+    if(msg.content === "!demoTrigger"){ //&& msg.author.id === process.env.ADMIN_USER_ID
+        await triggerImmediatePost();
+    }
+    // Check if the message is from the bot itself
     if (msg.author.id === client.user.id) {
         // Check if the message is in the specified channel
         if (msg.channel.id === process.env.DISCORD_SUBMISSION_CHANNEL_ID) {
@@ -147,8 +191,9 @@ client.on('messageCreate', async msg => {
                 console.log(`timeToRespond: ${elapsedSeconds} seconds.`); //TODO: BMS-99 TODO: Make this fill into the DB as timeToRespond
             }
         }
-    }
+    } 
 });
+
 
 // Make sure this line is the last line
 client.login(TOKEN);

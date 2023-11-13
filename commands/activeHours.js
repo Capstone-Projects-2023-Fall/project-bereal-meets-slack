@@ -1,34 +1,54 @@
 const {SlashCommandBuilder} = require ('discord.js');
-const {LocalStorage} = require ('node-localstorage');
+const activeHoursUtils = require('../utils/activeHoursUtils');;
 
-const localStorage = new LocalStorage('./data');
 
-//new slash command to view active hours 
-const activeHoursCommand = new SlashCommandBuilder()
-    .setName('activehours')
-    .setDescription('view active hours for prompts');
+module.exports = {
+    data: new SlashCommandBuilder()
+        .setName('activehours')
+        .setDescription('View active hours for prompts')
+        .addSubcommand(subcommand =>
+            subcommand
+              .setName('set')
+              .setDescription(`set the bot's active hours.`)
+              .addStringOption(option =>
+                option.setName('start-time').setDescription('Enter start time(HH:MM)').setRequired(true))
+              .addStringOption(option =>
+                option.setName('end-time').setDescription('Enter end time (HH:MM)').setRequired(true)),
+          )
+        .addSubcommand(subcommand =>
+            subcommand
+              .setName('list')
+              .setDescription('List the active hours.')
+          ),
 
-//function for viewing active hours
-function getActiveHours(interaction) {
-    const guildId = interaction.guild.id;
-    //this will get the active hours
-    const activeHours = JSON.parse (localStorage.getItem(`activeHours_${guildId}`));
-
-    //incase no active hours are set
-    if (!activeHours) {
-        const reply = "No Active Hours SET";
-        interaction.reply(reply);
-        return;
-    }
-
-    const { startTime, endTime } = activeHours;
-    //will state the active hours
-    const reply = `Active hours are set from ${startTime} to ${endTime}`;
-    interaction.repl(reply);
-}
-
-//will export command data
-module.exports= {
-    data: activeHoursCommand,
-    execute: getActiveHours,
-};
+      
+        async execute(interaction){
+            const subcommand = interaction.options.getSubcommand();
+            const guildId = interaction.guild.id;
+            switch(subcommand){
+                case 'list':
+                    await interaction.deferReply();
+                    try{
+                        const hours = await activeHoursUtils.fetchActiveHoursFromDB(guildId);
+                        await interaction.followUp(`Active hours are from ${hours.start_time} to ${hours.end_time}`);
+                    } catch (error){
+                        console.error('Failed to retrieve active hours:', error);
+                        await interaction.followUp('Failed to retrieve active hours.');
+                    }
+                    break;
+                
+                case 'set':
+                    await interaction.deferReply(); 
+                        const startTime = interaction.options.getString('start-time');
+                        const endTime = interaction.options.getString('end-time');
+                            try{
+                                await activeHoursUtils.storeOperatingHours(guildId, startTime, endTime);
+                                await interaction.followUp(`Active hours set from ${startTime} to ${endTime}`);
+                            } catch (error){
+                                console.error('Failed to set active hours:', error);
+                                await interaction.followUp('There was an error setting active hours.');
+                            }
+                    break;
+            }
+        }
+    };
