@@ -24,6 +24,7 @@ server.listen(port, () => {
 console.log('Hello world listening on port', port);
 });
 
+
 const TOKEN = process.env.DISCORD_TOKEN;
 
 class Timer {
@@ -109,9 +110,9 @@ client.on('ready', async () => {
     const activeHoursData = await activeHoursUtils.fetchActiveHoursFromDB(guildId);
     await schedulePost(activeHoursData);
 
-    //setup cron
-
+    // setup cron
     cron.schedule('* * 8 * * *', async () => {
+
     //try to schedule post 
     try{
         const activeHoursData = await activeHoursUtils.fetchActiveHoursFromDB(guildId);
@@ -195,6 +196,7 @@ client.on('messageCreate', async msg => {
         }
     } 
 });
+
 
 
 // Make sure this line is the last line
