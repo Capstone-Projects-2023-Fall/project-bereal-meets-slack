@@ -9,7 +9,7 @@ module.exports = {
 		.addAttachmentOption(option => {
 			return option
 				.setName('file')	
-				.setDescription('Give the file')
+				.setDescription('Give the file').setRequired(true)
 		})
 		.addStringOption(option => {
 			return option
