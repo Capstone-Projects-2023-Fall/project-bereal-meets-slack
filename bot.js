@@ -7,7 +7,7 @@ const cron = require('node-cron');
 const moment = require('moment-timezone');
 const http = require('http');
 const promptUtils = require('./utils/promptUtils');
-const outputUsers = require('./utils/promptRandom');
+const outputUsers = require('./utils/getRandom');
 const activeHoursUtils = require('./utils/activeHoursUtils');
 
 //for cloud run, serverless application needs a server to listen.
@@ -153,7 +153,7 @@ async function schedulePost(activeHoursData, immediate = false){
         async function postPrompt(){
             const list = client.guilds.cache.get(process.env.DISCORD_GUILD_ID);
             const userRand = await outputUsers(list);
-            const randomPrompt = await database.getRandomPrompt();
+            const randomPrompt = await promptUtils.getRandomPrompt();
             client.sendMessageWithTimer(process.env.DISCORD_SUBMISSION_CHANNEL_ID, `<@${userRand}> Use /submit to submit your post! \n **Prompt:**\n${randomPrompt}`);
         }
 }
