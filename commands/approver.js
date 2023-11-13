@@ -1,6 +1,7 @@
 const { AttachmentBuilder, ComponentType, SlashCommandBuilder } = require('discord.js');
 const notifyMods = require('../utils/notifyMods.js')
 
+const test = "What are you procrastinating with?"
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('submit') //upload?
@@ -35,7 +36,8 @@ module.exports = {
 					console.log('THIS IS AN IMAGE');
 
 					const caption = interaction.options.getString('caption');
-					const { responses, moderators } = await notifyMods(interaction.guild, caption, interaction.user, [attachment]);
+
+					const { responses, moderators } = await notifyMods(interaction.guild, test, interaction.user, [attachment]);
 				
 					const collectorFilter = i => moderators.has(i.user.id);
 
@@ -62,8 +64,8 @@ module.exports = {
 									approved = true;
 									approver = moderator;
 									const file = new AttachmentBuilder(url);
-									await interaction.channel.send({ content: `(${interaction.user}) ${caption ?? '[no caption provided]'}`, files: [file]});
-									await interaction.channel.send('@everyone New post!');
+									await interaction.channel.send({ content: `(${interaction.user}) ${test}`, files: [file]});
+									await interaction.channel.send('@everyone New post');
 									collectorStop();
 								} else if (i.customId === 'deny') {
 									await i.deferUpdate();
