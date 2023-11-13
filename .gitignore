@@ -7,6 +7,7 @@ package-lock.json
 
 # Misc
 data
+saved_data.txt
 .env
 .DS_Store
 .env.local

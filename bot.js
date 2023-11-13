@@ -1,5 +1,5 @@
 require('dotenv').config(); //initialize dotenv
-const { AttachmentBuilder, ChannelType, Client, Collection, ComponentType, Events, GatewayIntentBits, channelLink, Partials } = require('discord.js');
+const { AttachmentBuilder, ChannelType, Client, Collection, ComponentType, Events, GatewayIntentBits, Partials } = require('discord.js');
 const path = require('node:path');
 const fs = require('fs');
 const registrar = require('./utils/commandregistrar'); 
@@ -7,7 +7,7 @@ const cron = require('node-cron');
 const moment = require('moment-timezone');
 const http = require('http');
 const promptUtils = require('./utils/promptUtils');
-const outputUsers = require('./utils/promptRandom');
+const outputUsers = require('./utils/getRandom');
 const activeHoursUtils = require('./utils/activeHoursUtils');
 const notifyMods = require('./utils/notifyMods.js');
 
@@ -117,17 +117,18 @@ client.on(Events.ClientReady, async () => {
     //setup cron
 
     cron.schedule('* * 8 * * *', async () => {
-		//try to schedule post 
-		try{
-			const activeHoursData = await activeHoursUtils.fetchActiveHoursFromDB(guildId);
-			await schedulePost(activeHoursData);
-		} catch (error) {
-			console.error('Error scheduling post', error);
-		}
-	});
+    //try to schedule post 
+    try{
+        const activeHoursData = await activeHoursUtils.fetchActiveHoursFromDB(guildId);
+        await schedulePost(activeHoursData);
+    } catch (error) {
+        console.error('Error scheduling post', error);
+    }
+  });
 });
 
-async function schedulePost(activeHoursData) {
+
+async function schedulePost(activeHoursData, immediate = false){
     //get random hour within active hours
     const targetHour = activeHoursUtils.getRandomHourWithinActiveHours(activeHoursData);
     const [hour, minute] = targetHour.split(':');
@@ -142,27 +143,46 @@ async function schedulePost(activeHoursData) {
     }
         const timeDifference = targetTime.diff(now);
 
-    setTimeout(async () => {
-			const list = client.guilds.cache.get(process.env.DISCORD_GUILD_ID);
-			const userRand = await outputUsers(list);
-			userID = userRand.id;
-			const randomPrompt = await database.getRandomPrompt();
 
+    setTimeout(async () => {
+			
+      if(immediate){
+            postPrompt();
+        }else{
+            setTimeout(postPrompt, timeDifference);
+        }
+      
+    }, timeDifference);
+        
+
+  
+   async function postPrompt(){
+           const list = client.guilds.cache.get(process.env.DISCORD_GUILD_ID);
+			     const userRand = await outputUsers(list);
+			     userID = userRand.id;
+			     const randomPrompt = await database.getRandomPrompt();
             if (!client.toggles.has(userID)) {
                 client.toggles.set(userID, true);
             }
-        
-			const instruction = client.toggles.get(userID) ? 'Use /submit to submit your post!' : 'Attach an image and type a caption!';
-			const message = `<${userRand}> ${instruction} \n **Prompt:**\n${randomPrompt}`;
-			if (client.toggles.get(userID)) {
-				// public
-				client.sendMessageWithTimer(process.env.DISCORD_SUBMISSION_CHANNEL_ID, message);
-			} else {
-				// private
-				userRand.send(message);
-			}
-    }, timeDifference);
-        
+			      const instruction = client.toggles.get(userID) ? 'Use /submit to submit your post!' : 'Attach an image and type a caption!';
+			      const message = `<${userRand}> ${instruction} \n **Prompt:**\n${randomPrompt}`;
+            if (client.toggles.get(userID)) {
+				      // public
+				      client.sendMessageWithTimer(process.env.DISCORD_SUBMISSION_CHANNEL_ID, message);
+			        } else {
+				      // private
+				       userRand.send(message);
+			        }
+        }
+
+async function triggerImmediatePost(){
+    try{
+        const activeHoursData = await activeHoursUtils.fetchActiveHoursFromDB(process.env.DISCORD_GUILD_ID);
+        await schedulePost(activeHoursData, true); //true for immediate
+    }catch (error){
+        console.error('Failed to trigger immediate post:', error);
+    }
+
 }
 
 client.sendMessageWithTimer = async (channelId, content) => {
@@ -176,6 +196,10 @@ client.sendMessageWithTimer = async (channelId, content) => {
 };
 
 client.on(Events.MessageCreate, async msg => {
+
+    if(msg.content === "!demoTrigger"){ //&& msg.author.id === process.env.ADMIN_USER_ID
+        await triggerImmediatePost();
+    }
     // Check if the message is from the bot itself
     if (msg.author.id === client.user.id) {
         // Check if the message is in the specified channel
@@ -188,7 +212,7 @@ client.on(Events.MessageCreate, async msg => {
             // If the timer is running, stop it and log the time
             if (timer.isRunning()) {
                 const elapsedSeconds = timer.stop();
-                console.log(`timeToRespond: ${elapsedSeconds} seconds.`); //TODO: Make this fill into the DB as timeToRespond
+                console.log(`timeToRespond: ${elapsedSeconds} seconds.`); //TODO: BMS-99 TODO: Make this fill into the DB as timeToRespond
             }
         }
 
@@ -282,7 +306,5 @@ client.on(Events.MessageCreate, async msg => {
 });
 
 
-
 // Make sure this line is the last line
 client.login(TOKEN);
-
