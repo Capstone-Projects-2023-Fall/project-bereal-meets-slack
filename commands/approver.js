@@ -37,9 +37,14 @@ module.exports = {
 
 					const caption = interaction.options.getString('caption');
 
-					const lastMessages = await interaction.channel.messages.fetch({ limit: 2 });
+                    const lastMessages = await interaction.channel.messages.fetch({ limit: 2 });
                     const content = lastMessages.last().content;
+                    const promptMatch = content.match(/\*\*Prompt:\*\*([\s\S]+)/);
+                    const promptContent = promptMatch && promptMatch[1] ? promptMatch[1].trim() : null;
+
 					console.log(content);
+					console.log(promptContent);
+					console.log(promptMatch);
 
 					const { responses, moderators } = await notifyMods(interaction.guild, test, interaction.user, [attachment]);
 				
