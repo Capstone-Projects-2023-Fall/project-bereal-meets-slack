@@ -1,6 +1,5 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
-const dbconn = require('../utils/dbconn.js');
-const pool = dbconn.createPromiseConnectionPool();
+const {pool} = require('./dbconn.js');
 
 async function getRandomUser(guild){
     await guild.members.fetch();
