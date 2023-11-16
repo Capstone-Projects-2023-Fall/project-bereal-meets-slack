@@ -1,6 +1,27 @@
 const { ChannelType } = require('discord.js');
+const mysql = require('mysql2/promise');
 
-async function fetchMessagesUntilPrompt(client, channelId) {
+const pool = mysql.createPool({
+    host: 'localhost',
+    user: 'your_username',
+    password: 'your_password',
+    database: 'your_database'
+});
+
+async function fetchData() { //FIXME: this is just a temporary placement, implement this further later
+    try {
+        const connection = await pool.getConnection();
+        const [rows, fields] = await connection.query('SELECT * FROM your_table_name');
+        connection.release();
+        return rows;
+    } catch (error) {
+        console.error('Error fetching data:', error);
+        throw error;
+    }
+}
+
+
+async function fetchImageMessagesUntilPrompt(client, channelId) {
     if (!client.isReady()) {
         console.error('Client is not ready');
         return [];
@@ -11,7 +32,7 @@ async function fetchMessagesUntilPrompt(client, channelId) {
         return [];
     }
     let lastId;
-    const messagesList = [];
+    const imageMessagesList = [];
     let foundPrompt = false;
     while (!foundPrompt) {
         const options = { limit: 100 };
@@ -28,7 +49,11 @@ async function fetchMessagesUntilPrompt(client, channelId) {
                     foundPrompt = true;
                     break; // Stop if we find the "Prompt"
                 }
-                messagesList.push(message); // Add the message to our list
+                // Check if the message has attachments and if any of them are images
+                const hasImage = message.attachments.some(attachment => attachment.contentType?.startsWith('image/'));
+                if (hasImage) {
+                    imageMessagesList.push(message); // Add the message to our list if it contains an image
+                }
                 lastId = message.id; // Set the last ID for the next fetch
             }
         } catch (error) {
@@ -36,8 +61,9 @@ async function fetchMessagesUntilPrompt(client, channelId) {
             break; // Exit the loop in case of API error
         }
     }
-    return messagesList;
+    return imageMessagesList;
 }
+
 
 function countReactions(message) {
     // Check if the message has reactions
@@ -114,8 +140,10 @@ async function saveDB(client, channelId) {
             const numOfReactions = countReactions(message);
             const imageLink = getImageLinkFromMessage(message);
             const timeToPost = await findTimeDifferenceToPrompt(client, channelId, message);
+            const message_id = message.id;
 
             const messageData = {
+                message_id: message_id,
                 numOfReactions: numOfReactions,
                 response_image: imageLink,
                 timeToPost: timeToPost
@@ -123,6 +151,18 @@ async function saveDB(client, channelId) {
             messagesData.push(messageData);
         }
         // TODO: Save messagesData to database here
+        try {
+            const connection = await pool.getConnection();
+            for (const messageData of messagesData) {
+                const query = 'INSERT INTO your_table_name SET ?'; //FIXME: this is just a temporary placement, implement this later
+                await connection.query(query, messageData);
+            }
+            connection.release();
+        } catch (error) {
+            console.error('Error in database operation:', error);
+            throw error;
+        }
+        console.log('we have also saved the data to the database')
         return messagesData;
     } catch (error) {
         console.error('Error in saveDB:', error);
