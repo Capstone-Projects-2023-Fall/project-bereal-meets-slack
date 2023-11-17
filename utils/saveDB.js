@@ -1,11 +1,12 @@
+require('dotenv').config();
 const { ChannelType } = require('discord.js');
-const mysql = require('mysql2/promise');
+const { pool } = require('./path_to_your_utils_directory');
 
 const pool = mysql.createPool({
-    host: 'localhost',
-    user: 'your_username',
-    password: 'your_password',
-    database: 'your_database'
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASS,
+    database: process.env.DB_NAME
 });
 
 async function fetchData() { //FIXME: this is just a temporary placement, implement this further later
@@ -19,7 +20,6 @@ async function fetchData() { //FIXME: this is just a temporary placement, implem
         throw error;
     }
 }
-
 
 async function fetchImageMessagesUntilPrompt(client, channelId) {
     if (!client.isReady()) {
@@ -150,11 +150,11 @@ async function saveDB(client, channelId) {
             };
             messagesData.push(messageData);
         }
-        // TODO: Save messagesData to database here
+        //DB stuff goes here
         try {
             const connection = await pool.getConnection();
             for (const messageData of messagesData) {
-                const query = 'INSERT INTO your_table_name SET ?'; //FIXME: this is just a temporary placement, implement this later
+                const query = 'INSERT INTO your_table_name SET ?'; // Update this line with your actual table name
                 await connection.query(query, messageData);
             }
             connection.release();
