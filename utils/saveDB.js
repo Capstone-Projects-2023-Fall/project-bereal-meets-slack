@@ -1,6 +1,6 @@
 require('dotenv').config();
 const { ChannelType } = require('discord.js');
-const { pool } = require('./path_to_your_utils_directory');
+const {pool} = require('./dbconn.js');
 
 const pool = mysql.createPool({
     host: process.env.DB_HOST,
@@ -8,18 +8,6 @@ const pool = mysql.createPool({
     password: process.env.DB_PASS,
     database: process.env.DB_NAME
 });
-
-async function fetchData() { //FIXME: this is just a temporary placement, implement this further later
-    try {
-        const connection = await pool.getConnection();
-        const [rows, fields] = await connection.query('SELECT * FROM your_table_name');
-        connection.release();
-        return rows;
-    } catch (error) {
-        console.error('Error fetching data:', error);
-        throw error;
-    }
-}
 
 async function fetchImageMessagesUntilPrompt(client, channelId) {
     if (!client.isReady()) {
@@ -141,32 +129,52 @@ async function saveDB(client, channelId) {
             const imageLink = getImageLinkFromMessage(message);
             const timeToPost = await findTimeDifferenceToPrompt(client, channelId, message);
             const message_id = message.id;
-
             const messageData = {
                 message_id: message_id,
-                numOfReactions: numOfReactions,
+                num_reactions: numOfReactions,
                 response_image: imageLink,
-                timeToPost: timeToPost
+                time_to_respond: timeToPost
             };
             messagesData.push(messageData);
         }
-        //DB stuff goes here
-        try {
-            const connection = await pool.getConnection();
-            for (const messageData of messagesData) {
-                const query = 'INSERT INTO your_table_name SET ?'; // Update this line with your actual table name
-                await connection.query(query, messageData);
-            }
-            connection.release();
-        } catch (error) {
-            console.error('Error in database operation:', error);
-            throw error;
+        // Insert each messageData into the database
+        for (const messageData of messagesData) {
+            await insertResponseData(messageData); // Use the new insertResponseData method
         }
-        console.log('we have also saved the data to the database')
+
+        console.log('All data has been saved to the database');
         return messagesData;
     } catch (error) {
         console.error('Error in saveDB:', error);
         throw error;
+    }
+}
+
+async function insertResponseData(messageData) {
+    const connection = await pool.getConnection();
+    try {
+        // Construct the SQL statement with specific columns
+        const query = `
+            INSERT INTO responses (response_image, num_reactions, time_to_respond, message_id) 
+            VALUES (?, ?, ?, ?)
+        `;
+
+        // Extract the values from messageData object in the order of the columns specified in the SQL statement
+        const values = [
+            messageData.response_image,
+            messageData.num_reactions,
+            messageData.time_to_respond,
+            messageData.message_id
+        ];
+
+        // Execute the query with the values array
+        await connection.query(query, values);
+        console.log('Data inserted successfully');
+    } catch (error) {
+        console.error('Error in insertResponseData:', error);
+        throw error;
+    } finally {
+        connection.release(); // Always release the connection
     }
 }
 
