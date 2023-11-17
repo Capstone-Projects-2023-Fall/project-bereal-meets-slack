@@ -2,13 +2,6 @@ require('dotenv').config();
 const { ChannelType } = require('discord.js');
 const {pool} = require('./dbconn.js');
 
-const pool = mysql.createPool({
-    host: process.env.DB_HOST,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASS,
-    database: process.env.DB_NAME
-});
-
 async function fetchImageMessagesUntilPrompt(client, channelId) {
     if (!client.isReady()) {
         console.error('Client is not ready');
@@ -121,7 +114,7 @@ async function findTimeDifferenceToPrompt(client, channelId, referenceMessage) {
 
 async function saveDB(client, channelId) {
     try {
-        const messagesList = await fetchMessagesUntilPrompt(client, channelId);
+        const messagesList = await fetchImageMessagesUntilPrompt(client, channelId);
         const messagesData = [];
 
         for (const message of messagesList) {
@@ -139,7 +132,7 @@ async function saveDB(client, channelId) {
         }
         // Insert each messageData into the database
         for (const messageData of messagesData) {
-            await insertResponseData(messageData); // Use the new insertResponseData method
+            await insertResponseData(messageData);
         }
 
         console.log('All data has been saved to the database');
@@ -153,28 +146,32 @@ async function saveDB(client, channelId) {
 async function insertResponseData(messageData) {
     const connection = await pool.getConnection();
     try {
-        // Construct the SQL statement with specific columns
-        const query = `
-            INSERT INTO responses (response_image, num_reactions, time_to_respond, message_id) 
-            VALUES (?, ?, ?, ?)
-        `;
+        // First, check if a record with the same message_id already exists
+        const checkQuery = 'SELECT * FROM responses WHERE message_id = ?';
+        const [existingRecords] = await connection.query(checkQuery, [messageData.message_id]);
 
-        // Extract the values from messageData object in the order of the columns specified in the SQL statement
-        const values = [
-            messageData.response_image,
-            messageData.num_reactions,
-            messageData.time_to_respond,
-            messageData.message_id
-        ];
-
-        // Execute the query with the values array
-        await connection.query(query, values);
-        console.log('Data inserted successfully');
+        // If no existing record is found, proceed to insert the new record
+        if (existingRecords.length === 0) {
+            const insertQuery = `
+                INSERT INTO responses (response_image, num_reactions, time_to_respond, message_id) 
+                VALUES (?, ?, ?, ?)
+            `;
+            const values = [
+                messageData.response_image,
+                messageData.num_reactions,
+                messageData.time_to_respond,
+                messageData.message_id
+            ];
+            await connection.query(insertQuery, values);
+            console.log('Data inserted successfully');
+        } else {
+            console.log(`Record with message_id ${messageData.message_id} already exists. Skipping insertion.`);
+        }
     } catch (error) {
         console.error('Error in insertResponseData:', error);
         throw error;
     } finally {
-        connection.release(); // Always release the connection
+        connection.release();
     }
 }
 

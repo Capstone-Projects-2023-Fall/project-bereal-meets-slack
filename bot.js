@@ -9,6 +9,7 @@ const http = require('http');
 const promptUtils = require('./utils/promptUtils');
 const outputUsers = require('./utils/getRandom');
 const activeHoursUtils = require('./utils/activeHoursUtils');
+const saveDB = require('./utils/saveDB');
 
 //for cloud run, serverless application needs a server to listen.
 const port = 8080;
@@ -112,14 +113,27 @@ client.on('ready', async () => {
     //setup cron
 
     cron.schedule('* * 8 * * *', async () => {
-    //try to schedule post 
-    try{
-        const activeHoursData = await activeHoursUtils.fetchActiveHoursFromDB(guildId);
-        await schedulePost(activeHoursData);
-    } catch (error) {
-        console.error('Error scheduling post', error);
-    }
-  });
+        //try to schedule post 
+        try{
+            const activeHoursData = await activeHoursUtils.fetchActiveHoursFromDB(guildId);
+            await schedulePost(activeHoursData);
+        } catch (error) {
+            console.error('Error scheduling post', error);
+        }
+    });
+    console.log('scheduling data collector')
+    cron.schedule('59 23 * * *', async () => { //scheduled to run every day at 11:59 PM
+        try {
+            console.log('Running daily saveDB task');
+            await saveDB(client, process.env.DISCORD_SUBMISSION_CHANNEL_ID); //this is hard coded for the submissions channel
+            console.log('Daily saveDB task completed');
+        } catch (error) {
+            console.error('Error running daily saveDB task:', error);
+        }
+    }, {
+        scheduled: true,
+        timezone: "America/New_York"
+    });
 });
 
 
@@ -180,7 +194,7 @@ client.sendMessageWithTimer = async (channelId, content) => {
 
 client.on('messageCreate', async msg => {
 
-    if(msg.content === "!demoTrigger"){ //&& msg.author.id === process.env.ADMIN_USER_ID
+    if(msg.content === "!demoTrigger"){
         await triggerImmediatePost();
     }
     // Check if the message is from the bot itself
@@ -190,12 +204,11 @@ client.on('messageCreate', async msg => {
             // If the timer is running, stop it and log the time
             if (timer.isRunning()) {
                 const elapsedSeconds = timer.stop();
-                console.log(`timeToRespond: ${elapsedSeconds} seconds.`); //TODO: BMS-99 TODO: Make this fill into the DB as timeToRespond
+                console.log(`timeToRespond: ${elapsedSeconds} seconds.`);
             }
         }
     } 
 });
-
 
 // Make sure this line is the last line
 client.login(TOKEN);
