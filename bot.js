@@ -25,6 +25,7 @@ server.listen(port, () => {
 console.log('Hello world listening on port', port);
 });
 
+
 const TOKEN = process.env.DISCORD_TOKEN;
 
 class Timer {
@@ -104,23 +105,20 @@ client.on(Events.InteractionCreate, async interaction => {
 client.on('ready', async () => {
     console.log(`Logged in as ${client.user.tag}!`);
     registrar.registercommands();
-
     const guildId = process.env.DISCORD_GUILD_ID;
-
     const activeHoursData = await activeHoursUtils.fetchActiveHoursFromDB(guildId);
     await schedulePost(activeHoursData);
 
     //setup cron
-
-    cron.schedule('* * 8 * * *', async () => {
-        //try to schedule post 
-        try{
-            const activeHoursData = await activeHoursUtils.fetchActiveHoursFromDB(guildId);
-            await schedulePost(activeHoursData);
-        } catch (error) {
-            console.error('Error scheduling post', error);
-        }
-    });
+    cron.schedule('0 0 8 * * *', async () => {
+    //try to schedule post 
+    try{
+        const activeHoursData = await activeHoursUtils.fetchActiveHoursFromDB(guildId);
+        await schedulePost(activeHoursData);
+    } catch (error) {
+        console.error('Error scheduling post', error);
+    }
+  });
     console.log('scheduling data collector')
     cron.schedule('59 23 * * *', async () => { //scheduled to run every day at 11:59 PM
         try {
@@ -134,10 +132,8 @@ client.on('ready', async () => {
         scheduled: true,
         timezone: "America/New_York"
     });
-});
 
-
-async function schedulePost(activeHoursData, immediate = false){
+async function schedulePost(activeHoursData){
     //get random hour within active hours
     const targetHour = activeHoursUtils.getRandomHourWithinActiveHours(activeHoursData);
     const [hour, minute] = targetHour.split(':');
@@ -153,30 +149,30 @@ async function schedulePost(activeHoursData, immediate = false){
         const timeDifference = targetTime.diff(now);
 
         setTimeout(async () => {
-          const list = client.guilds.cache.get(process.env.DISCORD_GUILD_ID);
-          const userRand = await outputUsers(list);
-          const randomPrompt = await promptUtils.getRandomPrompt();
-          client.sendMessageWithTimer(process.env.DISCORD_SUBMISSION_CHANNEL_ID, `<@${userRand}> Use /submit to submit your post! \n **Prompt:**\n${randomPrompt}`);
+          await postPrompt();
         }, timeDifference);
-
-        if(immediate){
-            postPrompt();
-        }else{
-            setTimeout(postPrompt, timeDifference);
-        }
-    
-        async function postPrompt(){
-            const list = client.guilds.cache.get(process.env.DISCORD_GUILD_ID);
-            const userRand = await outputUsers(list);
-            const randomPrompt = await promptUtils.getRandomPrompt();
-            client.sendMessageWithTimer(process.env.DISCORD_SUBMISSION_CHANNEL_ID, `<@${userRand}> Use /submit to submit your post! \n **Prompt:**\n${randomPrompt}`);
-        }
 }
 
-async function triggerImmediatePost(){
+async function postPrompt(callingUser){
+    const randomPrompt = await promptUtils.getRandomPrompt();
+    if(callingUser){
+        client.sendMessageWithTimer(process.env.DISCORD_SUBMISSION_CHANNEL_ID, `${callingUser} Use /submit to submit your post! \n **Prompt:**\n${randomPrompt}`);
+    }
+    else{
+        const list = client.guilds.cache.get(process.env.DISCORD_GUILD_ID);
+        const userRand = await outputUsers(list);
+        client.sendMessageWithTimer(process.env.DISCORD_SUBMISSION_CHANNEL_ID, `<@${userRand}> Use /submit to submit your post! \n **Prompt:**\n${randomPrompt}`);
+    }
+}
+
+async function triggerImmediatePost(callingUser){
     try{
-        const activeHoursData = await activeHoursUtils.fetchActiveHoursFromDB(process.env.DISCORD_GUILD_ID);
-        await schedulePost(activeHoursData, true); //true for immediate
+        if(callingUser){
+            await postPrompt(callingUser); //true for immediate
+        }
+        else{
+            await postPrompt();
+        }
     }catch (error){
         console.error('Failed to trigger immediate post:', error);
     }
@@ -188,15 +184,12 @@ client.sendMessageWithTimer = async (channelId, content) => {
     if (!channel) {
         throw new Error("Channel not found");
     }
+    
     await channel.send(content);
     console.log("Message sent and timer started.");
 };
 
 client.on('messageCreate', async msg => {
-
-    if(msg.content === "!demoTrigger"){
-        await triggerImmediatePost();
-    }
     // Check if the message is from the bot itself
     if (msg.author.id === client.user.id) {
         // Check if the message is in the specified channel
@@ -208,7 +201,12 @@ client.on('messageCreate', async msg => {
             }
         }
     } 
+    else if(msg.content === "!demoTrigger"){ //&& msg.author.id === process.env.ADMIN_USER_ID
+        await triggerImmediatePost();
+    }
+    else if(msg.content === "Prompt me"){ //&& msg.author.id === process.env.ADMIN_USER_ID
+        await triggerImmediatePost(msg.author);
+    }
 });
-
 // Make sure this line is the last line
 client.login(TOKEN);
