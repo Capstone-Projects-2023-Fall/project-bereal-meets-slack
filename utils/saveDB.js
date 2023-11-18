@@ -162,7 +162,7 @@ async function insertResponseData(messageData) {
                 messageData.time_to_respond,
                 messageData.message_id
             ];
-            await connection.query(insertQuery, values);
+            await pool.query(insertQuery, values)
             console.log('Data inserted successfully');
         } else {
             console.log(`Record with message_id ${messageData.message_id} already exists. Skipping insertion.`);
@@ -170,8 +170,6 @@ async function insertResponseData(messageData) {
     } catch (error) {
         console.error('Error in insertResponseData:', error);
         throw error;
-    } finally {
-        connection.release();
     }
 }
 

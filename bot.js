@@ -106,8 +106,6 @@ client.on('ready', async () => {
     console.log(`Logged in as ${client.user.tag}!`);
     registrar.registercommands();
     const guildId = process.env.DISCORD_GUILD_ID;
-    const activeHoursData = await activeHoursUtils.fetchActiveHoursFromDB(guildId);
-    await schedulePost(activeHoursData);
 
     //setup cron
     cron.schedule('0 0 8 * * *', async () => {
