@@ -130,6 +130,7 @@ client.on('ready', async () => {
         scheduled: true,
         timezone: "America/New_York"
     });
+},
 
 async function schedulePost(activeHoursData){
     //get random hour within active hours
@@ -149,7 +150,7 @@ async function schedulePost(activeHoursData){
         setTimeout(async () => {
           await postPrompt();
         }, timeDifference);
-}
+},
 
 async function postPrompt(callingUser){
     const randomPrompt = await promptUtils.getRandomPrompt();
@@ -161,7 +162,7 @@ async function postPrompt(callingUser){
         const userRand = await outputUsers(list);
         client.sendMessageWithTimer(process.env.DISCORD_SUBMISSION_CHANNEL_ID, `<@${userRand}> Use /submit to submit your post! \n **Prompt:**\n${randomPrompt}`);
     }
-}
+},
 
 async function triggerImmediatePost(callingUser){
     try{
@@ -174,7 +175,7 @@ async function triggerImmediatePost(callingUser){
     }catch (error){
         console.error('Failed to trigger immediate post:', error);
     }
-}
+},
 
 client.sendMessageWithTimer = async (channelId, content) => {
     timer.start(); // Ensure the timer starts when the message is sent
@@ -185,7 +186,7 @@ client.sendMessageWithTimer = async (channelId, content) => {
     
     await channel.send(content);
     console.log("Message sent and timer started.");
-};
+});
 
 client.on('messageCreate', async msg => {
     // Check if the message is from the bot itself
