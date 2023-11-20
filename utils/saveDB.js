@@ -1,6 +1,8 @@
+require('dotenv').config();
 const { ChannelType } = require('discord.js');
+const {pool} = require('./dbconn.js');
 
-async function fetchMessagesUntilPrompt(client, channelId) {
+async function fetchImageMessagesUntilPrompt(client, channelId) {
     if (!client.isReady()) {
         console.error('Client is not ready');
         return [];
@@ -11,7 +13,7 @@ async function fetchMessagesUntilPrompt(client, channelId) {
         return [];
     }
     let lastId;
-    const messagesList = [];
+    const imageMessagesList = [];
     let foundPrompt = false;
     while (!foundPrompt) {
         const options = { limit: 100 };
@@ -28,7 +30,11 @@ async function fetchMessagesUntilPrompt(client, channelId) {
                     foundPrompt = true;
                     break; // Stop if we find the "Prompt"
                 }
-                messagesList.push(message); // Add the message to our list
+                // Check if the message has attachments and if any of them are images
+                const hasImage = message.attachments.some(attachment => attachment.contentType?.startsWith('image/'));
+                if (hasImage) {
+                    imageMessagesList.push(message); // Add the message to our list if it contains an image
+                }
                 lastId = message.id; // Set the last ID for the next fetch
             }
         } catch (error) {
@@ -36,8 +42,9 @@ async function fetchMessagesUntilPrompt(client, channelId) {
             break; // Exit the loop in case of API error
         }
     }
-    return messagesList;
+    return imageMessagesList;
 }
+
 
 function countReactions(message) {
     // Check if the message has reactions
@@ -107,25 +114,61 @@ async function findTimeDifferenceToPrompt(client, channelId, referenceMessage) {
 
 async function saveDB(client, channelId) {
     try {
-        const messagesList = await fetchMessagesUntilPrompt(client, channelId);
+        const messagesList = await fetchImageMessagesUntilPrompt(client, channelId);
         const messagesData = [];
 
         for (const message of messagesList) {
             const numOfReactions = countReactions(message);
             const imageLink = getImageLinkFromMessage(message);
             const timeToPost = await findTimeDifferenceToPrompt(client, channelId, message);
-
+            const message_id = message.id;
             const messageData = {
-                numOfReactions: numOfReactions,
+                message_id: message_id,
+                num_reactions: numOfReactions,
                 response_image: imageLink,
-                timeToPost: timeToPost
+                time_to_respond: timeToPost
             };
             messagesData.push(messageData);
         }
-        // TODO: Save messagesData to database here
+        // Insert each messageData into the database
+        for (const messageData of messagesData) {
+            await insertResponseData(messageData);
+        }
+
+        console.log('All data has been saved to the database');
         return messagesData;
     } catch (error) {
         console.error('Error in saveDB:', error);
+        throw error;
+    }
+}
+
+async function insertResponseData(messageData) {
+    const connection = await pool.getConnection();
+    try {
+        // First, check if a record with the same message_id already exists
+        const checkQuery = 'SELECT * FROM responses WHERE message_id = ?';
+        const [existingRecords] = await connection.query(checkQuery, [messageData.message_id]);
+
+        // If no existing record is found, proceed to insert the new record
+        if (existingRecords.length === 0) {
+            const insertQuery = `
+                INSERT INTO responses (response_image, num_reactions, time_to_respond, message_id) 
+                VALUES (?, ?, ?, ?)
+            `;
+            const values = [
+                messageData.response_image,
+                messageData.num_reactions,
+                messageData.time_to_respond,
+                messageData.message_id
+            ];
+            await pool.query(insertQuery, values)
+            console.log('Data inserted successfully');
+        } else {
+            console.log(`Record with message_id ${messageData.message_id} already exists. Skipping insertion.`);
+        }
+    } catch (error) {
+        console.error('Error in insertResponseData:', error);
         throw error;
     }
 }

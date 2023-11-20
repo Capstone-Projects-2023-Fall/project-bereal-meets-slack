@@ -9,6 +9,7 @@ const http = require('http');
 const promptUtils = require('./utils/promptUtils');
 const outputUsers = require('./utils/getRandom');
 const activeHoursUtils = require('./utils/activeHoursUtils');
+const saveDB = require('./utils/saveDB');
 
 //for cloud run, serverless application needs a server to listen.
 const port = 8080;
@@ -106,7 +107,7 @@ client.on('ready', async () => {
     registrar.registercommands();
     const guildId = process.env.DISCORD_GUILD_ID;
 
-    // setup cron
+    //setup cron
     cron.schedule('0 0 8 * * *', async () => {
     //try to schedule post 
     try{
@@ -116,8 +117,20 @@ client.on('ready', async () => {
         console.error('Error scheduling post', error);
     }
   });
-});
-
+    console.log('scheduling data collector')
+    cron.schedule('59 23 * * *', async () => { //scheduled to run every day at 11:59 PM
+        try {
+            console.log('Running daily saveDB task');
+            await saveDB(client, process.env.DISCORD_SUBMISSION_CHANNEL_ID); //this is hard coded for the submissions channel
+            console.log('Daily saveDB task completed');
+        } catch (error) {
+            console.error('Error running daily saveDB task:', error);
+        }
+    }, {
+        scheduled: true,
+        timezone: "America/New_York"
+    });
+},
 
 async function schedulePost(activeHoursData){
     //get random hour within active hours
@@ -137,7 +150,7 @@ async function schedulePost(activeHoursData){
         setTimeout(async () => {
           await postPrompt();
         }, timeDifference);
-}
+},
 
 async function postPrompt(callingUser){
     const randomPrompt = await promptUtils.getRandomPrompt();
@@ -149,7 +162,7 @@ async function postPrompt(callingUser){
         const userRand = await outputUsers(list);
         client.sendMessageWithTimer(process.env.DISCORD_SUBMISSION_CHANNEL_ID, `<@${userRand}> Use /submit to submit your post! \n **Prompt:**\n${randomPrompt}`);
     }
-}
+},
 
 async function triggerImmediatePost(callingUser){
     try{
@@ -162,7 +175,7 @@ async function triggerImmediatePost(callingUser){
     }catch (error){
         console.error('Failed to trigger immediate post:', error);
     }
-}
+},
 
 client.sendMessageWithTimer = async (channelId, content) => {
     timer.start(); // Ensure the timer starts when the message is sent
@@ -173,10 +186,9 @@ client.sendMessageWithTimer = async (channelId, content) => {
     
     await channel.send(content);
     console.log("Message sent and timer started.");
-};
+});
 
 client.on('messageCreate', async msg => {
-
     // Check if the message is from the bot itself
     if (msg.author.id === client.user.id) {
         // Check if the message is in the specified channel
@@ -184,7 +196,7 @@ client.on('messageCreate', async msg => {
             // If the timer is running, stop it and log the time
             if (timer.isRunning()) {
                 const elapsedSeconds = timer.stop();
-                console.log(`timeToRespond: ${elapsedSeconds} seconds.`); //TODO: BMS-99 TODO: Make this fill into the DB as timeToRespond
+                console.log(`timeToRespond: ${elapsedSeconds} seconds.`);
             }
         }
     } 
@@ -195,8 +207,5 @@ client.on('messageCreate', async msg => {
         await triggerImmediatePost(msg.author);
     }
 });
-
-
-
 // Make sure this line is the last line
 client.login(TOKEN);
