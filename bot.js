@@ -9,7 +9,8 @@ const http = require('http');
 const promptUtils = require('./utils/promptUtils');
 const outputUsers = require('./utils/getRandom');
 const activeHoursUtils = require('./utils/activeHoursUtils');
-const notifyMods = require('./utils/notifyMods.js');
+const saveDB = require('./utils/saveDB');
+
 
 //for cloud run, serverless application needs a server to listen.
 const port = 8080;
@@ -24,6 +25,7 @@ res.end('BeRealBot lives here\n');
 server.listen(port, () => {
 console.log('Hello world listening on port', port);
 });
+
 
 const TOKEN = process.env.DISCORD_TOKEN;
 
@@ -108,15 +110,10 @@ client.on(Events.InteractionCreate, async interaction => {
 client.on(Events.ClientReady, async () => {
     console.log(`Logged in as ${client.user.tag}!`);
     registrar.registercommands();
-
     const guildId = process.env.DISCORD_GUILD_ID;
 
-    const activeHoursData = await activeHoursUtils.fetchActiveHoursFromDB(guildId);
-    await schedulePost(activeHoursData);
-
     //setup cron
-
-    cron.schedule('* * 8 * * *', async () => {
+    cron.schedule('0 0 8 * * *', async () => {
     //try to schedule post 
     try{
         const activeHoursData = await activeHoursUtils.fetchActiveHoursFromDB(guildId);
@@ -125,10 +122,22 @@ client.on(Events.ClientReady, async () => {
         console.error('Error scheduling post', error);
     }
   });
+    console.log('scheduling data collector')
+    cron.schedule('59 23 * * *', async () => { //scheduled to run every day at 11:59 PM
+        try {
+            console.log('Running daily saveDB task');
+            await saveDB(client, process.env.DISCORD_SUBMISSION_CHANNEL_ID); //this is hard coded for the submissions channel
+            console.log('Daily saveDB task completed');
+        } catch (error) {
+            console.error('Error running daily saveDB task:', error);
+        }
+    }, {
+        scheduled: true,
+        timezone: "America/New_York"
+    });
 });
 
-
-async function schedulePost(activeHoursData, immediate = false){
+async function schedulePost(activeHoursData){
     //get random hour within active hours
     const targetHour = activeHoursUtils.getRandomHourWithinActiveHours(activeHoursData);
     const [hour, minute] = targetHour.split(':');
@@ -143,42 +152,31 @@ async function schedulePost(activeHoursData, immediate = false){
     }
         const timeDifference = targetTime.diff(now);
 
+        setTimeout(async () => {
+          await postPrompt();
+        }, timeDifference);
+}
 
-    setTimeout(async () => {
-			
-      if(immediate){
-            await postPrompt();
-        }else{
-            setTimeout(postPrompt, timeDifference);
-        }
-      
-    }, timeDifference);
-        
+async function postPrompt(callingUser){
+    const randomPrompt = await promptUtils.getRandomPrompt();
+    if(callingUser){
+        client.sendMessageWithTimer(process.env.DISCORD_SUBMISSION_CHANNEL_ID, `${callingUser} Use /submit to submit your post! \n **Prompt:**\n${randomPrompt}`);
+    }
+    else{
+        const list = client.guilds.cache.get(process.env.DISCORD_GUILD_ID);
+        const userRand = await outputUsers(list);
+        client.sendMessageWithTimer(process.env.DISCORD_SUBMISSION_CHANNEL_ID, `<@${userRand}> Use /submit to submit your post! \n **Prompt:**\n${randomPrompt}`);
+    }
+}
 
-  
-   async function postPrompt(){
-           const list = client.guilds.cache.get(process.env.DISCORD_GUILD_ID);
-			     const userRand = await outputUsers(list);
-			     userID = userRand.id;
-			     const randomPrompt = await database.getRandomPrompt();
-            if (!client.toggles.has(userID)) {
-                client.toggles.set(userID, true);
-            }
-			      const instruction = client.toggles.get(userID) ? 'Use /submit to submit your post!' : 'Attach an image and type a caption!';
-			      const message = `<${userRand}> ${instruction} \n **Prompt:**\n${randomPrompt}`;
-            if (client.toggles.get(userID)) {
-				      // public
-				      client.sendMessageWithTimer(process.env.DISCORD_SUBMISSION_CHANNEL_ID, message);
-			        } else {
-				      // private
-				       userRand.send(message);
-			        }
-        }
-
-async function triggerImmediatePost(){
+async function triggerImmediatePost(callingUser){
     try{
-        const activeHoursData = await activeHoursUtils.fetchActiveHoursFromDB(process.env.DISCORD_GUILD_ID);
-        await schedulePost(activeHoursData, true); //true for immediate
+        if(callingUser){
+            await postPrompt(callingUser); 
+        }
+        else{
+            await postPrompt();
+        }
     }catch (error){
         console.error('Failed to trigger immediate post:', error);
     }
@@ -191,9 +189,11 @@ client.sendMessageWithTimer = async (channelId, content) => {
     if (!channel) {
         throw new Error("Channel not found");
     }
+    
     await channel.send(content);
     console.log("Message sent and timer started.");
-};
+}
+
 
 client.on(Events.MessageCreate, async msg => {
     // Check if the message is from the bot itself
@@ -208,17 +208,21 @@ client.on(Events.MessageCreate, async msg => {
             // If the timer is running, stop it and log the time
             if (timer.isRunning()) {
                 const elapsedSeconds = timer.stop();
-                console.log(`timeToRespond: ${elapsedSeconds} seconds.`); //TODO: BMS-99 TODO: Make this fill into the DB as timeToRespond
+                console.log(`timeToRespond: ${elapsedSeconds} seconds.`);
             }
         }
     
     } 
+
     else {
         //trigger
-        if(msg.content === "!demoTrigger"){ //&& msg.author.id === process.env.ADMIN_USER_ID
-            await triggerImmediatePost();
-            return;
-        }
+      if(msg.content === "!demoTrigger"){ //&& msg.author.id === process.env.ADMIN_USER_ID
+        await triggerImmediatePost();
+      }
+      else if(msg.content === "Prompt me"){ //&& msg.author.id === process.env.ADMIN_USER_ID
+        await triggerImmediatePost(msg.author);
+      }
+      else{
 
     	// make sure it is a dm
 		const channel = await client.channels.fetch(msg.channelId);
@@ -303,6 +307,7 @@ client.on(Events.MessageCreate, async msg => {
 			console.log('NO ATTACHMENT');
 		}
 	}
+ }
 
 });
 

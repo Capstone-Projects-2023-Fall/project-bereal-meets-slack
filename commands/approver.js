@@ -1,6 +1,7 @@
 const { AttachmentBuilder, ComponentType, SlashCommandBuilder } = require('discord.js');
 const notifyMods = require('../utils/notifyMods.js')
 
+const test = "What are you procrastinating with?"
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('submit') //upload?
@@ -8,7 +9,7 @@ module.exports = {
 		.addAttachmentOption(option => {
 			return option
 				.setName('file')	
-				.setDescription('Give the file')
+				.setDescription('Give the file').setRequired(true)
 		})
 		.addStringOption(option => {
 			return option
@@ -34,13 +35,17 @@ module.exports = {
 				if (type.startsWith('image')) {
 					console.log('THIS IS AN IMAGE');
 
-					const caption = interaction.options.getString('caption'); // retrieve the caption value
-					const { responses, moderators } = await notifyMods(interaction.guild, caption, interaction.user, [attachment]);
-					// console.log(responses)
-					// console.log(moderators)
 
-					// console.log(moderators);
-					const collectorFilter = i => moderators.has(i.user.id); // makes sure that only the mods can do the button-ing, redundant-ish
+					const caption = interaction.options.getString('caption');
+
+                    const lastMessages = await interaction.channel.messages.fetch({ limit: 2 });
+                    const content = lastMessages.last().content;
+                    const promptMatch = content.match(/\*\*Prompt:\*\*([\s\S]+)/);
+                    const promptContent = promptMatch && promptMatch[1] ? promptMatch[1].trim() : null;
+
+                    const { responses, moderators } = await notifyMods(interaction.guild, promptContent, caption, interaction.user, [attachment]);
+									
+					const collectorFilter = i => moderators.has(i.user.id);
 
 					// const zip = (a, b) => a.map((k, i) => [k, Array.from(b)[i][1].user.globalName]);
 					const zip = (a, b) => a.map((k, i) => [i, k, Array.from(b)[i][1].user.globalName]); // just makes it easier to iterate through things
@@ -74,11 +79,10 @@ module.exports = {
 										await response.edit({ content: approve_msg, components: [] });
 									}
 									const file = new AttachmentBuilder(url);
-									await interaction.channel.send({ content: `(${interaction.user}) ${caption ?? '[no caption provided]'}`, files: [file]});
-                  await interaction.channel.send('@everyone New post!');
-								}
-								// checks if someone  press deny
-                 else if (i.customId === 'deny') {
+                  await interaction.channel.send({ content: `(${interaction.user}) responded to \"${promptContent}\" \n Caption: ${caption}`, files: [file]});
+									await interaction.channel.send('@everyone New post!');
+									collectorStop();
+								} else if (i.customId === 'deny') {
 									await i.deferUpdate();
 									console.log(`${moderator} denied`);
 									await i.editReply({ content: '**DENIED**', components: [] }); 

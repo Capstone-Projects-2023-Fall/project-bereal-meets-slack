@@ -1,6 +1,7 @@
 const {ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, Attachment} = require('discord.js');
 
-async function notifyMods(guild, content, author, attachments) {
+// async function notifyMods(guild, content, author, attachments) {
+	async function notifyMods(guild, content, caption, author, attachments) {
 
 	//console.log('AAAA');
 
@@ -33,7 +34,7 @@ async function notifyMods(guild, content, author, attachments) {
         .setTitle('New Submission!') //title of embedded message
         .setDescription(`New submission from: ${author.tag} `) //who submitted post
         .setColor('Blue')
-    	.addFields({name: 'Caption:', value: content ?? '[no caption provided]'}); //include text from post with image
+    	.addFields({name: 'Prompt:', value: content ?? '[no promp provided]'}, {name: 'Caption:', value: caption ?? '[no caption provided]'}); //include prompt with image
 
 	//if theres an attachment, include it
 	const image = Array.isArray(attachments) ? attachments[0] : attachments.first(); //get the first attachment

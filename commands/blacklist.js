@@ -17,25 +17,31 @@ module.exports = {
             if (!(interaction.member.roles.cache.has(modRole.id))) return await interaction.followUp({ content: 'Only **moderators** can use this command', ephemeral: true});
 
             const user = options.getString('user');
+            let dbuser;
+            if(user){
+                dbuser = user.replace('<', '');
+                dbuser = dbuser.replace('>', '');
+                dbuser = dbuser.replace('@', '');
+            }
             const sub = options.getSubcommand();
             
             switch(sub) {
                 case 'add':
                     await interaction.deferReply({ephemeral: true});
-                    const checkQuery = `SELECT * FROM bot.blacklist WHERE user_id = '${user}' AND guild_id = '${interaction.guild.id}'`;
+                    const checkQuery = `SELECT * FROM bot.blacklist WHERE user_id = '${dbuser}' AND guild_id = '${interaction.guild.id}'`;
                     try{
                         [rows, fields] = await pool.query(checkQuery);
                         const results = rows;
                         if (results.length === 0) {
                             (async function(){
-                                const insertQuery = `INSERT INTO bot.blacklist (user_id, guild_id) VALUES ('${user}', '${interaction.guild.id}')`;
+                                const insertQuery = `INSERT INTO bot.blacklist (user_id, guild_id) VALUES ('${dbuser}', '${interaction.guild.id}')`;
                                 try{
                                 await pool.query(insertQuery);
                                     const embed = new EmbedBuilder()
                                     .setColor("Green")
                                     .setDescription(`The user \'${user}\` has been blacklisted from this bot`);
     
-                                    interaction.followUp({embeds: [embed]});
+                                    await interaction.followUp({embeds: [embed]});
 
                                     for (const moderator of moderators.values()) {
                                         try {
@@ -51,7 +57,7 @@ module.exports = {
                                 }
                             })();
                         } else {
-                            interaction.followUp({content: `The user \`${user}\` has already been blacklisted`});
+                            await interaction.followUp({content: `The user \`${user}\` has already been blacklisted`});
                         }
                     }
                     catch(err){
@@ -62,7 +68,7 @@ module.exports = {
 
                 case 'remove':
                     await interaction.deferReply({ephemeral: true});
-                    const deleteQuery = `DELETE FROM bot.blacklist WHERE user_id = '${user}' AND guild_id = '${interaction.guild.id}'`;
+                    const deleteQuery = `DELETE FROM bot.blacklist WHERE user_id = '${dbuser}' AND guild_id = '${interaction.guild.id}'`;
                     try{
                         [rows, fields] = await pool.query(deleteQuery);
                         const results = rows;
@@ -71,9 +77,9 @@ module.exports = {
                             .setColor("Green")
                             .setDescription(`The user \`${user}\` has been removed from the blacklist`);
 
-                            interaction.followUp({embeds: [embed]});
+                            await interaction.followUp({embeds: [embed]});
                         } else {
-                            interaction.followUp({content: `The user \`${user}\` is not on the blacklist`});
+                            await interaction.followUp({content: `The user \`${user}\` is not on the blacklist`});
                         }
 
                     }
@@ -89,15 +95,18 @@ module.exports = {
                     try{
                         [rows, fields] = await pool.query(listQuery);
                         const results = rows;
-                        const blacklistArray = results.map(row => row.user_id);
+                        blacklistArray = results.map(row => row.user_id);
                         if (blacklistArray.length === 0){
-                            interaction.followUp({content: 'The blacklist is empty'});
+                            await interaction.followUp({content: 'The blacklist is empty'});
                         } else {
-                            interaction.followUp({content: `Users on the blacklist: ${blacklistArray.join (', ')}`});
+                            for(i = 0; i < blacklistArray.length; i++){
+                                blacklistArray[i] = '<@' + blacklistArray[i].toString() + '>'
+                            }
+                            await interaction.followUp({content: `Users on the blacklist: ${blacklistArray.join (', ')}`});
                         }
                     }
                     catch(err){
-                        console.error('Error deleting from the blacklist', err);
+                        console.error('Error reading from the blacklist', err);
                         return;
                     }
                     break;
