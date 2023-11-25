@@ -14,8 +14,8 @@ const {ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, Attachment} =
         return console.error("Moderator role not found");
     }
 
-	if (!attachments || attachments.size == 0) {
-		return console.error("No attachment was provided");
+	if (!attachments || attachments.size == 0) { 
+ 		return console.error("No attachment was provided");
 	}
 
 	//console.log('B');
@@ -34,7 +34,7 @@ const {ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, Attachment} =
         .setTitle('New Submission!') //title of embedded message
         .setDescription(`New submission from: ${author.tag} `) //who submitted post
         .setColor('Blue')
-    	.addFields({name: 'Prompt:', value: content ?? '[no promp provided]'}, {name: 'Caption:', value: caption ?? '[no caption provided]'}); //include prompt with image
+    	.addFields({name: 'Prompt:', value: content ?? '[no prompt provided]'}, {name: 'Caption:', value: caption ?? '[no caption provided]'}); //include prompt with image
 
 	//if theres an attachment, include it
 	const image = Array.isArray(attachments) ? attachments[0] : attachments.first(); //get the first attachment

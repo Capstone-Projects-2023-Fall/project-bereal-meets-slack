@@ -2,13 +2,14 @@ require('dotenv').config(); //initialize dotenv
 const { AttachmentBuilder, ChannelType, Client, Collection, ComponentType, Events, GatewayIntentBits, Partials } = require('discord.js');
 const path = require('node:path');
 const fs = require('fs');
-const registrar = require('./utils/commandregistrar'); 
+const registrar = require('./utils/commandregistrar');
 const cron = require('node-cron');
 const moment = require('moment-timezone');
 const http = require('http');
 const promptUtils = require('./utils/promptUtils');
 const outputUsers = require('./utils/getRandom');
 const activeHoursUtils = require('./utils/activeHoursUtils');
+const notifyMods = require('./utils/notifyMods.js');
 const saveDB = require('./utils/saveDB');
 
 
@@ -16,14 +17,14 @@ const saveDB = require('./utils/saveDB');
 const port = 8080;
 
 const server = http.createServer((req, res) => {
-// Set the response HTTP header with HTTP status and Content type
-res.writeHead(200, {'Content-Type': 'text/plain'});
-// Send the response body "Hello World"
-res.end('BeRealBot lives here\n');
+    // Set the response HTTP header with HTTP status and Content type
+    res.writeHead(200, { 'Content-Type': 'text/plain' });
+    // Send the response body "Hello World"
+    res.end('BeRealBot lives here\n');
 });
 
 server.listen(port, () => {
-console.log('Hello world listening on port', port);
+    console.log('Hello world listening on port', port);
 });
 
 
@@ -53,57 +54,58 @@ class Timer {
 }
 const timer = new Timer(); //create a timer object
 
-const client = new Client({ 
+const client = new Client({
     intents: [
-		GatewayIntentBits.Guilds,
-		GatewayIntentBits.GuildMessages,
-		GatewayIntentBits.MessageContent,
-		GatewayIntentBits.GuildMembers,
-	],
-	partials: [
-		Partials.Channel,
-	]
+        GatewayIntentBits.Guilds,
+        GatewayIntentBits.GuildMessages,
+        GatewayIntentBits.MessageContent,
+        GatewayIntentBits.GuildMembers,
+        GatewayIntentBits.DirectMessages,
+    ],
+    partials: [
+        Partials.Channel,
+    ]
 }); //create new client
 
-client.toggles = new Collection(); 
+client.toggles = new Collection();
 client.commands = new Collection(); // set up commands list
 
 const commandsPath = path.join(__dirname, 'commands');
 const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
 
 for (const file of commandFiles) {
-	const filePath = path.join(commandsPath, file);
-	const command = require(filePath);
-	// Set a new item in the Collection with the key as the command name and the value as the exported module
-	if ('data' in command && 'execute' in command) {
-		client.commands.set(command.data.name, command);
-	} else {
-		console.log(`[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`);
-	}
+    const filePath = path.join(commandsPath, file);
+    const command = require(filePath);
+    // Set a new item in the Collection with the key as the command name and the value as the exported module
+    if ('data' in command && 'execute' in command) {
+        client.commands.set(command.data.name, command);
+    } else {
+        console.log(`[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`);
+    }
 }
 
 
 //check for ping command.
 client.on(Events.InteractionCreate, async interaction => {
-  if (!interaction.isChatInputCommand()) return;
-  
-	const command = interaction.client.commands.get(interaction.commandName);
+    if (!interaction.isChatInputCommand()) return;
 
-	if (!command) {
-		console.error(`No command matching ${interaction.commandName} was found.`);
-		return;
-	}
+    const command = interaction.client.commands.get(interaction.commandName);
 
-	try {
-		await command.execute(interaction);
-	} catch (error) {
-		console.error(error);
-		if (interaction.replied || interaction.deferred) {
-			await interaction.followUp({ content: 'There was an error while executing this command!', ephemeral: true });
-		} else {
-			await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
-		}
-	}
+    if (!command) {
+        console.error(`No command matching ${interaction.commandName} was found.`);
+        return;
+    }
+
+    try {
+        await command.execute(interaction);
+    } catch (error) {
+        console.error(error);
+        if (interaction.replied || interaction.deferred) {
+            await interaction.followUp({ content: 'There was an error while executing this command!', ephemeral: true });
+        } else {
+            await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
+        }
+    }
 });
 
 
@@ -114,14 +116,14 @@ client.on(Events.ClientReady, async () => {
 
     //setup cron
     cron.schedule('0 0 8 * * *', async () => {
-    //try to schedule post 
-    try{
-        const activeHoursData = await activeHoursUtils.fetchActiveHoursFromDB(guildId);
-        await schedulePost(activeHoursData);
-    } catch (error) {
-        console.error('Error scheduling post', error);
-    }
-  });
+        //try to schedule post 
+        try {
+            const activeHoursData = await activeHoursUtils.fetchActiveHoursFromDB(guildId);
+            await schedulePost(activeHoursData);
+        } catch (error) {
+            console.error('Error scheduling post', error);
+        }
+    });
     console.log('scheduling data collector')
     cron.schedule('59 23 * * *', async () => { //scheduled to run every day at 11:59 PM
         try {
@@ -137,7 +139,7 @@ client.on(Events.ClientReady, async () => {
     });
 });
 
-async function schedulePost(activeHoursData){
+async function schedulePost(activeHoursData) {
     //get random hour within active hours
     const targetHour = activeHoursUtils.getRandomHourWithinActiveHours(activeHoursData);
     const [hour, minute] = targetHour.split(':');
@@ -145,39 +147,67 @@ async function schedulePost(activeHoursData){
     const now = moment().tz("America/New_York");
     const targetTime = now.clone().hour(hour).minute(minute).second(0);
 
-    if(now.isAfter(targetTime)){
+    if (now.isAfter(targetTime)) {
         //if current time is after target time, schedule for next day
         console.log("Current time is past target posting time. Scheduling for next available slot.");
         targetTime.add(1, 'day');
     }
-        const timeDifference = targetTime.diff(now);
+    const timeDifference = targetTime.diff(now);
 
-        setTimeout(async () => {
-          await postPrompt();
-        }, timeDifference);
+    setTimeout(async () => {
+        await postPrompt();
+    }, timeDifference);
 }
 
-async function postPrompt(callingUser){
+async function postPrompt(callingUser) {
     const randomPrompt = await promptUtils.getRandomPrompt();
-    if(callingUser){
-        client.sendMessageWithTimer(process.env.DISCORD_SUBMISSION_CHANNEL_ID, `${callingUser} Use /submit to submit your post! \n **Prompt:**\n${randomPrompt}`);
+    if (callingUser) {
+        const userID = callingUser.id;
+        const message = `${callingUser} Use /submit to submit your post! \n **Prompt:**\n${randomPrompt}`;
+
+        if (client.toggles.get(userID)) {
+            // public
+            client.sendMessageWithTimer(process.env.DISCORD_SUBMISSION_CHANNEL_ID, message);
+        }
+        else {
+            // private
+            callingUser.send(message);
+        }
+
     }
-    else{
+    else {
+
         const list = client.guilds.cache.get(process.env.DISCORD_GUILD_ID);
         const userRand = await outputUsers(list);
-        client.sendMessageWithTimer(process.env.DISCORD_SUBMISSION_CHANNEL_ID, `<@${userRand}> Use /submit to submit your post! \n **Prompt:**\n${randomPrompt}`);
+        const userID = userRand.id;
+
+        if (!client.toggles.has(userID)) {
+            client.toggles.set(userID, true);
+        }
+        const instruction = client.toggles.get(userID) ? 'Use /submit to submit your post!' : 'Attach an image and type a caption!';
+        const message = `<${userRand}> ${instruction} \n **Prompt:**\n${randomPrompt}`;
+
+        if (client.toggles.get(userID)) {
+            // public
+            client.sendMessageWithTimer(process.env.DISCORD_SUBMISSION_CHANNEL_ID, message);
+        }
+        else {
+            // private
+            userRand.send(message);
+        }
     }
 }
 
-async function triggerImmediatePost(callingUser){
-    try{
-        if(callingUser){
-            await postPrompt(callingUser); 
+
+async function triggerImmediatePost(callingUser) {
+    try {
+        if (callingUser) {
+            await postPrompt(callingUser);
         }
-        else{
+        else {
             await postPrompt();
         }
-    }catch (error){
+    } catch (error) {
         console.error('Failed to trigger immediate post:', error);
     }
 
@@ -189,7 +219,7 @@ client.sendMessageWithTimer = async (channelId, content) => {
     if (!channel) {
         throw new Error("Channel not found");
     }
-    
+
     await channel.send(content);
     console.log("Message sent and timer started.");
 }
@@ -201,9 +231,9 @@ client.on(Events.MessageCreate, async msg => {
         // Check if the message is in the specified channel
         if (msg.channel.id === process.env.DISCORD_SUBMISSION_CHANNEL_ID) {
             if (!msg.content.includes('\n **Prompt:**\n')) {
-				// bot posted an approved submission 
-				return;
-			}
+                // bot posted an approved submission 
+                return;
+            }
 
             // If the timer is running, stop it and log the time
             if (timer.isRunning()) {
@@ -211,107 +241,108 @@ client.on(Events.MessageCreate, async msg => {
                 console.log(`timeToRespond: ${elapsedSeconds} seconds.`);
             }
         }
-    
-    } 
+
+    }
 
     else {
         //trigger
-      if(msg.content === "!demoTrigger"){ //&& msg.author.id === process.env.ADMIN_USER_ID
-        await triggerImmediatePost();
-      }
-      else if(msg.content === "Prompt me"){ //&& msg.author.id === process.env.ADMIN_USER_ID
-        await triggerImmediatePost(msg.author);
-      }
-      else{
+        console.log("I caught that");
+        if (msg.content === "!demoTrigger") { 
+            await triggerImmediatePost();
+        }
+        else if (msg.content === "Prompt me") { 
+            await triggerImmediatePost(msg.author);
+        }
 
-    	// make sure it is a dm
-		const channel = await client.channels.fetch(msg.channelId);
-		if (channel.type != ChannelType.DM) {
-			return;
-		}
+        // make sure it is a dm
+        if (msg.channel.type === ChannelType.DM) {
+            console.log("amogus");
+        }
+        else{
+            return;
+        }
         // the user has dm'd the bot
-		const attachment = msg.attachments.first();
-		
-		if (attachment) {
-			const url = attachment.url;
-			const type = attachment.contentType;
+        const attachment = msg.attachments.first();
 
-			if (type) {
-				if (type.startsWith('image')) {
-					console.log('THIS IS AN IMAGE');
+        if (attachment) {
+            const url = attachment.url;
+            const type = attachment.contentType;
 
-					const caption = !msg.content.trim().length ? null : msg.content;
-					const guild = await client.guilds.fetch(process.env.DISCORD_GUILD_ID);
-					const { responses, moderators } = await notifyMods(guild, caption, msg.author, [attachment]);
+            if (type) {
+                if (type.startsWith('image')) {
+                    console.log('THIS IS AN IMAGE');
 
-					const collectorFilter = i => moderators.has(i.user.id); //
+                    const caption = !msg.content.trim().length ? null : msg.content;
+                    const guild = await client.guilds.fetch(process.env.DISCORD_GUILD_ID);
+                    const { responses, moderators } = await notifyMods(guild, null, caption, msg.author, [attachment]);
 
-					const zip = (a, b) => a.map((k, i) => [i, k, Array.from(b)[i][1].user.globalName]); // just makes it easier to iterate through things
-					try {
-						const collectors = [];
-						for (const [idx, response, moderator] of zip(responses, moderators)) {
-							const collector = response.createMessageComponentCollector({ componentType: ComponentType.Button,
-																						 filter: collectorFilter,
-																						 max: 1,
-																						 time: 86_400_000 });
+                    const collectorFilter = i => moderators.has(i.user.id); //
 
-							collector.mod = moderator; // tag collector with who they belong to
+                    const zip = (a, b) => a.map((k, i) => [i, k, Array.from(b)[i][1].user.globalName]); // just makes it easier to iterate through things
+                    try {
+                        const collectors = [];
+                        for (const [idx, response, moderator] of zip(responses, moderators)) {
+                            const collector = response.createMessageComponentCollector({
+                                componentType: ComponentType.Button,
+                                filter: collectorFilter,
+                                max: 1,
+                                time: 86_400_000
+                            });
 
-							collector.on('collect', async i => {
-								if (i.customId === 'approve') {
-									await i.deferUpdate();
-									console.log(`${moderator} approved`);
+                            collector.mod = moderator; // tag collector with who they belong to
 
-									// if somebody approved, then kill every collector since we dont need to get more inputs
-									for (const collector of collectors) {
-										if (!collector.ended) {
-											collector.stop();
-										}
-									}
-									// edit all the messages that bot sent to the DMs for the particular submission
-									for (const [idx2, response] of responses.entries()) {
-										approve_msg = idx == idx2 ? '**APPROVED**' :  `**APPROVED BY ${moderator}**`;
-										await response.edit({ content: approve_msg, components: [] });
-									}
+                            collector.on('collect', async i => {
+                                if (i.customId === 'approve') {
+                                    await i.deferUpdate();
+                                    console.log(`${moderator} approved`);
 
-									const file = new AttachmentBuilder(url);
-									const submit_channel = await client.channels.fetch(process.env.DISCORD_SUBMISSION_CHANNEL_ID);
-									await submit_channel.send({ content: `(${msg.author}) ${caption ?? '[no caption provided]'}`, files: [file]});
-								}
-								
-								// check if someone press deny
-								else if (i.customId === 'deny') {
-									await i.deferUpdate();
-									console.log(`${moderator} denied`);
-									await i.editReply({ content: '**DENIED**', components: [] });
-								}
-							});
+                                    // if somebody approved, then kill every collector since we dont need to get more inputs
+                                    for (const collector of collectors) {
+                                        if (!collector.ended) {
+                                            collector.stop();
+                                        }
+                                    }
+                                    // edit all the messages that bot sent to the DMs for the particular submission
+                                    for (const [idx2, response] of responses.entries()) {
+                                        approve_msg = idx == idx2 ? '**APPROVED**' : `**APPROVED BY ${moderator}**`;
+                                        await response.edit({ content: approve_msg, components: [] });
+                                    }
 
-							collector.on('end', () => {
-								console.log(`(${collector.mod}'s collector explosioned)`);
-							})
+                                    const file = new AttachmentBuilder(url);
+                                    const submit_channel = await client.channels.fetch(process.env.DISCORD_SUBMISSION_CHANNEL_ID);
+                                    await submit_channel.send({ content: `(${msg.author}) ${caption ?? '[no caption provided]'}`, files: [file] });
+                                }
 
-							collectors.push(collector); // keep track of the collector
-						}
-					} catch (e) {
-						console.error('BUTTON ERROR');
-						console.error(e);
-					}
-				} else {
-					console.log('THIS IS NOT AN IMAGE');
-				}
-			} else {
-				console.log('Type is nonexistent');
-			}
-		} else {
-			console.log('NO ATTACHMENT');
-		}
-	}
- }
+                                // check if someone press deny
+                                else if (i.customId === 'deny') {
+                                    await i.deferUpdate();
+                                    console.log(`${moderator} denied`);
+                                    await i.editReply({ content: '**DENIED**', components: [] });
+                                }
+                            });
+
+                            collector.on('end', () => {
+                                console.log(`(${collector.mod}'s collector explosioned)`);
+                            })
+
+                            collectors.push(collector); // keep track of the collector
+                        }
+                    } catch (e) {
+                        console.error('BUTTON ERROR');
+                        console.error(e);
+                    }
+                } else {
+                    console.log('THIS IS NOT AN IMAGE');
+                }
+            } else {
+                console.log('Type is nonexistent');
+            }
+        } else {
+            console.log('NO ATTACHMENT');
+        }
+    }
 
 });
-
-}
 
 // Make sure this line is the last line
 client.login(TOKEN);
