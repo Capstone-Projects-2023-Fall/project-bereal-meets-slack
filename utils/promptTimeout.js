@@ -5,7 +5,7 @@ class PromptTimeout {
     //this will setup the timeout and message
     setupPrompt(channelId, message) {
         const promptId = `${channelId}-${Date.now()}`;
-        const timeoutDuration = 3600000; // 60 seconds (1hr is 3600000)
+        const timeoutDuration = 3600000; // 60 seconds (1hr is 3600000 & 1min is 60000)
         const expiredContent = 'Post has expired.';
 
         this.setPromptTimeout(promptId, timeoutDuration, message, expiredContent);
