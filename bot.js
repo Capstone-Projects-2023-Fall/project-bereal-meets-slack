@@ -164,6 +164,7 @@ async function postPrompt(callingUser) {
         const userRand = await outputUsers(list);
         messageContent = `<@${userRand}> Use /submit to submit your post!\n**Prompt:**\n${randomPrompt}`;
     }
+    //for promptTimeout
     const channelId = process.env.DISCORD_SUBMISSION_CHANNEL_ID;
     const sentMessage = await client.sendMessageWithTimer(channelId, messageContent);
     promptTimeout.setupPrompt(channelId, sentMessage);
