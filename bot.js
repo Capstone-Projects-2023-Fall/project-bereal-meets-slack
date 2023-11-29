@@ -10,7 +10,7 @@ const promptUtils = require('./utils/promptUtils');
 const outputUsers = require('./utils/getRandom');
 const activeHoursUtils = require('./utils/activeHoursUtils');
 const saveDB = require('./utils/saveDB');
-const promptTimeout = require('./utils/promptTimeout');
+const PromptTimeout = require('./utils/promptTimeout');
 
 
 //for cloud run, serverless application needs a server to listen.
@@ -64,6 +64,7 @@ const client = new Client({
 }); //create new client
 
 client.commands = new Collection(); // set up commands list
+const promptTimeout = new PromptTimeout(client);
 
 const commandsPath = path.join(__dirname, 'commands');
 const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
@@ -187,7 +188,7 @@ async function postPrompt(callingUser) {
     const channelId = process.env.DISCORD_SUBMISSION_CHANNEL_ID;
     try {
         const sentMessage = await client.sendMessageWithTimer(channelId, messageContent);
-        promptTimeout.setupPrompt(channelId, sentMessage, userToPrompt, randomPrompt);
+        promptTimeout.setupPrompt(channelId, sentMessage, userToPrompt, randomPrompt, channelId); // Pass channelId as well
     } catch (error) {
         console.error("Error sending message or setting up prompt:", error);
     }
