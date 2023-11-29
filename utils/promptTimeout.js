@@ -7,7 +7,7 @@ class PromptTimeout {
     //this will setup the timeout and message
     setupPrompt(channelId, message, user, originalPrompt) {
         const promptId = `${channelId}-${Date.now()}`;
-        const timeoutDuration = 10000; // 60 seconds (1hr is 3600000 & 1min is 60000)
+        const timeoutDuration = 3600000; // 60 seconds (1hr is 3600000 & 1min is 60000)
         const expiredContent = 'Post has expired.';
 
         this.setPromptTimeout(promptId, timeoutDuration, message, expiredContent, user, originalPrompt, channelId);
@@ -45,7 +45,7 @@ class PromptTimeout {
     handleReprompt(user, originalPrompt, channelId, originalMessage) {
         // this is for reprompting the user
         const repromptId = `${channelId}-${user.id}-${Date.now()}`;
-        const repromptDuration = 60000;
+        const repromptDuration = 3600000; //set to 1hr
 
         this.repromptTimeouts.set(repromptId, Date.now() + repromptDuration);
 
