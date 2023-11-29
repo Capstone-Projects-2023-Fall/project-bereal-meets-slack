@@ -188,7 +188,7 @@ async function postPrompt(callingUser) {
     const channelId = process.env.DISCORD_SUBMISSION_CHANNEL_ID;
     try {
         const sentMessage = await client.sendMessageWithTimer(channelId, messageContent);
-        promptTimeout.setupPrompt(channelId, sentMessage, userToPrompt, randomPrompt, channelId); // Pass channelId as well
+        promptTimeout.setupPrompt(channelId, sentMessage, userToPrompt, randomPrompt, channelId);
     } catch (error) {
         console.error("Error sending message or setting up prompt:", error);
     }
