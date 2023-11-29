@@ -161,13 +161,8 @@ async function postPrompt(callingUser) {
     let userToPrompt;
 
     if (callingUser) {
-        try {
             userToPrompt = await client.users.fetch(callingUser.id); // this should store the calling user
             messageContent = `${callingUser.toString()} Use /submit to submit your post!\n**Prompt:**\n${randomPrompt}`;
-        } catch (error) {
-            console.error("Error fetching callingUser:", error);
-            return;
-        }
     } else {
         const list = client.guilds.cache.get(process.env.DISCORD_GUILD_ID);
         const userRand = await outputUsers(list);
@@ -186,12 +181,8 @@ async function postPrompt(callingUser) {
     
     //for promptTimeout
     const channelId = process.env.DISCORD_SUBMISSION_CHANNEL_ID;
-    try {
-        const sentMessage = await client.sendMessageWithTimer(channelId, messageContent);
-        promptTimeout.setupPrompt(channelId, sentMessage, userToPrompt, randomPrompt, channelId);
-    } catch (error) {
-        console.error("Error sending message or setting up prompt:", error);
-    }
+    const sentMessage = await client.sendMessageWithTimer(channelId, messageContent);
+    promptTimeout.setupPrompt(channelId, sentMessage, userToPrompt, randomPrompt, channelId);
 }
 
 async function triggerImmediatePost(callingUser){

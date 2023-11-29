@@ -60,7 +60,7 @@ class PromptTimeout {
                         await repromptMessage.delete();
                         const userDMChannel = await user.createDM();
                         await userDMChannel.send(`Your reprompt has also expired.`);
-                        console.log("Reprompt message deleted after final expiration.");
+                        console.log("Reprompt message deleted after final timeout.");
                     }
                 }, repromptDuration);
             })
