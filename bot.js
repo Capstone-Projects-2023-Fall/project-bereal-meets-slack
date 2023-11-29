@@ -11,7 +11,7 @@ const outputUsers = require('./utils/getRandom');
 const activeHoursUtils = require('./utils/activeHoursUtils');
 const saveDB = require('./utils/saveDB');
 const promptTimeout = require('./utils/promptTimeout');
-
+const { prompt } = require('./utils/notifyMods');
 
 //for cloud run, serverless application needs a server to listen.
 const port = 8080;
@@ -156,6 +156,8 @@ async function schedulePost(activeHoursData){
 
 async function postPrompt(callingUser) {
     const randomPrompt = await promptUtils.getRandomPrompt();
+    prompt.setPrompt(randomPrompt);
+
     let messageContent;    
     if (callingUser) {
         messageContent = `${callingUser} Use /submit to submit your post!\n**Prompt:**\n${randomPrompt}`;

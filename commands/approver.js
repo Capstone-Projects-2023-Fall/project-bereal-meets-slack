@@ -1,5 +1,5 @@
 const { AttachmentBuilder, ComponentType, SlashCommandBuilder } = require('discord.js');
-const notifyMods = require('../utils/notifyMods.js')
+const { notifyMods, prompt } = require('../utils/notifyMods.js');
 
 const test = "What are you procrastinating with?"
 module.exports = {
@@ -36,13 +36,7 @@ module.exports = {
 					console.log('THIS IS AN IMAGE');
 
 					const caption = interaction.options.getString('caption');
-
-                    const lastMessages = await interaction.channel.messages.fetch({ limit: 2 });
-                    const content = lastMessages.last().content;
-                    const promptMatch = content.match(/\*\*Prompt:\*\*([\s\S]+)/);
-                    const promptContent = promptMatch && promptMatch[1] ? promptMatch[1].trim() : null;
-
-                    const { responses, moderators } = await notifyMods(interaction.guild, promptContent, caption, interaction.user, [attachment]);
+                    const { responses, moderators } = await notifyMods(interaction.guild, prompt.getPrompt(), caption, interaction.user, [attachment]);
 									
 					const collectorFilter = i => moderators.has(i.user.id);
 
@@ -69,7 +63,7 @@ module.exports = {
 									approved = true;
 									approver = moderator;
 									const file = new AttachmentBuilder(url);
-                                    await interaction.channel.send({ content: `(${interaction.user}) responded to \"${promptContent}\" \n Caption: ${caption}`, files: [file]});
+                                    await interaction.channel.send({ content: `(${interaction.user}) responded to \"${prompt.getPrompt()}\" \n Caption: ${caption}`, files: [file]});
 									await interaction.channel.send('@everyone New post!');
 									collectorStop();
 								} else if (i.customId === 'deny') {

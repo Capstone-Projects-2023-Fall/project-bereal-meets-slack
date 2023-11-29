@@ -2,7 +2,7 @@
 const {ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, Attachment} = require('discord.js');
 
 // async function notifyMods(guild, content, author, attachments) {
-	async function notifyMods(guild, content, caption, author, attachments) {
+async function notifyMods(guild, content, caption, author, attachments) {
 
 	//console.log('AAAA');
 
@@ -77,4 +77,17 @@ const {ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, Attachment} =
 	return { responses, moderators };
 }
 
-module.exports = notifyMods;
+class Prompt {
+    prompt = '';
+
+    setPrompt(msg) {
+        this.Prompt = msg;
+    }
+
+    getPrompt() {
+        return this.Prompt; 
+    }
+}
+const prompt = new Prompt();
+
+module.exports = { notifyMods, prompt };
