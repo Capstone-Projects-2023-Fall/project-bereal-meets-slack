@@ -38,7 +38,7 @@
   },
   "devDependencies": {
     "@discordjs/rest": "^2.0.1",
-    "discord.js": "^14.13.0",
+    "discord.js": "^14.14.1",
     "mocha": "^10.2.0"
   }
 }
