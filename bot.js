@@ -172,7 +172,7 @@ async function postPrompt(callingUser) {
         const list = client.guilds.cache.get(process.env.DISCORD_GUILD_ID);
         const userRand = await outputUsers(list);
         try {
-            userToPrompt = await client.users.fetch(userRand); // Fetch the User object
+            userToPrompt = await client.users.fetch(userRand); // this should fetch the user that was prompted
             messageContent = `<@${userRand}> Use /submit to submit your post!\n**Prompt:**\n${randomPrompt}`;
         } catch (error) {
             console.error("Error fetching random user:", error);

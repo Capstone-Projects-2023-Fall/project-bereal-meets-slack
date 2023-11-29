@@ -33,7 +33,7 @@ class PromptTimeout {
                 //this should reprompt the user
                 const channel = await this.client.channels.cache.get(channelId);
                 if (channel) {
-                    await channel.send(`<@${user.id}> ${originalPrompt}`);
+                    await channel.send(`Use /submit to submit your post!\n**Prompt:**\n <@${user.id}> ${originalPrompt}`);
                 }
                 console.log("Same user has been reprompted!")
             }
