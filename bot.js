@@ -156,18 +156,41 @@ async function schedulePost(activeHoursData){
 
 async function postPrompt(callingUser) {
     const randomPrompt = await promptUtils.getRandomPrompt();
-    let messageContent;    
+    let messageContent;
+    let userToPrompt;
+
     if (callingUser) {
-        messageContent = `${callingUser} Use /submit to submit your post!\n**Prompt:**\n${randomPrompt}`;
+        try {
+            userToPrompt = await client.users.fetch(callingUser.id); // this should store the calling user
+            messageContent = `${callingUser.toString()} Use /submit to submit your post!\n**Prompt:**\n${randomPrompt}`;
+        } catch (error) {
+            console.error("Error fetching callingUser:", error);
+            return;
+        }
     } else {
         const list = client.guilds.cache.get(process.env.DISCORD_GUILD_ID);
         const userRand = await outputUsers(list);
-        messageContent = `<@${userRand}> Use /submit to submit your post!\n**Prompt:**\n${randomPrompt}`;
+        try {
+            userToPrompt = await client.users.fetch(userRand); // Fetch the User object
+            messageContent = `<@${userRand}> Use /submit to submit your post!\n**Prompt:**\n${randomPrompt}`;
+        } catch (error) {
+            console.error("Error fetching random user:", error);
+            return;
+        }
     }
+    if (!userToPrompt || !messageContent) {
+        console.error("Error: User or message content is not defined.");
+        return;
+    }
+    
     //for promptTimeout
     const channelId = process.env.DISCORD_SUBMISSION_CHANNEL_ID;
-    const sentMessage = await client.sendMessageWithTimer(channelId, messageContent);
-    promptTimeout.setupPrompt(channelId, sentMessage);
+    try {
+        const sentMessage = await client.sendMessageWithTimer(channelId, messageContent);
+        promptTimeout.setupPrompt(channelId, sentMessage, userToPrompt, randomPrompt);
+    } catch (error) {
+        console.error("Error sending message or setting up prompt:", error);
+    }
 }
 
 async function triggerImmediatePost(callingUser){

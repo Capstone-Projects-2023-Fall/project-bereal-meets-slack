@@ -3,16 +3,16 @@ class PromptTimeout {
         this.activePrompts = new Map();
     }
     //this will setup the timeout and message
-    setupPrompt(channelId, message) {
+    setupPrompt(channelId, message, user, originalPrompt) {
         const promptId = `${channelId}-${Date.now()}`;
-        const timeoutDuration = 3600000; // 60 seconds (1hr is 3600000 & 1min is 60000)
+        const timeoutDuration = 30000; // 60 seconds (1hr is 3600000 & 1min is 60000)
         const expiredContent = 'Post has expired.';
 
-        this.setPromptTimeout(promptId, timeoutDuration, message, expiredContent);
+        this.setPromptTimeout(promptId, timeoutDuration, message, expiredContent, user, originalPrompt, channelId);
     }
 
     // this will set a timeout for a prompt
-    setPromptTimeout(promptId, duration, message, expiredContent) {
+    setPromptTimeout(promptId, duration, message, expiredContent, user, originalPrompt, channelId) {
         const expirationTime = Date.now() + duration;
         this.activePrompts.set(promptId, expirationTime);
         
@@ -22,6 +22,19 @@ class PromptTimeout {
                 await message.edit(expiredContent);
             }
             console.log("Prompt has expired")
+            
+            // will send the same user to post again or re-prompt
+            if (user) {
+                const userDMChannel = await user.createDM();
+                await userDMChannel.send(`Your prompt has expired. Please visit submissions channel to post. Your prompt! = ${originalPrompt}`);
+                console.log("User was DMed")
+                
+                //this should reprompt the user
+                const channel = await client.channels.cache.get(channelId);
+                if (channel) {
+                    await channel.send(`<@${user.id}> ${originalPrompt}`);
+                }
+            }
         }, duration);
     }
 
