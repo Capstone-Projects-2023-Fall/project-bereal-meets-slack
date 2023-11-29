@@ -2,6 +2,7 @@ class PromptTimeout {
     constructor(client) {
         this.client = client;
         this.activePrompts = new Map();
+        this.repromptTimeouts = new Map();
     }
     //this will setup the timeout and message
     setupPrompt(channelId, message, user, originalPrompt) {
@@ -27,7 +28,7 @@ class PromptTimeout {
             // will send the same user to post again or re-prompt
             if (user) {
                 const userDMChannel = await user.createDM();
-                await userDMChannel.send(`Your original prompt has expired, and you have been reprompted! Please visit the submissions channel to post`);
+                await userDMChannel.send(`Your original prompt has expired, and you have been reprompted!\nPlease visit the submissions channel to post`);
                 console.log("User was sent a DM about expired Prompt")
 
                 //this should reprompt the user
@@ -36,17 +37,35 @@ class PromptTimeout {
                     await channel.send(`<@${user.id}> Use /submit to submit your post!\n**Prompt:**\n${originalPrompt}`);
                 }
                 console.log("Same user has been reprompted!")
+                this.handleReprompt(user, originalPrompt, channelId, message);
             }
         }, duration);
     }
 
-    // this will check if a prompt is still active
-    isPromptActive(promptId) {
-        if (!this.activePrompts.has(promptId)) {
-            return false;
+    handleReprompt(user, originalPrompt, channelId, originalMessage) {
+        // this is for reprompting the user
+        const repromptId = `${channelId}-${user.id}-${Date.now()}`;
+        const repromptDuration = 60000;
+
+        this.repromptTimeouts.set(repromptId, Date.now() + repromptDuration);
+
+        // will send reprompt message in channel
+        const channel = this.client.channels.cache.get(channelId);
+        if (channel) {
+            channel.send(`<@${user.id}> Use /submit to submit your post!\n**Prompt:**\n${originalPrompt}`).then(repromptMessage => {
+                // this will set a timeout for the reprompt eprompt message after the reprompt duration
+                setTimeout(async () => {
+                    this.repromptTimeouts.delete(repromptId);
+                    if (repromptMessage && repromptMessage.deletable) {
+                        await repromptMessage.delete();
+                        const userDMChannel = await user.createDM();
+                        await userDMChannel.send(`Your reprompt has also expired.`);
+                        console.log("Reprompt message deleted after final expiration.");
+                    }
+                }, repromptDuration);
+            })
+            .catch(console.error);
         }
-        const expirationTime = this.activePrompts.get(promptId);
-        return Date.now() < expirationTime;
     }
 }
 
