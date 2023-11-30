@@ -30,13 +30,6 @@ class PromptTimeout {
                 const userDMChannel = await user.createDM();
                 await userDMChannel.send(`Your original prompt has expired, and you have been reprompted!\nPlease visit the submissions channel to post`);
                 console.log("User was sent a DM about expired Prompt")
-
-                //this should reprompt the user
-                const channel = await this.client.channels.cache.get(channelId);
-                if (channel) {
-                    await channel.send(`<@${user.id}> Use /submit to submit your post!\n**Prompt:**\n${originalPrompt}`);
-                }
-                console.log("Same user has been reprompted!")
                 this.handleReprompt(user, originalPrompt, channelId, message);
             }
         }, duration);
