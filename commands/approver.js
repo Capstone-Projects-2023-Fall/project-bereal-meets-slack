@@ -69,14 +69,21 @@ module.exports = {
 									approved = true;
 									approver = moderator;
 									const file = new AttachmentBuilder(url);
-                                    await interaction.channel.send({ content: `(${interaction.user}) responded to \"${promptContent}\" \n Caption: ${caption}`, files: [file]});
+                                    await interaction.channel.send({ content: `(${interaction.user}) responded to \"${promptContent}\" \n Caption: ${caption}`, files: [file]}); //use interaction.user for dm
 									await interaction.channel.send('@everyone New post!');
 									collectorStop();
 								} else if (i.customId === 'deny') {
 									await i.deferUpdate();
 									remaining_votes--;
-									console.log(`${moderator} denied; ${remaining_votes} votes left pending`);
+									console.log(`${interaction.moderator} denied; ${remaining_votes} votes left pending`);
+									try {
+										await interaction.moderator.send(`Why did you deny <@${interaction.user}> post`);
+									} catch (error) {
+										console.error(`Could not send notification to <@${interaction.moderator}>`);
+									}
+									//put dm to user here
 									await i.editReply({ content: '**DENIED**', components: [] });
+									
 									if (remaining_votes === 0) {
 										console.log('hello');
 										collectorStop();
