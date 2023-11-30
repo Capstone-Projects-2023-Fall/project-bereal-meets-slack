@@ -144,11 +144,10 @@ async function saveDB(client, channelId) {
 }
 
 async function insertResponseData(messageData) {
-    const connection = await pool.getConnection();
     try {
         // First, check if a record with the same message_id already exists
         const checkQuery = 'SELECT * FROM responses WHERE message_id = ?';
-        const [existingRecords] = await connection.query(checkQuery, [messageData.message_id]);
+        const [existingRecords] = await pool.query(checkQuery, [messageData.message_id]);
 
         // If no existing record is found, proceed to insert the new record
         if (existingRecords.length === 0) {
@@ -165,7 +164,9 @@ async function insertResponseData(messageData) {
             await pool.query(insertQuery, values)
             console.log('Data inserted successfully');
         } else {
-            console.log(`Record with message_id ${messageData.message_id} already exists. Skipping insertion.`);
+            const updateQuery = `UPDATE bot.responses SET response_image = '${messageData.response_image}' , num_reactions = ${messageData.num_reactions} , time_to_respond = ${messageData.time_to_respond} WHERE (message_id= ${messageData.message_id}) `;
+            pool.query(updateQuery);
+            console.log(`Record with message_id ${messageData.message_id} already exists. Updating`);
         }
     } catch (error) {
         console.error('Error in insertResponseData:', error);

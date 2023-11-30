@@ -78,14 +78,12 @@ module.exports = {
 									console.log(`${moderator} denied; ${remaining_votes} votes left pending`);
 									await i.editReply({ content: '**DENIED**', components: [] });
 									if (remaining_votes === 0) {
-										console.log('hello');
 										collectorStop();
 									}
 								}
 							});
 
 							collector.on('end', () => {
-								console.log('ahhh check ');
 							})
 
 							collectors.push(collector)
