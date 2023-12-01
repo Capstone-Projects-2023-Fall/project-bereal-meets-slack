@@ -44,6 +44,7 @@ module.exports = {
         )
     ),
   async execute(interaction) {
+    const guildId = interaction.guild.id; //Get guild ID
     const subcommand = interaction.options.getSubcommand();
     await interaction.deferReply({ephemeral: true});
     let reply = '';
@@ -51,19 +52,19 @@ module.exports = {
      reply = subcommand === 'add'
     ? await (async () => {
       const prompt = interaction.options.getString('prompt');
-      return await addPrompt(prompt);
+      return await addPrompt(guildId, prompt);
     })()
     : subcommand === 'delete'
     ? await (async () => {
         const promptToDelete = interaction.options.getString('prompt');
-        return await deletePrompt(promptToDelete, subcommand === 'delete');
+        return await deletePrompt(guildId, promptToDelete, subcommand === 'delete');
      })()
     : subcommand === 'list'
       ? await listPrompts()
     : subcommand === 'search'
       ? await (async () => {
         const query = interaction.options.getString('search-term');
-        return await searchPrompts(query);
+        return await searchPrompts(guildId, query);
       })()
     : '';
   

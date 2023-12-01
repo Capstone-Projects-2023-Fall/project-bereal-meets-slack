@@ -1,12 +1,8 @@
 const {pool} = require('./dbconn.js');
 
-
-
-
-async function getPrompts(){
-  [rows, fields] = await pool.query({sql: "SELECT prompt_text FROM bot.prompts", rowsAsArray: true});
-  promptArray = rows;
-  return promptArray;
+async function getPrompts(guildId){
+  const [rows] = await pool.query("SELECT prompt_text FROM bot.prompts WHERE guild_id = ?", [guildId]);
+  return rows.map(row => row.prompt_text);
 }
 
 async function addPrompt(prompt) {
