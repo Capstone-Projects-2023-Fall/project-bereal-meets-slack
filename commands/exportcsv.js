@@ -5,7 +5,7 @@ const { Parser } = require('json2csv');
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('savedata')
+        .setName('exportcsv')
         .setDescription('Saves data to a text file and uploads it to the chat'),
     async execute(interaction) {
         await interaction.deferReply();
