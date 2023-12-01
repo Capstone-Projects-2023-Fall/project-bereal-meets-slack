@@ -31,9 +31,9 @@ async function deletePrompt(guildId, promptToDelete) {
 
 }
 
-async function listPrompts() {
-  promptArray = await getPrompts();
-  return `Current Prompts: ${promptArray.join(', ')}`;
+async function listPrompts(guildId) {
+  const prompts = await getPrompts(guildId);
+  return `Current Prompts: ${prompts.join(', ')}`;
 }
 
 async function searchPrompts(query) {
