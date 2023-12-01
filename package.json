@@ -27,6 +27,7 @@
     "axios": "^1.5.1",
     "dotenv": "^16.3.1",
     "fs": "^0.0.1-security",
+    "json2csv": "^6.0.0-alpha.2",
     "luxon": "^3.4.3",
     "moment-timezone": "^0.5.43",
     "mysql2": "^3.6.3",
@@ -37,7 +38,7 @@
   },
   "devDependencies": {
     "@discordjs/rest": "^2.0.1",
-    "discord.js": "^14.13.0",
+    "discord.js": "^14.14.1",
     "mocha": "^10.2.0"
   }
 }

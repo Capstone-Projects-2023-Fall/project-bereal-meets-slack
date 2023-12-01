@@ -10,6 +10,8 @@ const promptUtils = require('./utils/promptUtils');
 const outputUsers = require('./utils/getRandom');
 const activeHoursUtils = require('./utils/activeHoursUtils');
 const saveDB = require('./utils/saveDB');
+const PromptTimeout = require('./utils/promptTimeout');
+
 
 //for cloud run, serverless application needs a server to listen.
 const port = 8080;
@@ -62,6 +64,7 @@ const client = new Client({
 }); //create new client
 
 client.commands = new Collection(); // set up commands list
+const promptTimeout = new PromptTimeout(client);
 
 const commandsPath = path.join(__dirname, 'commands');
 const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
@@ -152,16 +155,34 @@ async function schedulePost(activeHoursData){
         }, timeDifference);
 }
 
-async function postPrompt(callingUser){
+async function postPrompt(callingUser) {
     const randomPrompt = await promptUtils.getRandomPrompt();
-    if(callingUser){
-        client.sendMessageWithTimer(process.env.DISCORD_SUBMISSION_CHANNEL_ID, `${callingUser} Use /submit to submit your post! \n **Prompt:**\n${randomPrompt}`);
-    }
-    else{
+    let messageContent;
+    let userToPrompt;
+
+    if (callingUser) {
+            userToPrompt = await client.users.fetch(callingUser.id); // this should store the calling user
+            messageContent = `${callingUser.toString()} Use /submit to submit your post!\n**Prompt:**\n${randomPrompt}`;
+    } else {
         const list = client.guilds.cache.get(process.env.DISCORD_GUILD_ID);
         const userRand = await outputUsers(list);
-        client.sendMessageWithTimer(process.env.DISCORD_SUBMISSION_CHANNEL_ID, `<@${userRand}> Use /submit to submit your post! \n **Prompt:**\n${randomPrompt}`);
+        try {
+            userToPrompt = await client.users.fetch(userRand); // this should fetch the user that was prompted
+            messageContent = `<@${userRand}> Use /submit to submit your post!\n**Prompt:**\n${randomPrompt}`;
+        } catch (error) {
+            console.error("Error fetching random user:", error);
+            return;
+        }
     }
+    if (!userToPrompt || !messageContent) {
+        console.error("Error: User or message content is not defined.");
+        return;
+    }
+    
+    //for promptTimeout
+    const channelId = process.env.DISCORD_SUBMISSION_CHANNEL_ID;
+    const sentMessage = await client.sendMessageWithTimer(channelId, messageContent);
+    promptTimeout.setupPrompt(channelId, sentMessage, userToPrompt, randomPrompt, channelId);
 }
 
 async function triggerImmediatePost(callingUser){
@@ -184,8 +205,9 @@ client.sendMessageWithTimer = async (channelId, content) => {
         throw new Error("Channel not found");
     }
     
-    await channel.send(content);
+    const message = await channel.send(content);
     console.log("Message sent and timer started.");
+    return message;
 }
 
 client.on('messageCreate', async msg => {
