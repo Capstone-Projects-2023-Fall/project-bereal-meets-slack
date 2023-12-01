@@ -5,8 +5,8 @@ async function getPrompts(guildId){
   return rows.map(row => row.prompt_text);
 }
 
-async function addPrompt(prompt) {
- await pool.query(`INSERT INTO bot.prompts (prompt_text)VALUES('${prompt}')`);
+async function addPrompt(guildId, prompt) {
+ await pool.query("INSERT INTO bot.prompts (guild_id, prompt_text) VALUES (?, ?)", [guildId, prompt]);
  return `Prompt "${prompt}" has been added to the list.`;
 }
 
