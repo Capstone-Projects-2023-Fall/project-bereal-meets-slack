@@ -1,4 +1,4 @@
-const { AttachmentBuilder, ComponentType, SlashCommandBuilder } = require('discord.js');
+const { AttachmentBuilder, ComponentType, SlashCommandBuilder, ModalBuilder } = require('discord.js');
 const notifyMods = require('../utils/notifyMods.js')
 
 const test = "What are you procrastinating with?"
@@ -37,17 +37,16 @@ module.exports = {
 
 					const caption = interaction.options.getString('caption');
 
-                    const lastMessages = await interaction.channel.messages.fetch({ limit: 2 });
+                    const lastMessages = await interaction.channel.messages.fetch({ limit: 1 });
                     const content = lastMessages.last().content;
                     const promptMatch = content.match(/\*\*Prompt:\*\*([\s\S]+)/);
                     const promptContent = promptMatch && promptMatch[1] ? promptMatch[1].trim() : null;
 
                     const { responses, moderators } = await notifyMods(interaction.guild, promptContent, caption, interaction.user, [attachment]);
-									
 					const collectorFilter = i => moderators.has(i.user.id);
 
 					// const zip = (a, b) => a.map((k, i) => [k, Array.from(b)[i][1].user.globalName]);
-					const zip = (a, b) => a.map((k, i) => [k, Array.from(b)[i][1].user.globalName]);
+					const zip = (a, b) => a.map((k, i) => [k, Array.from(b)[i][1].user]);
 					try {
 						let approved = false;
 						let approver = null;
@@ -65,7 +64,7 @@ module.exports = {
 							collector.on('collect', async i => {
 								if (i.customId === 'approve') {
 									await i.deferUpdate();
-									console.log(`${moderator} approved`);
+									console.log(`${moderator.username} approved`);
 									approved = true;
 									approver = moderator;
 									const file = new AttachmentBuilder(url);
@@ -75,13 +74,23 @@ module.exports = {
 								} else if (i.customId === 'deny') {
 									await i.deferUpdate();
 									remaining_votes--;
-									console.log(`${interaction.moderator} denied; ${remaining_votes} votes left pending`);
+									console.log(`${moderator.username} denied; ${remaining_votes} votes left pending`);
+									
 									try {
-										await interaction.moderator.send(`Why did you deny <@${interaction.user}> post`);
-									} catch (error) {
-										console.error(`Could not send notification to <@${interaction.moderator}>`);
-									}
-									//put dm to user here
+										let messagefilter = m => m.author.id ===moderator.id
+										const message = await moderator.send("why did you deny post");
+										const collected = await message.channel.awaitMessages({messagefilter, max: 1, time: 30000, error: ['time']});
+										console.log(collected);
+										if(collected){
+										  await interaction.user.send(collected.first().content);
+										}
+										else{
+										   message.channel.send("timeout");
+										} 
+										} catch (error) {
+											console.error(`Could not send notification to ${moderator.username}.`, error);
+										}
+
 									await i.editReply({ content: '**DENIED**', components: [] });
 									
 									if (remaining_votes === 0) {

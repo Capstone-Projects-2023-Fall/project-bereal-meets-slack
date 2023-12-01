@@ -69,20 +69,10 @@ const {ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, Attachment, C
         try {
             const response = await moderator.send({ content: 'Review This Image to Approve or Deny', components: [row], embeds: [embed] });
 			responses.push(response);
-			/*
-			if(response == "deny"){
-				moderator.send({ content: 'Please Give Reason for Denying Post' })
-				await (async () => {
-					const reason = interaction.options.getString('reason');
-				});
-				author.send(`Your post was denied for the following reasons: ${reason}`);
-			}
-			*/
         } catch (error) {
             console.error(`Could not send DM to ${moderator.user.tag}.`, error);
         }
     }
-
 	return { responses, moderators };
 }
 
