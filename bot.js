@@ -156,7 +156,8 @@ async function schedulePost(activeHoursData){
 }
 
 async function postPrompt(callingUser) {
-    const randomPrompt = await promptUtils.getRandomPrompt();
+    const guildId = process.env.DISCORD_GUILD_ID;
+    const randomPrompt = await promptUtils.getRandomPrompt(guildId);
     let messageContent;
     let userToPrompt;
 

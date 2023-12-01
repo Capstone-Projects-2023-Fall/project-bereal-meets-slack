@@ -1,6 +1,6 @@
 const { AttachmentBuilder, ComponentType, SlashCommandBuilder } = require('discord.js');
 const notifyMods = require('../utils/notifyMods.js');
-const blacklistCommand = require('../utils/blacklist.js');
+const blacklistCommand = require('./blacklist.js');
 
 const denialCounts = new Map(); //map to track denial counts
 
