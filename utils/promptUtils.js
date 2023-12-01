@@ -10,22 +10,22 @@ async function addPrompt(guildId, prompt) {
  return `Prompt "${prompt}" has been added to the list.`;
 }
 
-async function deletePrompt(promptToDelete) {
-  [rows, fields] = await pool.query({sql: `SELECT prompt_id, prompt_text FROM bot.prompts WHERE prompt_text LIKE "%${promptToDelete}%"`, rowsAsArray: true});
-  promptArray = rows;
-  const fullMatches = promptArray.filter(prompt => prompt[1] === promptToDelete);
-  const partialMatches = promptArray.filter(prompt => prompt[1].includes(promptToDelete));
+async function deletePrompt(guildId, promptToDelete) {
+  const [rows] = await pool.query("SELECT prompt_id, prompt_text FROM bot.prompts WHERE guild_id = ? AND prompt_text LIKE ?", [guildId, `%${promptToDelete}%`]);
+ 
+  const fullMatches = rows.filter(prompt => prompt.prompt_text === promptToDelete);
+  const partialMatches = rows.filter(prompt => prompt.prompt_text.includes(promptToDelete) && prompt.prompt_text !== promptToDelete);
 
   if(fullMatches.length > 0){
     try{
-      await pool.query(`DELETE FROM bot.prompts WHERE prompt_id = ${fullMatches[0][0]}`);
-      return `${fullMatches[0][1]} was deleted`
+      await pool.query("DELETE FROM bot.prompts WHERE guild_id = ? AND prompt_id = ?", [guildId, fullMatches[0].prompt_id]);
+      return `${fullMatches[0].prompt_text} was deleted`
     }
     catch(error){return "There was an error deleting the specified prompt!"}
 
   }
   else if(partialMatches.length > 0){
-    return `Did not find specified prompt, did you mean: ${partialMatches.join(", ")}`
+    return `Did not find specified prompt, did you mean: ${partialMatches.map(p => p.prompt_text).join(", ")}`;
   }
   else{ return "Prompt Not Found."}
 
