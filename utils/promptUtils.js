@@ -36,10 +36,10 @@ async function listPrompts(guildId) {
   return `Current Prompts: ${prompts.join(', ')}`;
 }
 
-async function searchPrompts(query) {
-  promptArray = await getPrompts();
-  console.log(promptArray);
-  const partialMatches = promptArray.filter(prompt => prompt[0].includes(query));
+async function searchPrompts(guildId, query) {
+  const prompts = await getPrompts(guildId);
+  console.log(prompts);
+  const partialMatches = prompts.filter(prompt => prompt.includes(query));
 
   console.log(partialMatches);
 
