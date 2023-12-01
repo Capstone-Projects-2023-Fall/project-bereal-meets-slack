@@ -48,9 +48,9 @@ async function searchPrompts(guildId, query) {
     : `Search results for "${query}":\n${partialMatches.join('\n')}`;
 }
 
-async function getRandomPrompt(){
+async function getRandomPrompt(guildId){
   // this should go through the database and select a random prompt
-  const [rows] = await pool.query('SELECT * FROM prompts ORDER BY RAND() LIMIT 1');
+  const [rows] = await pool.query("SELECT prompt_text FROM bot.prompts WHERE guild_id = ? ORDER BY RAND() LIMIT 1", [guildId]);
   
   if (rows.length > 0) {
     return rows[0].prompt_text;
