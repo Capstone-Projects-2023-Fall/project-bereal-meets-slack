@@ -1,8 +1,5 @@
 const { AttachmentBuilder, ComponentType, SlashCommandBuilder } = require('discord.js');
 const notifyMods = require('../utils/notifyMods.js');
-const blacklistCommand = require('../utils/blacklist.js');
-
-const denialCounts = new Map(); //map to track denial counts
 
 const test = "What are you procrastinating with?"
 module.exports = {
@@ -81,15 +78,6 @@ module.exports = {
 									console.log(`${moderator} denied; ${remaining_votes} votes left pending`);
 									await i.editReply({ content: '**DENIED**', components: [] });
 									
-									const user = interaction.user.id;
-									const denialCount = (denialCounts.get(user) || 0) + 1;
-									denialCounts.set(user, denialCount);
-
-									if(denialCount >= 2) {
-										await blacklistCommand.execute(interaction, {options : {getSubCommand: () => 'add', getString: () => user}});
-										await interaction.followUp({ content: `The user '**${user}**' has been automatically blacklisted due to repeated denials` });
-									}
-
 									if (remaining_votes === 0) {
 										console.log('hello');
 										collectorStop();
