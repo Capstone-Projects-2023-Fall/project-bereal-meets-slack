@@ -78,18 +78,17 @@ module.exports = {
 									
 									try {
 										let messagefilter = m => m.author.id ===moderator.id
-										const message = await moderator.send("why did you deny post");
+										const message = await moderator.send(`<@${moderator.id}> PLEASE GIVE REASON FOR DENYING THE POST:`);
 										const collected = await message.channel.awaitMessages({messagefilter, max: 1, time: 30000, error: ['time']});
-										console.log(collected);
-										if(collected){
+										if(collected.first()){
 										  await interaction.user.send(collected.first().content);
 										}
 										else{
-										   message.channel.send("timeout");
+											message.channel.send("timeout error");
 										} 
-										} catch (error) {
-											console.error(`Could not send notification to ${moderator.username}.`, error);
-										}
+									} catch (error) {
+										console.error(`Could not send notification to ${moderator.username}.`, error);
+									}
 
 									await i.editReply({ content: '**DENIED**', components: [] });
 									
