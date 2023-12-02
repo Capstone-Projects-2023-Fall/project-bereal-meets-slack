@@ -1,6 +1,7 @@
 const { AttachmentBuilder, ComponentType, SlashCommandBuilder } = require('discord.js');
 const notifyMods = require('../utils/notifyMods.js');
 
+
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('submit') 
@@ -67,6 +68,7 @@ module.exports = {
 									remaining_votes--;
 									console.log(`${moderator} denied; ${remaining_votes} votes left pending`);
 									await i.editReply({ content: '**DENIED**', components: [] });
+
 									if (remaining_votes === 0) {
 										console.log('hello');
 										collectorStop();
