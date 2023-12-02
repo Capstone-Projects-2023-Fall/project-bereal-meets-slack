@@ -148,24 +148,23 @@ async function insertResponseData(messageData) {
         // First, check if a record with the same message_id already exists
         const checkQuery = 'SELECT * FROM responses WHERE message_id = ?';
         const [existingRecords] = await pool.query(checkQuery, [messageData.message_id]);
-
+        const values = [
+            messageData.response_image,
+            messageData.num_reactions,
+            messageData.time_to_respond,
+            messageData.message_id
+        ];
         // If no existing record is found, proceed to insert the new record
         if (existingRecords.length === 0) {
             const insertQuery = `
                 INSERT INTO responses (response_image, num_reactions, time_to_respond, message_id) 
                 VALUES (?, ?, ?, ?)
             `;
-            const values = [
-                messageData.response_image,
-                messageData.num_reactions,
-                messageData.time_to_respond,
-                messageData.message_id
-            ];
             await pool.query(insertQuery, values)
             console.log('Data inserted successfully');
         } else {
-            const updateQuery = `UPDATE bot.responses SET response_image = '${messageData.response_image}' , num_reactions = ${messageData.num_reactions} , time_to_respond = ${messageData.time_to_respond} WHERE (message_id= ${messageData.message_id}) `;
-            pool.query(updateQuery);
+            const updateQuery = `UPDATE bot.responses SET response_image = ? , num_reactions = ? , time_to_respond = ? WHERE (message_id= ? ) `;
+            pool.query(updateQuery, values);
             console.log(`Record with message_id ${messageData.message_id} already exists. Updating`);
         }
     } catch (error) {
