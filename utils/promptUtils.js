@@ -44,7 +44,7 @@ async function searchPrompts(guildId, query) {
   console.log(partialMatches);
 
   return partialMatches.length === 0
-    ? `No prompts found that match "${query}"\nall prompts: ${promptArray}`
+    ? `No prompts found that match "${query}"\nall prompts: ${prompts.join('\n')}`
     : `Search results for "${query}":\n${partialMatches.join('\n')}`;
 }
 
