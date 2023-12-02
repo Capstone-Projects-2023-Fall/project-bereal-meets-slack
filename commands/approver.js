@@ -1,13 +1,9 @@
 const { AttachmentBuilder, ComponentType, SlashCommandBuilder } = require('discord.js');
 const notifyMods = require('../utils/notifyMods.js');
-const blacklistCommand = require('./blacklist.js');
 
-const denialCounts = new Map(); //map to track denial counts
-
-const test = "What are you procrastinating with?"
 module.exports = {
 	data: new SlashCommandBuilder()
-		.setName('submit') //upload?
+		.setName('submit') 
 		.setDescription('Please submit your post:')
 		.addAttachmentOption(option => {
 			return option
@@ -22,16 +18,10 @@ module.exports = {
 		
 	async execute(interaction) {
 		await interaction.deferReply();
-
-		// console.log(interaction)
 		await interaction.editReply('submitted to moderators!');
-		//await interaction.channel.send('b again');
-
 		const attachment = interaction.options.getAttachment('file');
 		if (attachment) {
-			const name = attachment.name;
 			const url = attachment.url;
-			const proxy = attachment.proxyURL;
 			const type = attachment.contentType;
 
 			if (type) {
@@ -49,7 +39,6 @@ module.exports = {
 									
 					const collectorFilter = i => moderators.has(i.user.id);
 
-					// const zip = (a, b) => a.map((k, i) => [k, Array.from(b)[i][1].user.globalName]);
 					const zip = (a, b) => a.map((k, i) => [k, Array.from(b)[i][1].user.globalName]);
 					try {
 						let approved = false;
@@ -58,8 +47,6 @@ module.exports = {
 
 						collectors = [];
 						for (const [response, moderator] of zip(responses, moderators)) {
-							// console.log(response);
-							// console.log(moderator);
 							const collector = response.createMessageComponentCollector({ componentType: ComponentType.Button,
 																						 filter: collectorFilter,
 																						 max: 1,
@@ -80,16 +67,6 @@ module.exports = {
 									remaining_votes--;
 									console.log(`${moderator} denied; ${remaining_votes} votes left pending`);
 									await i.editReply({ content: '**DENIED**', components: [] });
-									
-									const user = interaction.user.id;
-									const denialCount = (denialCounts.get(user) || 0) + 1;
-									denialCounts.set(user, denialCount);
-
-									if(denialCount >= 2) {
-										await blacklistCommand.execute(interaction, {options : {getSubCommand: () => 'add', getString: () => user}});
-										await interaction.followUp({ content: `The user '**${user}**' has been automatically blacklisted due to repeated denials` });
-									}
-
 									if (remaining_votes === 0) {
 										console.log('hello');
 										collectorStop();

@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require('discord.js');
-const {addPrompt, listPrompts, searchPrompts, deletePrompt} = require('../utils/promptUtils.js')
+const {addPrompt, listPrompts, searchPrompts, deletePrompt, getPrompts} = require('../utils/promptUtils.js')
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -24,7 +24,8 @@ module.exports = {
           option
             .setName('prompt')
             .setDescription('Enter the prompt to delete')
-            .setRequired(true),
+            .setRequired(true)
+            .setAutocomplete(true),
         )
     )
     .addSubcommand(subcommand =>
@@ -43,6 +44,16 @@ module.exports = {
             .setRequired(true),
         )
     ),
+    
+  async autocomplete(interaction) {
+      const focusedValue = interaction.options.getFocused();
+      const choices = await getPrompts(interaction.guild.id);
+      const filtered = choices.filter(choice => choice.startsWith(focusedValue));
+      await interaction.respond(
+        filtered.map(choice => ({ name: choice, value: choice })),
+      );
+  },
+
   async execute(interaction) {
     const guildId = interaction.guild.id; //Get guild ID
     const subcommand = interaction.options.getSubcommand();
