@@ -49,24 +49,15 @@ module.exports = {
     await interaction.deferReply({ephemeral: true});
     let reply = '';
 
-     reply = subcommand === 'add'
-    ? await (async () => {
-      const prompt = interaction.options.getString('prompt');
-      return await addPrompt(guildId, prompt);
-    })()
-    : subcommand === 'delete'
-    ? await (async () => {
-        const promptToDelete = interaction.options.getString('prompt');
-        return await deletePrompt(guildId, promptToDelete, subcommand === 'delete');
-     })()
-    : subcommand === 'list'
-      ? await listPrompts()
-    : subcommand === 'search'
-      ? await (async () => {
-        const query = interaction.options.getString('search-term');
-        return await searchPrompts(guildId, query);
-      })()
-    : '';
+    reply = subcommand === 'add'
+      ? await addPrompt(guildId, interaction.options.getString('prompt'))
+      : subcommand === 'delete'
+      ? await deletePrompt(guildId, interaction.options.getString('prompt'))
+      : subcommand === 'list'
+      ? await listPrompts(guildId)
+      : subcommand === 'search'
+      ? await searchPrompts(guildId, interaction.options.getString('search-term'))
+      : '';
   
       await interaction.followUp(reply);
   },
