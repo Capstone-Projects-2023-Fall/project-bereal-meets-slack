@@ -1,4 +1,4 @@
-const { AttachmentBuilder, ComponentType, SlashCommandBuilder } = require('discord.js');
+const { AttachmentBuilder, ComponentType, SlashCommandBuilder} = require('discord.js');
 const notifyMods = require('../utils/notifyMods.js');
 
 const test = "What are you procrastinating with?"
