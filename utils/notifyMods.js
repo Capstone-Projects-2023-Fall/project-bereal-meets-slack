@@ -1,5 +1,5 @@
 
-const {ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, Attachment} = require('discord.js');
+const {ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder} = require('discord.js');
 
 // async function notifyMods(guild, content, author, attachments) {
 	async function notifyMods(guild, content, caption, author, attachments) {
@@ -73,7 +73,6 @@ const {ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, Attachment} =
             console.error(`Could not send DM to ${moderator.user.tag}.`, error);
         }
     }
-
 	return { responses, moderators };
 }
 
