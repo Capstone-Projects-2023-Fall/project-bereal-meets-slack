@@ -111,6 +111,5 @@ module.exports = {
                     }
                     break;
             }
-        }
+    }
 };
-
