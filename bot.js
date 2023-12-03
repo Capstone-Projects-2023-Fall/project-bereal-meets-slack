@@ -112,16 +112,6 @@ client.on('ready', async () => {
     const guildId = process.env.DISCORD_GUILD_ID;
     schedulePost();
 
-    //setup cron
-    //cron.schedule('0 0 8 * * *', async () => {
-    //try to schedule post 
-   // try{
-    //    const activeHoursData = await activeHoursUtils.fetchActiveHoursFromDB(guildId);
-    //    await schedulePost(activeHoursData);
-  //  } catch (error) {
-   //     console.error('Error scheduling post', error);
-  //  }
- // });
     console.log('scheduling data collector')
     cron.schedule('59 23 * * *', async () => { //scheduled to run every day at 11:59 PM
         try {
