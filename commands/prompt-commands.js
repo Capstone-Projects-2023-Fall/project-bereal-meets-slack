@@ -54,8 +54,8 @@ module.exports = {
         filtered.map(choice => ({ name: choice, value: choice })),
       );
     }catch(error){
-      console.log(error);
-      await interaction.respond([{name: "ERROR The application took too long to respond! You can still enter a different prompt to delete", value: "ERROR The application took too long to respond! You can still enter a different prompt to delete"}]);
+      console.log("Timeout; Unknown Interaction");
+      await interaction.respond([{name: "Fetching ERROR: You can still enter aprompt to delete", value: "N/A"}]);
     }
   },
 
