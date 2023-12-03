@@ -11,7 +11,7 @@ const outputUsers = require('./utils/getRandom');
 const activeHoursUtils = require('./utils/activeHoursUtils');
 const notifyMods = require('./utils/notifyMods.js');
 const saveDB = require('./utils/saveDB');
-
+const handleUserSubmission = require('./utils/handleUserSubmission.js');
 
 //for cloud run, serverless application needs a server to listen.
 const port = 8080;
@@ -241,107 +241,26 @@ client.on(Events.MessageCreate, async msg => {
                 console.log(`timeToRespond: ${elapsedSeconds} seconds.`);
             }
         }
-
-    }
-
-    else {
+    } else {
         //trigger
         console.log("I caught that");
         if (msg.content === "!demoTrigger") { 
             await triggerImmediatePost();
-        }
-        else if (msg.content === "Prompt me") { 
+        } else if (msg.content === "Prompt me") { 
             await triggerImmediatePost(msg.author);
         }
 
         // make sure it is a dm
         if (msg.channel.type === ChannelType.DM) {
             console.log("amogus");
-        }
-        else{
+        } else {
             return;
         }
-        // the user has dm'd the bot
-        const attachment = msg.attachments.first();
 
-        if (attachment) {
-            const url = attachment.url;
-            const type = attachment.contentType;
-
-            if (type) {
-                if (type.startsWith('image')) {
-                    console.log('THIS IS AN IMAGE');
-
-                    const caption = !msg.content.trim().length ? null : msg.content;
-                    const guild = await client.guilds.fetch(process.env.DISCORD_GUILD_ID);
-                    const { responses, moderators } = await notifyMods(guild, null, caption, msg.author, [attachment]);
-
-                    const collectorFilter = i => moderators.has(i.user.id); //
-
-                    const zip = (a, b) => a.map((k, i) => [i, k, Array.from(b)[i][1].user.globalName]); // just makes it easier to iterate through things
-                    try {
-                        const collectors = [];
-                        for (const [idx, response, moderator] of zip(responses, moderators)) {
-                            const collector = response.createMessageComponentCollector({
-                                componentType: ComponentType.Button,
-                                filter: collectorFilter,
-                                max: 1,
-                                time: 86_400_000
-                            });
-
-                            collector.mod = moderator; // tag collector with who they belong to
-
-                            collector.on('collect', async i => {
-                                if (i.customId === 'approve') {
-                                    await i.deferUpdate();
-                                    console.log(`${moderator} approved`);
-
-                                    // if somebody approved, then kill every collector since we dont need to get more inputs
-                                    for (const collector of collectors) {
-                                        if (!collector.ended) {
-                                            collector.stop();
-                                        }
-                                    }
-                                    // edit all the messages that bot sent to the DMs for the particular submission
-                                    for (const [idx2, response] of responses.entries()) {
-                                        approve_msg = idx == idx2 ? '**APPROVED**' : `**APPROVED BY ${moderator}**`;
-                                        await response.edit({ content: approve_msg, components: [] });
-                                    }
-
-                                    const file = new AttachmentBuilder(url);
-                                    const submit_channel = await client.channels.fetch(process.env.DISCORD_SUBMISSION_CHANNEL_ID);
-                                    await submit_channel.send({ content: `(${msg.author}) ${caption ?? '[no caption provided]'}`, files: [file] });
-                                }
-
-                                // check if someone press deny
-                                else if (i.customId === 'deny') {
-                                    await i.deferUpdate();
-                                    console.log(`${moderator} denied`);
-                                    await i.editReply({ content: '**DENIED**', components: [] });
-                                }
-                            });
-
-                            collector.on('end', () => {
-                                console.log(`(${collector.mod}'s collector explosioned)`);
-                            })
-
-                            collectors.push(collector); // keep track of the collector
-                        }
-                    } catch (e) {
-                        console.error('BUTTON ERROR');
-                        console.error(e);
-                    }
-                } else {
-                    console.log('THIS IS NOT AN IMAGE');
-                }
-            } else {
-                console.log('Type is nonexistent');
-            }
-        } else {
-            console.log('NO ATTACHMENT');
-        }
+        const guild = await client.guilds.fetch(process.env.DISCORD_GUILD_ID);
+		const caption = !msg.content.trim().length ? null : msg.content;
+		await handleUserSubmission(client, msg.attachments.first(), guild, channel, caption, msg.author);
     }
-
 });
 
 // Make sure this line is the last line

@@ -1,12 +1,7 @@
 const {ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, Attachment} = require('discord.js');
 
-// async function notifyMods(guild, content, author, attachments) {
-	async function notifyMods(guild, content, caption, author, attachments) {
-
-	//console.log('AAAA');
-
+async function notifyMods(attachments, guild, content, caption, author) {
     //Get role for mods
-    //const modRole = guild.roles.cache.find(role => role.name === 'mod all');
     const modRole = guild.roles.cache.find(role => role.name === 'bot mod'); //the current role name is bot mod for testing purpsoes
     await guild.members.fetch();
 
@@ -18,16 +13,8 @@ const {ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, Attachment} =
  		return console.error("No attachment was provided");
 	}
 
-	//console.log('B');
-
     //Fetch memebrs with mod all role 
     const moderators = guild.members.cache.filter(member => member.roles.cache.has(modRole.id));
-    // console.log("List of mods");
-    // moderators.forEach(moderator => {
-    //     console.log(`Moderator: ${moderator.user.username} #${moderator.user.discriminator}`);
-    // });
-  
-	//console.log('C');
 
     //Embedd message to include images
     const embed = new EmbedBuilder()
@@ -43,8 +30,6 @@ const {ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, Attachment} =
 		embed.setImage(image.url); //embed image 
 	}
 
-	//console.log('D');
-
 	// create buttons
 	const approve = new ButtonBuilder()
 		.setCustomId('approve')
@@ -59,8 +44,6 @@ const {ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, Attachment} =
 	// send message
 	const row = new ActionRowBuilder()
 		.addComponents(approve, deny);
-
-		//console.log('E');
 
     // send DM to all moderators
 	const responses = []
