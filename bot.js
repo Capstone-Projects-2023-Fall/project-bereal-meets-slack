@@ -150,9 +150,10 @@ async function schedulePost(activeHoursData){
             clearTimeout(nextPostTimeout);
         }
         console.log(`Scheduling next post for: ${targetTime.format("YYYY-MM-DD HH:mm:ss")}`);
+        console.log("Prompting...")
         // schedule the next post
         nextPostTimeout = setTimeout(async () => {
-            console.log("posting now");
+            console.log("Posting now\n");
             await postPrompt();
             schedulePost();
         }, timeDifference);
