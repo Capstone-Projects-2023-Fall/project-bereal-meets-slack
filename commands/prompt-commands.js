@@ -46,12 +46,16 @@ module.exports = {
     ),
     
   async autocomplete(interaction) {
+    try{
       const focusedValue = interaction.options.getFocused();
       const choices = await getPrompts(interaction.guild.id);
       const filtered = choices.filter(choice => choice.startsWith(focusedValue));
       await interaction.respond(
         filtered.map(choice => ({ name: choice, value: choice })),
       );
+    }catch(error){
+        interaction.respond({name: "The database took too long to respond", choice: "The application took too long to respond"});
+    }
   },
 
   async execute(interaction) {
