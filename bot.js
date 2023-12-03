@@ -11,6 +11,7 @@ const outputUsers = require('./utils/getRandom');
 const activeHoursUtils = require('./utils/activeHoursUtils');
 const saveDB = require('./utils/saveDB');
 const { prompt } = require('../utils/prompt.js');
+const PromptTimeout = require('./utils/promptTimeout');
 
 //for cloud run, serverless application needs a server to listen.
 const port = 8080;
@@ -59,10 +60,12 @@ const client = new Client({
     GatewayIntentBits.GuildMessages,
     GatewayIntentBits.MessageContent,
     GatewayIntentBits.GuildMembers,
+    GatewayIntentBits.DirectMessages,
 ],
 }); //create new client
 
 client.commands = new Collection(); // set up commands list
+const promptTimeout = new PromptTimeout(client);
 
 const commandsPath = path.join(__dirname, 'commands');
 const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
@@ -80,26 +83,43 @@ for (const file of commandFiles) {
 
 
 //check for ping command.
-client.on(Events.InteractionCreate, async interaction => {
-  if (!interaction.isChatInputCommand()) return;
-  
-	const command = interaction.client.commands.get(interaction.commandName);
+client.on(Events.InteractionCreate, async interaction => {  
+    if(interaction.isAutocomplete()) {
+        const command = interaction.client.commands.get(interaction.commandName);
 
-	if (!command) {
-		console.error(`No command matching ${interaction.commandName} was found.`);
-		return;
-	}
+        if (!command) {
+            console.error(`No command matching ${interaction.commandName} was found.`);
+            return;
+        }
 
-	try {
-		await command.execute(interaction);
-	} catch (error) {
-		console.error(error);
-		if (interaction.replied || interaction.deferred) {
-			await interaction.followUp({ content: 'There was an error while executing this command!', ephemeral: true });
-		} else {
-			await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
+        try {
+			await command.autocomplete(interaction);
+		} catch (error) {
+			console.error(error);
 		}
-	}
+    }
+
+    else if(interaction.isChatInputCommand()){
+        const command = interaction.client.commands.get(interaction.commandName);
+
+        if (!command) {
+            console.error(`No command matching ${interaction.commandName} was found.`);
+            return;
+        }
+	    try {
+		    await command.execute(interaction);
+	    } catch (error) {
+		    console.error(error);
+		    if (interaction.replied || interaction.deferred) {
+			    await interaction.followUp({ content: 'There was an error while executing this command!', ephemeral: true });
+		    } else {
+		    	await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
+		    }
+	    }
+    }
+    else{
+        return;
+    }
 });
 
 
@@ -158,17 +178,32 @@ async function postPrompt(callingUser) {
     const randomPrompt = await promptUtils.getRandomPrompt(guildId);
     prompt.setPrompt(randomPrompt);
         
+    let messageContent;
+    let userToPrompt;
+
     if (callingUser) {
-        messageContent = `${callingUser} Use /submit to submit your post!\n**Prompt:**\n${randomPrompt}`;
+            userToPrompt = await client.users.fetch(callingUser.id); // this should store the calling user
+            messageContent = `${callingUser.toString()} Use /submit to submit your post!\n**Prompt:**\n${randomPrompt}`;
     } else {
         const list = client.guilds.cache.get(process.env.DISCORD_GUILD_ID);
         const userRand = await outputUsers(list);
-        messageContent = `<@${userRand}> Use /submit to submit your post!\n**Prompt:**\n${randomPrompt}`;
+        try {
+            userToPrompt = await client.users.fetch(userRand); // this should fetch the user that was prompted
+            messageContent = `<@${userRand}> Use /submit to submit your post!\n**Prompt:**\n${randomPrompt}`;
+        } catch (error) {
+            console.error("Error fetching random user:", error);
+            return;
+        }
     }
+    if (!userToPrompt || !messageContent) {
+        console.error("Error: User or message content is not defined.");
+        return;
+    }
+    
     //for promptTimeout
     const channelId = process.env.DISCORD_SUBMISSION_CHANNEL_ID;
     const sentMessage = await client.sendMessageWithTimer(channelId, messageContent);
-    promptTimeout.setupPrompt(channelId, sentMessage);
+    promptTimeout.setupPrompt(channelId, sentMessage, userToPrompt, randomPrompt, channelId);
 }
 
 async function triggerImmediatePost(callingUser){

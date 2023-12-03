@@ -16,7 +16,7 @@
     "BeReal",
     "discord"
   ],
-  "author": "Rishi Duggal, Rachel To, Vivek Patel, Tara Feeley, Sojel Sunny, Gevork Dramgotchian, Christian Smith, Nick Sowers",
+  "author": "Rishi Duggal, Vivek Patel, Tara Feeley, Gevork Dramgotchian, Rachel To, Sojel Sunny, Christian Smith, Nick Sowers",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/Capstone-Projects-2023-Fall/project-bereal-meets-slack/issues"
@@ -38,7 +38,7 @@
   },
   "devDependencies": {
     "@discordjs/rest": "^2.0.1",
-    "discord.js": "^14.13.0",
+    "discord.js": "^14.14.1",
     "mocha": "^10.2.0"
   }
 }
