@@ -50,11 +50,12 @@ module.exports = {
       const focusedValue = interaction.options.getFocused();
       const choices = await getPrompts(interaction.guild.id);
       const filtered = choices.filter(choice => choice.startsWith(focusedValue));
+      console.log(filtered.map(choice => ({ name: choice, value: choice }))); 
       await interaction.respond(
         filtered.map(choice => ({ name: choice, value: choice })),
       );
     }catch(error){
-        interaction.respond({name: "The database took too long to respond", choice: "The application took too long to respond"});
+        await interaction.respond([{name: "The database took too long to respond", choice: "The application took too long to respond"}]);
     }
   },
 
