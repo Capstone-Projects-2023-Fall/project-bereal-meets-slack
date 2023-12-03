@@ -2,7 +2,7 @@ const { SlashCommandBuilder} = require('discord.js');
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('toggle')
+        .setName('notifications')
         .setDescription('Toggle bot notifications'),
     
     async execute(interaction) {
@@ -15,10 +15,10 @@ module.exports = {
 
         if (hasBotUserRole) {
             await member.roles.remove(botUserRole).catch(console.error);
-            await interaction.reply('Successfully removed the Bot User role'); 
+            await interaction.reply('Successfully removed the Bot User role. You will no longer receive BeReal Bot post notifications.'); 
         } else {
             await member.roles.add(botUserRole).catch(console.error);
-            await interaction.reply('Successfully added the Bot User role'); 
+            await interaction.reply('Successfully added the Bot User role. You will now receive BeReal Bot post notifications.'); 
         }
     }
 }
