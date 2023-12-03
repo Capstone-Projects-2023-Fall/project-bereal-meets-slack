@@ -1,5 +1,6 @@
 const { AttachmentBuilder, ComponentType, SlashCommandBuilder } = require('discord.js');
-const { notifyMods, prompt } = require('../utils/notifyMods.js');
+const { notifyMods } = require('../utils/notifyMods.js');
+const { prompt } = require('../utils/prompt.js');
 
 const test = "What are you procrastinating with?"
 module.exports = {

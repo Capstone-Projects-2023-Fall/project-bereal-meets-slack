@@ -11,7 +11,7 @@ const outputUsers = require('./utils/getRandom');
 const activeHoursUtils = require('./utils/activeHoursUtils');
 const saveDB = require('./utils/saveDB');
 const promptTimeout = require('./utils/promptTimeout');
-const { prompt } = require('./utils/notifyMods');
+const { prompt } = require('../utils/prompt.js');
 
 //for cloud run, serverless application needs a server to listen.
 const port = 8080;
