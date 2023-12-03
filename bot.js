@@ -110,17 +110,18 @@ client.on('ready', async () => {
     console.log(`Logged in as ${client.user.tag}!`);
     registrar.registercommands();
     const guildId = process.env.DISCORD_GUILD_ID;
+    schedulePost();
 
     //setup cron
-    cron.schedule('0 0 8 * * *', async () => {
+    //cron.schedule('0 0 8 * * *', async () => {
     //try to schedule post 
-    try{
-        const activeHoursData = await activeHoursUtils.fetchActiveHoursFromDB(guildId);
-        await schedulePost(activeHoursData);
-    } catch (error) {
-        console.error('Error scheduling post', error);
-    }
-  });
+   // try{
+    //    const activeHoursData = await activeHoursUtils.fetchActiveHoursFromDB(guildId);
+    //    await schedulePost(activeHoursData);
+  //  } catch (error) {
+   //     console.error('Error scheduling post', error);
+  //  }
+ // });
     console.log('scheduling data collector')
     cron.schedule('59 23 * * *', async () => { //scheduled to run every day at 11:59 PM
         try {
@@ -136,24 +137,38 @@ client.on('ready', async () => {
     });
 });
 
+let nextPostTimeout = null;
+
 async function schedulePost(activeHoursData){
     //get random hour within active hours
-    const targetHour = activeHoursUtils.getRandomHourWithinActiveHours(activeHoursData);
-    const [hour, minute] = targetHour.split(':');
+    const guildId = process.env.DISCORD_GUILD_ID;
+    try{
+        const activeHoursData = await activeHoursUtils.fetchActiveHoursFromDB(guildId);
+        const targetHour = activeHoursUtils.getRandomHourWithinActiveHours(activeHoursData);
+        const [hour, minute] = targetHour.split(':');
+        const now = moment().tz("America/New_York");
+        const targetTime = now.clone().hour(hour).minute(minute).second(0);
 
-    const now = moment().tz("America/New_York");
-    const targetTime = now.clone().hour(hour).minute(minute).second(0);
-
-    if(now.isAfter(targetTime)){
-        //if current time is after target time, schedule for next day
-        console.log("Current time is past target posting time. Scheduling for next available slot.");
-        targetTime.add(1, 'day');
-    }
+        if(now.isAfter(targetTime)){
+            //if current time is after target time, schedule for next day
+            console.log("Current time is past target posting time. Scheduling for next available slot.");
+            targetTime.add(1, 'day');
+        }
         const timeDifference = targetTime.diff(now);
 
-        setTimeout(async () => {
-          await postPrompt();
+        if (nextPostTimeout) {
+            clearTimeout(nextPostTimeout);
+        }
+        console.log(`Scheduling next post for: ${targetTime.format("YYYY-MM-DD HH:mm:ss")}`);
+        // schedule the next post
+        nextPostTimeout = setTimeout(async () => {
+            console.log("posting now");
+            await postPrompt();
+            schedulePost();
         }, timeDifference);
+    } catch (error) {
+        console.error('Error in schedulePost:', error);
+    }
 }
 
 async function postPrompt(callingUser) {
