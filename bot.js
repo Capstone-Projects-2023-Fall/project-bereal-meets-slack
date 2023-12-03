@@ -213,7 +213,7 @@ client.sendMessageWithTimer = async (channelId, content) => {
     }
     
     const message = await channel.send(content);
-    console.log("Message sent and timer started.");
+    console.log("Message sent and timer started.\n");
     return message;
 }
 
