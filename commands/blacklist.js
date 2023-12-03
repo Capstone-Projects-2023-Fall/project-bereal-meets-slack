@@ -1,7 +1,6 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const {pool} = require('../utils/dbconn.js');
 
-
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('blacklist')
@@ -14,10 +13,11 @@ module.exports = {
             const modRole = interaction.guild.roles.cache.find(role => role.name === 'bot mod');
             const moderators = interaction.guild.members.cache.filter(member => member.roles.cache.has(modRole.id));
             
-            if (!(interaction.member.roles.cache.has(modRole.id))) return await interaction.followUp({ content: 'Only **moderators** can use this command', ephemeral: true});
+            if (!(interaction.member.roles.cache.has(modRole.id))) return await interaction.reply({ content: 'Only **moderators** can use this command', ephemeral: true});
 
             const user = options.getString('user');
             let dbuser;
+            //Remove brackets so discord understands id string
             if(user){
                 dbuser = user.replace('<', '');
                 dbuser = dbuser.replace('>', '');
@@ -111,6 +111,5 @@ module.exports = {
                     }
                     break;
             }
-        }
+    }
 };
-

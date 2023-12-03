@@ -20,7 +20,7 @@ function createConnectionPoolCloud(){
     password : process.env.DB_PASS,
     database : process.env.DB_NAME,
     waitForConnections: true,
-    connectTimeout: 5000
+    connectTimeout: 2000
   }
   return mysql.createPool(dboptions);
 };
