@@ -6,7 +6,7 @@ const { prompt } = require('../utils/prompt.js');
 let deniedUsers = new Map(); //keep track of user denial counts
 
 async function handleUserSubmission(client, attachment, guild, caption, submitter) {
-    const botUserRole = guild.roles.cache.find((role) => role.name === 'bot mod');
+    const botUserRole = guild.roles.cache.find((role) => role.name === 'bot mod'); //Bot User, bot mod, mod all
     const promptContent = prompt.getPrompt();
 
     if (!attachment) {
