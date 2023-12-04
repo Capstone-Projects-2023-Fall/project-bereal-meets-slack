@@ -12,6 +12,8 @@ const activeHoursUtils = require('./utils/activeHoursUtils');
 const saveDB = require('./utils/saveDB');
 const { prompt } = require('./utils/prompt.js');
 const PromptTimeout = require('./utils/promptTimeout');
+const activeEvents = require('./utils/activeEvents')
+
 
 //for cloud run, serverless application needs a server to listen.
 const port = 8080;
@@ -138,7 +140,7 @@ client.on('ready', async () => {
         console.error('Error scheduling post', error);
     }
   });
-    console.log('scheduling data collector')
+    console.log('scheduling data collector\n')
     cron.schedule('59 23 * * *', async () => { //scheduled to run every day at 11:59 PM
         try {
             console.log('Running daily saveDB task');
@@ -152,8 +154,17 @@ client.on('ready', async () => {
         timezone: "America/New_York"
     });
 });
+let scheduledPromptTimeout;
+
+activeEvents.on('activeHoursUpdated', async (data) => {
+    const activeHoursData = await activeHoursUtils.fetchActiveHoursFromDB(data.guildId);
+    await schedulePost(activeHoursData);
+});
 
 async function schedulePost(activeHoursData){
+    if (scheduledPromptTimeout) {
+        clearTimeout(scheduledPromptTimeout);
+    }
     //get random hour within active hours
     const targetHour = activeHoursUtils.getRandomHourWithinActiveHours(activeHoursData);
     const [hour, minute] = targetHour.split(':');
@@ -163,12 +174,13 @@ async function schedulePost(activeHoursData){
 
     if(now.isAfter(targetTime)){
         //if current time is after target time, schedule for next day
-        console.log("Current time is past target posting time. Scheduling for next available slot.");
+        console.log("Current time is past target posting time. Scheduling for next available slot.\n");
         targetTime.add(1, 'day');
     }
         const timeDifference = targetTime.diff(now);
+        console.log(`Now prompt is scheduled for: ${targetTime.format('MM-DD-YYYY @ HH:mm A')}`);
 
-        setTimeout(async () => {
+        scheduledPromptTimeout = setTimeout(async () => {
           await postPrompt();
         }, timeDifference);
 }
@@ -227,7 +239,7 @@ client.sendMessageWithTimer = async (channelId, content) => {
     }
     
     const message = await channel.send(content);
-    console.log("Message sent and timer started.");
+    console.log("Message sent and timer started.\n");
     return message;
 }
 
