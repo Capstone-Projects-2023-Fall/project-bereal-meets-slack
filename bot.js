@@ -123,7 +123,7 @@ client.on('ready', async () => {
         console.error('Error scheduling post', error);
     }
   });
-    console.log('scheduling data collector')
+    console.log('scheduling data collector\n')
     cron.schedule('59 23 * * *', async () => { //scheduled to run every day at 11:59 PM
         try {
             console.log('Running daily saveDB task');
