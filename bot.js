@@ -161,7 +161,7 @@ async function schedulePost(activeHoursData){
         targetTime.add(1, 'day');
     }
         const timeDifference = targetTime.diff(now);
-        console.log(`Now prompt is scheduled for: ${targetTime.format('MM-DD-YYYY @ HH:MM:SS A')}`);
+        console.log(`Now prompt is scheduled for: ${targetTime.format('MM-DD-YYYY @ HH:MM A')}`);
 
         scheduledPromptTimeout = setTimeout(async () => {
           await postPrompt();
