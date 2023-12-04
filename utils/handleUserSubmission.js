@@ -1,7 +1,8 @@
 const { AttachmentBuilder, ComponentType } = require('discord.js');
-const notifyMods = require('./notifyMods.js');
+const { notifyMods }  = require('./notifyMods.js');
+const { prompt } = require('./prompt.js');
 
-async function handleUserSubmission(client, attachment, guild, promptChannel, caption, submitter) {
+async function handleUserSubmission(client, attachment, guild, caption, submitter) {
     if (!attachment) {
         return;
     }
@@ -11,15 +12,10 @@ async function handleUserSubmission(client, attachment, guild, promptChannel, ca
         return;
     }
 
-    const lastMessages = await promptChannel.messages.fetch({ limit: 2 });
-    const content = lastMessages.last().content;
-    const promptMatch = content.match(/\*\*Prompt:\*\*([\s\S]+)/);
-    const promptContent = promptMatch && promptMatch[1] ? promptMatch[1].trim() : null;
-
-    const { responses, moderators } = await notifyMods([attachment], guild, promptContent, caption, submitter);              
+    const { responses, moderators } = await notifyMods([attachment], guild, prompt.getPrompt(), caption, submitter);              
     const collectorFilter = i => moderators.has(i.user.id);
 
-    const zip = (a, b) => a.map((k, i) => [i, k, Array.from(b)[i][1].user.globalName]); // just makes it easier to iterate through things
+    const zip = (a, b) => a.map((k, i) => [i, k, Array.from(b)[i][1].user]); // just makes it easier to iterate through things
     try {
         const collectors = [];
         for (const [idx, response, moderator] of zip(responses, moderators)) {
@@ -30,7 +26,7 @@ async function handleUserSubmission(client, attachment, guild, promptChannel, ca
                 time: 86_400_000
             });
         
-            collector.mod = moderator; // tag collector with who they belong to
+            collector.mod = moderator.username; // tag collector with who they belong to
             collector.on('collect', async i => {
                 if (i.customId === 'approve') {
                     await i.deferUpdate();
@@ -54,7 +50,19 @@ async function handleUserSubmission(client, attachment, guild, promptChannel, ca
                 // check if someone press deny
                 else if (i.customId === 'deny') {
                     await i.deferUpdate();
-                    console.log(`${moderator} denied`);
+						try {
+							let messagefilter = m => m.author.id ===moderator.id
+							const message = await moderator.send(`<@${moderator.id}> PLEASE GIVE REASON FOR DENYING THE POST:`);
+							const collected = await message.channel.awaitMessages({messagefilter, max: 1, time: 30000, error: ['time']});
+							if(collected.first()){
+				    		    await submitter.send(collected.first().content);
+							}
+							else{
+								message.channel.send("Timed out");
+							} 
+						} catch (error) {
+							console.error(`Could not send notification to ${moderator.username}.`, error);
+						}
                     await i.editReply({ content: '**DENIED**', components: [] });
                 }
             });

@@ -23,7 +23,7 @@ module.exports = {
 
 		const attachment = interaction.options.getAttachment('file');
 		const caption = interaction.options.getString('caption');
-		await handleUserSubmission(interaction.client, attachment, interaction.guild, interaction.channel, caption, interaction.user);	
+		await handleUserSubmission(interaction.client, attachment, interaction.channel, caption, interaction.user);	
 	}
 }
 
