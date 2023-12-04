@@ -11,6 +11,8 @@ const outputUsers = require('./utils/getRandom');
 const activeHoursUtils = require('./utils/activeHoursUtils');
 const saveDB = require('./utils/saveDB');
 const PromptTimeout = require('./utils/promptTimeout');
+const activeEvents = require('./utils/activeEvents')
+
 
 
 //for cloud run, serverless application needs a server to listen.
@@ -135,8 +137,17 @@ client.on('ready', async () => {
         timezone: "America/New_York"
     });
 });
+let scheduledPromptTimeout;
+
+activeEvents.on('activeHoursUpdated', async (data) => {
+    const activeHoursData = await activeHoursUtils.fetchActiveHoursFromDB(data.guildId);
+    await schedulePost(activeHoursData);
+});
 
 async function schedulePost(activeHoursData){
+    if (scheduledPromptTimeout) {
+        clearTimeout(scheduledPromptTimeout);
+    }
     //get random hour within active hours
     const targetHour = activeHoursUtils.getRandomHourWithinActiveHours(activeHoursData);
     const [hour, minute] = targetHour.split(':');
@@ -151,7 +162,7 @@ async function schedulePost(activeHoursData){
     }
         const timeDifference = targetTime.diff(now);
 
-        setTimeout(async () => {
+        scheduledPromptTimeout = setTimeout(async () => {
           await postPrompt();
         }, timeDifference);
 }
