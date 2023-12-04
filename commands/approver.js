@@ -1,5 +1,6 @@
 const { AttachmentBuilder, ComponentType, SlashCommandBuilder } = require('discord.js');
 const notifyMods = require('../utils/notifyMods.js');
+const blacklist = require('./blacklist.js');
 
 const test = "What are you procrastinating with?"
 module.exports = {
@@ -45,6 +46,8 @@ module.exports = {
                     const { responses, moderators } = await notifyMods(interaction.guild, promptContent, caption, interaction.user, [attachment]);
 									
 					const collectorFilter = i => moderators.has(i.user.id);
+
+					let deniedUsers = new Map(); //keep track of user denial counts
 
 					// const zip = (a, b) => a.map((k, i) => [k, Array.from(b)[i][1].user.globalName]);
 					const zip = (a, b) => a.map((k, i) => [k, Array.from(b)[i][1].user.globalName]);
@@ -102,6 +105,35 @@ module.exports = {
 							if (approved) {
 								for (const response of responses) {
 									await response.edit({ content: `**APPROVED BY ${approver}**`, components: [] });
+								}
+							} else {
+								//if not approved, check if user should be automatically added to blacklist
+								const deniedUser = response[0]?.user;
+								if(deniedUser){
+									const denialCount = (deniedUsers.get(deniedUser.id) || 0) + 1;
+									deniedUsers.set(deniedUser.id, denialCount);
+
+									if (denialCount >= 2) {
+										//add user to blacklist
+										const blacklistCommand = interaction.client.commands.get('add');
+
+										//execute blacklist command
+										await blacklistCommand.execute ({
+											interaction: interaction,
+											options: blacklistCommand.data	
+												.find(subcommand => subcommand.name === 'add')
+												.toJSON()
+												.options.map(option => {
+													return {
+														name: option.name,
+														value: option.name === 'user'? deniedUser.id : null
+													};
+												})
+										});
+										
+										//remove user from denial tracking
+										deniedUsers.delete(deniedUser.id);
+									}
 								}
 							}
 						}
