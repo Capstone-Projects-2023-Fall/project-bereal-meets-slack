@@ -5,7 +5,7 @@ const {pool} = require('./dbconn.js');
 async function fetchImageMessagesUntilPrompt(client, channelId) {
     if (!client.isReady()) {
         console.error('Client is not ready');
-        return [];
+        return { imageMessagesList: [], promptText: null, promptUserId: null };
     }
     const channel = client.channels.cache.get(channelId);
     if (!channel || channel.type !== ChannelType.GuildText) {
@@ -15,6 +15,8 @@ async function fetchImageMessagesUntilPrompt(client, channelId) {
     let lastId;
     const imageMessagesList = [];
     let foundPrompt = false;
+    let promptText = null;
+    let promptUserId = null;
     while (!foundPrompt) {
         const options = { limit: 100 };
         if (lastId) {
@@ -28,6 +30,8 @@ async function fetchImageMessagesUntilPrompt(client, channelId) {
             for (const message of messages.values()) {
                 if (message.content.includes("Prompt")) {
                     foundPrompt = true;
+                    promptText = extractPromptText(message.content);
+                    promptUserId = message.author.id;
                     break; // Stop if we find the "Prompt"
                 }
                 // Check if the message has attachments and if any of them are images
@@ -42,9 +46,16 @@ async function fetchImageMessagesUntilPrompt(client, channelId) {
             break; // Exit the loop in case of API error
         }
     }
-    return imageMessagesList;
+    return {imageMessagesList, promptText, promptUserId};
 }
-
+//to clean prompt text to only provide the main prompt when adding to database
+function extractPromptText(fullMessage) {
+    const promptStartIndex = fullMessage.indexOf("**Prompt:**");
+    if (promptStartIndex !== -1) {
+        return fullMessage.substring(promptStartIndex + "**Prompt:**".length).trim();
+    }
+    return fullMessage;
+}
 
 function countReactions(message) {
     // Check if the message has reactions
@@ -114,10 +125,10 @@ async function findTimeDifferenceToPrompt(client, channelId, referenceMessage) {
 
 async function saveDB(client, channelId) {
     try {
-        const messagesList = await fetchImageMessagesUntilPrompt(client, channelId);
+        const {imageMessagesList, promptText, promptUserId} = await fetchImageMessagesUntilPrompt(client, channelId);
         const messagesData = [];
 
-        for (const message of messagesList) {
+        for (const message of imageMessagesList) {
             const numOfReactions = countReactions(message);
             const imageLink = getImageLinkFromMessage(message);
             const timeToPost = await findTimeDifferenceToPrompt(client, channelId, message);
@@ -126,7 +137,9 @@ async function saveDB(client, channelId) {
                 message_id: message_id,
                 num_reactions: numOfReactions,
                 response_image: imageLink,
-                time_to_respond: timeToPost
+                time_to_respond: timeToPost,
+                prompt_text: promptText,
+                user_id: promptUserId
             };
             messagesData.push(messageData);
         }
@@ -152,18 +165,20 @@ async function insertResponseData(messageData) {
             messageData.response_image,
             messageData.num_reactions,
             messageData.time_to_respond,
-            messageData.message_id
+            messageData.message_id,
+            messageData.prompt_text,
+            messageData.user_id
         ];
         // If no existing record is found, proceed to insert the new record
         if (existingRecords.length === 0) {
             const insertQuery = `
-                INSERT INTO responses (response_image, num_reactions, time_to_respond, message_id) 
-                VALUES (?, ?, ?, ?)
+                INSERT INTO responses (response_image, num_reactions, time_to_respond, message_id, prompt_text, user_id) 
+                VALUES (?, ?, ?, ?, ?, ?)
             `;
             await pool.query(insertQuery, values)
             console.log('Data inserted successfully');
         } else {
-            const updateQuery = `UPDATE bot.responses SET response_image = ? , num_reactions = ? , time_to_respond = ? WHERE (message_id= ? ) `;
+            const updateQuery = `UPDATE bot.responses SET response_image = ? , num_reactions = ? , time_to_respond = ? , prompt_text = ? , user_id = ? WHERE (message_id= ? ) `;
             pool.query(updateQuery, values);
             console.log(`Record with message_id ${messageData.message_id} already exists. Updating`);
         }

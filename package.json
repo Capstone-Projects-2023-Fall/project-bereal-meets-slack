@@ -25,6 +25,9 @@
   "dependencies": {
     "@google-cloud/cloud-sql-connector": "^1.1.0",
     "axios": "^1.5.1",
+    "canvas": "^2.11.2",
+    "chart.js": "^3.7.1",
+    "chartjs-node-canvas": "^4.1.6",
     "dotenv": "^16.3.1",
     "fs": "^0.0.1-security",
     "json2csv": "^6.0.0-alpha.2",
@@ -34,7 +37,9 @@
     "node-cron": "^3.0.3",
     "node-localstorage": "^3.0.5",
     "nodemon": "^3.0.1",
-    "pg": "^8.11.3"
+    "nodeplotlib": "^0.7.7",
+    "pg": "^8.11.3",
+    "puppeteer": "^21.5.2"
   },
   "devDependencies": {
     "@discordjs/rest": "^2.0.1",
