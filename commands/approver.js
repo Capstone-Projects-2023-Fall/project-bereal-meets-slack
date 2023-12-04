@@ -87,10 +87,7 @@ module.exports = {
 									}
 
 									await i.editReply({ content: '**DENIED**', components: [] });
-
-									if (remaining_votes === 0) {
-										collectorStop();
-									}
+									collectorStop();
 
 								}
 							});
