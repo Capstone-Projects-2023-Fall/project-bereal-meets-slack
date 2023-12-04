@@ -1,4 +1,4 @@
-const {ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, Attachment} = require('discord.js');
+const { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder } = require('discord.js');
 
 async function notifyMods(attachments, guild, content, caption, author) {
     //Get role for mods
