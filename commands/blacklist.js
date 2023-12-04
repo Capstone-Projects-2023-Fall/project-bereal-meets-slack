@@ -1,5 +1,4 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
-const {pool} = require('../utils/dbconn.js');
 const { blacklistAddUser, blacklistDeleteUser, blacklistListUsers } = require('../utils/blacklistutils.js');
 
 module.exports = {
