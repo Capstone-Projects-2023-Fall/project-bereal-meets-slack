@@ -62,7 +62,7 @@ module.exports = {
 									const file = new AttachmentBuilder(url);
                   await interaction.channel.send({ content: `(${interaction.user}) responded to \"${prompt.getPrompt()}\" \n Caption: ${caption}`, files: [file]});
 
-									await interaction.channel.send(`@${botUserRole} New post!`);
+									await interaction.channel.send(`${botUserRole} New post!`);
 									collectorStop();
 								} else if (i.customId === 'deny') {
 									await i.deferUpdate();
