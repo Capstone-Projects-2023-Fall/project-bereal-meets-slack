@@ -1,6 +1,9 @@
+const {blacklistAddUser} = require('../utils/blacklistutils.js');
 const { AttachmentBuilder, ComponentType, SlashCommandBuilder} = require('discord.js');
-const notifyMods = require('../utils/notifyMods.js');
+const { notifyMods } = require('../utils/notifyMods.js');
+const { prompt } = require('../utils/prompt.js');
 
+let deniedUsers = new Map(); //keep track of user denial counts
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -21,6 +24,8 @@ module.exports = {
 		await interaction.deferReply();
 		await interaction.editReply('submitted to moderators!');
 		const attachment = interaction.options.getAttachment('file');
+		const botUserRole = interaction.guild.roles.cache.find((role) => role.name === 'Bot User');
+
 		if (attachment) {
 			const url = attachment.url;
 			const type = attachment.contentType;
@@ -30,14 +35,12 @@ module.exports = {
 					console.log('THIS IS AN IMAGE');
 
 					const caption = interaction.options.getString('caption');
+          			const { responses, moderators } = await notifyMods(interaction.guild, prompt.getPrompt(), caption, interaction.user, [attachment]);
+									
 
-                    const lastMessages = await interaction.channel.messages.fetch({ limit: 1 });
-                    const content = lastMessages.last().content;
-                    const promptMatch = content.match(/\*\*Prompt:\*\*([\s\S]+)/);
-                    const promptContent = promptMatch && promptMatch[1] ? promptMatch[1].trim() : null;
-
-                    const { responses, moderators } = await notifyMods(interaction.guild, promptContent, caption, interaction.user, [attachment]);
 					const collectorFilter = i => moderators.has(i.user.id);
+
+					
 
 					// const zip = (a, b) => a.map((k, i) => [k, Array.from(b)[i][1].user.globalName]);
 					const zip = (a, b) => a.map((k, i) => [k, Array.from(b)[i][1].user]);
@@ -45,7 +48,7 @@ module.exports = {
 					try {
 						let approved = false;
 						let approver = null;
-						let remaining_votes = responses.length;
+						
 
 						collectors = [];
 						for (const [response, moderator] of zip(responses, moderators)) {
@@ -61,13 +64,13 @@ module.exports = {
 									approved = true;
 									approver = moderator;
 									const file = new AttachmentBuilder(url);
-                                    await interaction.channel.send({ content: `(${interaction.user}) responded to \"${promptContent}\" \n Caption: ${caption}`, files: [file]}); //use interaction.user for dm
-									await interaction.channel.send('@everyone New post!');
+                  await interaction.channel.send({ content: `(${interaction.user}) responded to \"${prompt.getPrompt()}\" \n Caption: ${caption}`, files: [file]});
+
+									await interaction.channel.send(`${botUserRole} New post!`);
 									collectorStop();
 								} else if (i.customId === 'deny') {
 									await i.deferUpdate();
-									remaining_votes--;
-									console.log(`${moderator.username} denied; ${remaining_votes} votes left pending`);
+									console.log(`${moderator.username} denied;`);
 									
 									try {
 										let messagefilter = m => m.author.id ===moderator.id
@@ -88,6 +91,7 @@ module.exports = {
 									if (remaining_votes === 0) {
 										collectorStop();
 									}
+
 								}
 							});
 
@@ -107,6 +111,28 @@ module.exports = {
 							if (approved) {
 								for (const response of responses) {
 									await response.edit({ content: `**APPROVED BY ${approver}**`, components: [] });
+								}
+							} else {
+								//if not approved, check if user should be automatically added to blacklist
+								const deniedUser = interaction.user;
+								
+								if(deniedUser){
+									const denialCount = (deniedUsers.get(deniedUser.id) || 0) + 1;
+									deniedUsers.set(deniedUser.id, denialCount);
+									console.log(deniedUsers.get(deniedUser.id));
+									if (denialCount >= 2) {
+										//add user to blacklist
+										await blacklistAddUser(interaction.guild.id, interaction.user.id);
+										for (const moderator of moderators.values()) {
+											try {
+												await moderator.user.send({ content: `${interaction.user} was added to the blacklist`});
+											} catch (error) {
+												console.error(`Could not send notification to ${moderator.user.tag}.`, error);
+											}
+										}
+										//remove user from denial tracking
+										deniedUsers.delete(deniedUser.id);
+									}
 								}
 							}
 						}

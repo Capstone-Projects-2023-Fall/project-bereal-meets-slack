@@ -10,6 +10,43 @@ This outlines the API specification for the Bot. It provides details on the meth
 
 **Bot Methods**
 
+### `fetchActiveHoursFromDB(guildId)`
+
+#### (async) fetchActiveHoursFromDB(guildId) → {Promise.<{start_time: string, end_time: string}>}
+
+Fetches active operating hours for a guild from the database.
+
+##### Parameters:
+
+#### `fetchActiveHoursFromDB(guildId)`
+
+| Name      | Type   | Description                           |
+|-----------|--------|---------------------------------------|
+| `guildId` | string | The ID of the Discord guild.           |
+
+#### Returns:
+
+A Promise that resolves to an object with `start_time` and `end_time` properties.
+
+### `getRandomHourWithinActiveHours(activeHoursData)`
+
+#### `getRandomHourWithinActiveHours(activeHoursData) → {string}`
+
+Generates a random hour within the active operating hours for a guild.
+
+##### Parameters:
+
+| Name             | Type   | Description                               |
+|------------------|--------|-------------------------------------------|
+| `activeHoursData`| Object | An object containing `start_time` and `end_time`. |
+
+##### Returns:
+
+- A formatted string representing a random hour within the active hours.
+
+  **Type:** `string`
+
+
 **getCSV()**  
 
 Description: Gets the CSV fields
