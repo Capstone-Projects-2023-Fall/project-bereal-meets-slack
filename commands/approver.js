@@ -1,5 +1,5 @@
 const { AttachmentBuilder, ComponentType, SlashCommandBuilder} = require('discord.js');
-const notifyMods = require('../utils/notifyMods.js');
+const { notifyMods } = require('../utils/notifyMods.js');
 const { prompt } = require('../utils/prompt.js');
 
 
@@ -22,6 +22,8 @@ module.exports = {
 		await interaction.deferReply();
 		await interaction.editReply('submitted to moderators!');
 		const attachment = interaction.options.getAttachment('file');
+		const botUserRole = interaction.guild.roles.cache.find((role) => role.name === 'Bot User');
+
 		if (attachment) {
 			const url = attachment.url;
 			const type = attachment.contentType;
@@ -31,7 +33,7 @@ module.exports = {
 					console.log('THIS IS AN IMAGE');
 
 					const caption = interaction.options.getString('caption');
-          const { responses, moderators } = await notifyMods(interaction.guild, prompt.getPrompt(), caption, interaction.user, [attachment]);
+          			const { responses, moderators } = await notifyMods(interaction.guild, prompt.getPrompt(), caption, interaction.user, [attachment]);
 									
 
 					const collectorFilter = i => moderators.has(i.user.id);
@@ -60,7 +62,7 @@ module.exports = {
 									const file = new AttachmentBuilder(url);
                   await interaction.channel.send({ content: `(${interaction.user}) responded to \"${prompt.getPrompt()}\" \n Caption: ${caption}`, files: [file]});
 
-									await interaction.channel.send('@everyone New post!');
+									await interaction.channel.send(`@${botUserRole} New post!`);
 									collectorStop();
 								} else if (i.customId === 'deny') {
 									await i.deferUpdate();
