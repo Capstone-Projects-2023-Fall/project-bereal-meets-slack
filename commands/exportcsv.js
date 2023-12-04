@@ -1,14 +1,15 @@
 const { SlashCommandBuilder, AttachmentBuilder } = require('discord.js');
+require('dotenv').config();
 const saveDB = require('../utils/saveDB');
 const { Parser } = require('json2csv');
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('savedata')
+        .setName('exportcsv')
         .setDescription('Saves data to a text file and uploads it to the chat'),
     async execute(interaction) {
         await interaction.deferReply();
-        const channelId = interaction.channelId;
+        const channelId = process.env.DISCORD_SUBMISSION_CHANNEL_ID;
         const savedData = await saveDB(interaction.client, channelId);
         try {
             const parser = new Parser();

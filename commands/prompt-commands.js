@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require('discord.js');
-const {addPrompt, listPrompts, searchPrompts, deletePrompt} = require('../utils/promptUtils.js')
+const {addPrompt, listPrompts, searchPrompts, deletePrompt, getPrompts} = require('../utils/promptUtils.js')
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -24,7 +24,8 @@ module.exports = {
           option
             .setName('prompt')
             .setDescription('Enter the prompt to delete')
-            .setRequired(true),
+            .setRequired(true)
+            .setAutocomplete(true),
         )
     )
     .addSubcommand(subcommand =>
@@ -43,29 +44,36 @@ module.exports = {
             .setRequired(true),
         )
     ),
+    
+  async autocomplete(interaction) {
+    try{
+      const focusedValue = interaction.options.getFocused();
+      const choices = await getPrompts(interaction.guild.id);
+      const filtered = choices.filter(choice => choice.startsWith(focusedValue));
+      await interaction.respond(
+        filtered.map(choice => ({ name: choice, value: choice })),
+      );
+    }catch(error){
+      console.log("Timeout; Unknown Interaction");
+      await interaction.respond([{name: "Fetching ERROR: You can still enter aprompt to delete", value: "N/A"}]);
+    }
+  },
+
   async execute(interaction) {
+    const guildId = interaction.guild.id; //Get guild ID
     const subcommand = interaction.options.getSubcommand();
     await interaction.deferReply({ephemeral: true});
     let reply = '';
 
-     reply = subcommand === 'add'
-    ? await (async () => {
-      const prompt = interaction.options.getString('prompt');
-      return await addPrompt(prompt);
-    })()
-    : subcommand === 'delete'
-    ? await (async () => {
-        const promptToDelete = interaction.options.getString('prompt');
-        return await deletePrompt(promptToDelete, subcommand === 'delete');
-     })()
-    : subcommand === 'list'
-      ? await listPrompts()
-    : subcommand === 'search'
-      ? await (async () => {
-        const query = interaction.options.getString('search-term');
-        return await searchPrompts(query);
-      })()
-    : '';
+    reply = subcommand === 'add'
+      ? await addPrompt(guildId, interaction.options.getString('prompt'))
+      : subcommand === 'delete'
+      ? await deletePrompt(guildId, interaction.options.getString('prompt'))
+      : subcommand === 'list'
+      ? await listPrompts(guildId)
+      : subcommand === 'search'
+      ? await searchPrompts(guildId, interaction.options.getString('search-term'))
+      : '';
   
       await interaction.followUp(reply);
   },
