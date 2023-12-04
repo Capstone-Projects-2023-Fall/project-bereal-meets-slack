@@ -1,6 +1,5 @@
 const {pool} = require('./dbconn.js');
 const {ChartJSNodeCanvas} = require('chartjs-node-canvas');
-const {createCanvas} = require('canvas');
 
 
 async function fetchDataForGraph() {
