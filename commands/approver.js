@@ -88,11 +88,11 @@ module.exports = {
 
 									await i.editReply({ content: '**DENIED**', components: [] });
 									collectorStop();
+
 								}
 							});
 
 							collector.on('end', () => {
-								console.log('ahhh check ');
 							})
 
 							collectors.push(collector)

@@ -35,7 +35,7 @@ async function notifyMods(guild, content, caption, author, attachments) {
         .setTitle('New Submission!') //title of embedded message
         .setDescription(`New submission from: ${author.tag} `) //who submitted post
         .setColor('Blue')
-    	.addFields({name: 'Prompt:', value: content ?? '[no promp provided]'}, {name: 'Caption:', value: caption ?? '[no caption provided]'}); //include prompt with image
+    	.addFields({name: 'Prompt:', value: content ?? '[no prompt provided]'}, {name: 'Caption:', value: caption ?? '[no caption provided]'}); //include prompt with image
 
 	//if theres an attachment, include it
 	const image = Array.isArray(attachments) ? attachments[0] : attachments.first(); //get the first attachment
