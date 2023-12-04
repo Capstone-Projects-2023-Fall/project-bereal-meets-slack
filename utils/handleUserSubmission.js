@@ -3,10 +3,19 @@ const { AttachmentBuilder, ComponentType } = require('discord.js');
 const { notifyMods } = require('./notifyMods.js');
 const { prompt } = require('../utils/prompt.js');
 
+<<<<<<< HEAD
 let deniedUsers = new Map(); //keep track of user denial counts
 
 async function handleUserSubmission(client, attachment, guild, caption, submitter) {
     const botUserRole = guild.roles.cache.find((role) => role.name === 'bot mod');
+=======
+// TODO: change what u need here before comitting
+
+let deniedUsers = new Map(); //keep track of user denial counts
+
+async function handleUserSubmission(client, attachment, guild, caption, submitter) {
+    const botUserRole = guild.roles.cache.find((role) => role.name === 'yoshino simp');
+>>>>>>> 4506020a3d75f2fa7193963b49a7446b487e2355
     const promptContent = prompt.getPrompt();
 
     if (!attachment) {
@@ -53,7 +62,11 @@ async function handleUserSubmission(client, attachment, guild, caption, submitte
                     }
                     const file = new AttachmentBuilder(attachment.url);
                     const submit_channel = await client.channels.fetch(process.env.DISCORD_SUBMISSION_CHANNEL_ID);
+<<<<<<< HEAD
                     await submit_channel.send({ content: `${botUserRole} New post!\n${submitter} responded to "${promptContent}":\n${caption ?? '[no caption provided]'}`, files: [file] });
+=======
+                    await submit_channel.send({ content: `${botUserRole} come get ur bread\n${submitter} responded to "${promptContent}":\n${caption ?? '[no caption provided]'}`, files: [file] });
+>>>>>>> 4506020a3d75f2fa7193963b49a7446b487e2355
                 }
                 // check if someone press deny
                 else if (i.customId === 'deny') {
@@ -63,15 +76,24 @@ async function handleUserSubmission(client, attachment, guild, caption, submitte
 
                     try {
                         const messageFilter = m => m.author.id === moderator.id
+<<<<<<< HEAD
                         const denyMessage = await moderator.send({content: `<@${moderator.id}> Please give the reason for denying the post` });
+=======
+                        const denyMessage = await moderator.send({content: `<@${moderator.id}> PLEASE GIVE REASON FOR DENYING THE POST` });
+>>>>>>> 4506020a3d75f2fa7193963b49a7446b487e2355
 
                         const denyCollector = await denyMessage.channel.createMessageCollector({ filter: messageFilter, max: 1, time: 30000, error: ['time']});
                         denyCollector.on('collect', async j => {
                             await submitter.send(`Notice of denial: ${j.content}`);
                         });
                         denyCollector.on('end', async j => {
+<<<<<<< HEAD
                             console.log('deny log');
                             denyMessage.edit({ content: `<@${moderator.id}> Please give the reason for denying the post (ENDED)` }); //bot was being mean and yelling at mods, now tamed. (Also not sure if we need @?) 
+=======
+                            console.log('deny dead');
+                            denyMessage.edit({ content: `<@${moderator.id}> PLEASE GIVE REASON FOR DENYING THE POST (ENDED)` });
+>>>>>>> 4506020a3d75f2fa7193963b49a7446b487e2355
                         });
                     } catch (error) {
                         console.error(`Could not send notification to ${modName}.`, error);
