@@ -1,10 +1,5 @@
-
-const {blacklistAddUser} = require('../utils/blacklistutils.js');
-const { AttachmentBuilder, ComponentType, SlashCommandBuilder} = require('discord.js');
-const { notifyMods } = require('../utils/notifyMods.js');
-const { prompt } = require('../utils/prompt.js');
-
-let deniedUsers = new Map(); //keep track of user denial counts
+const { SlashCommandBuilder} = require('discord.js');
+const handleUserSubmission = require('../utils/handleUserSubmission.js');
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -26,7 +21,7 @@ module.exports = {
 		await interaction.editReply('submitted to moderators!');
 		const attachment = interaction.options.getAttachment('file');
 		const caption = interaction.options.getString('caption');
-		await handleUserSubmission(interaction.client, attachment, interaction.channel, caption, interaction.user);	
+		await handleUserSubmission(interaction.client, attachment, interaction.guild, caption, interaction.user);	
 	}
 
 }
