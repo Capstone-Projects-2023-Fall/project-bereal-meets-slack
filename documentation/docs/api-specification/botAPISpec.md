@@ -68,6 +68,60 @@ Stores or updates operating hours for a guild in the database.
 
 **Type:** `Promise.<void>`
 
+## Database Conneection (dbconn.js)
+
+## Members
+
+## `pool`
+
+### Type:
+
+- **Object**
+
+### Description:
+
+The MySQL connection pool used throughout the Discord bot.
+
+
+## Methods
+
+## `createConnectionPoolCloud() → {Object}`
+
+### Description:
+
+Creates a connection pool for cloud database calls.
+
+### Returns:
+
+- MySQL connection pool.
+
+  **Type:** `Object`
+
+## `createConnectionPoolLocal() → {Object}`
+
+### Description:
+
+Creates a connection pool for local database calls during testing.
+
+### Returns:
+
+- MySQL connection pool.
+
+  **Type:** `Object`
+
+## `createPromiseConnectionPool() → {Object}`
+
+### Description:
+
+Creates a promise-based connection pool based on the specified environment flag.
+
+### Returns:
+
+- Promise-based MySQL connection pool.
+
+  **Type:** `Object`
+
+
 
 
 
