@@ -1,32 +1,35 @@
 require('dotenv').config(); //initialize dotenv
-const { Client, Collection, Events, GatewayIntentBits, channelLink,  ChannelType } = require('discord.js');
+const { AttachmentBuilder, ChannelType, Client, Collection, ComponentType, Events, GatewayIntentBits, Partials } = require('discord.js');
 const path = require('node:path');
 const fs = require('fs');
-const registrar = require('./utils/commandregistrar'); 
+const registrar = require('./utils/commandregistrar');
 const cron = require('node-cron');
 const moment = require('moment-timezone');
 const http = require('http');
 const promptUtils = require('./utils/promptUtils');
 const outputUsers = require('./utils/getRandom');
 const activeHoursUtils = require('./utils/activeHoursUtils');
+const notifyMods = require('./utils/notifyMods.js');
 const saveDB = require('./utils/saveDB');
+const handleUserSubmission = require('./utils/handleUserSubmission.js');
 const { prompt } = require('./utils/prompt.js');
 const PromptTimeout = require('./utils/promptTimeout');
 const activeEvents = require('./utils/activeEvents')
+
 
 
 //for cloud run, serverless application needs a server to listen.
 const port = 8080;
 
 const server = http.createServer((req, res) => {
-// Set the response HTTP header with HTTP status and Content type
-res.writeHead(200, {'Content-Type': 'text/plain'});
-// Send the response body "Hello World"
-res.end('BeRealBot lives here\n');
+    // Set the response HTTP header with HTTP status and Content type
+    res.writeHead(200, { 'Content-Type': 'text/plain' });
+    // Send the response body "Hello World"
+    res.end('BeRealBot lives here\n');
 });
 
 server.listen(port, () => {
-console.log('Hello world listening on port', port);
+    console.log('Hello world listening on port', port);
 });
 
 
@@ -56,16 +59,21 @@ class Timer {
 }
 const timer = new Timer(); //create a timer object
 
-const client = new Client({ 
+const client = new Client({
     intents: [
-    GatewayIntentBits.Guilds,
-    GatewayIntentBits.GuildMessages,
-    GatewayIntentBits.MessageContent,
-    GatewayIntentBits.GuildMembers,
-    GatewayIntentBits.DirectMessages,
-],
+        GatewayIntentBits.Guilds,
+        GatewayIntentBits.GuildMessages,
+        GatewayIntentBits.MessageContent,
+        GatewayIntentBits.GuildMembers,
+        GatewayIntentBits.DirectMessages,
+    ],
+    partials: [
+        Partials.Channel,
+    ]
+
 }); //create new client
 
+client.toggles = new Collection();
 client.commands = new Collection(); // set up commands list
 const promptTimeout = new PromptTimeout(client);
 
@@ -73,14 +81,14 @@ const commandsPath = path.join(__dirname, 'commands');
 const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
 
 for (const file of commandFiles) {
-	const filePath = path.join(commandsPath, file);
-	const command = require(filePath);
-	// Set a new item in the Collection with the key as the command name and the value as the exported module
-	if ('data' in command && 'execute' in command) {
-		client.commands.set(command.data.name, command);
-	} else {
-		console.log(`[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`);
-	}
+    const filePath = path.join(commandsPath, file);
+    const command = require(filePath);
+    // Set a new item in the Collection with the key as the command name and the value as the exported module
+    if ('data' in command && 'execute' in command) {
+        client.commands.set(command.data.name, command);
+    } else {
+        console.log(`[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`);
+    }
 }
 
 
@@ -125,22 +133,24 @@ client.on(Events.InteractionCreate, async interaction => {
 });
 
 
-client.on('ready', async () => {
+client.on(Events.ClientReady, async () => {
     console.log(`Logged in as ${client.user.tag}!`);
     registrar.registercommands();
     const guildId = process.env.DISCORD_GUILD_ID;
 
     //setup cron
     cron.schedule('0 0 8 * * *', async () => {
-    //try to schedule post 
-    try{
-        const activeHoursData = await activeHoursUtils.fetchActiveHoursFromDB(guildId);
-        await schedulePost(activeHoursData);
-    } catch (error) {
-        console.error('Error scheduling post', error);
-    }
-  });
-    console.log('scheduling data collector\n')
+      
+        //try to schedule post 
+        try {
+            const activeHoursData = await activeHoursUtils.fetchActiveHoursFromDB(guildId);
+            await schedulePost(activeHoursData);
+        } catch (error) {
+            console.error('Error scheduling post', error);
+        }
+    });
+    console.log('scheduling data collector')
+
     cron.schedule('59 23 * * *', async () => { //scheduled to run every day at 11:59 PM
         try {
             console.log('Running daily saveDB task');
@@ -161,6 +171,7 @@ activeEvents.on('activeHoursUpdated', async (data) => {
     await schedulePost(activeHoursData);
 });
 
+
 async function schedulePost(activeHoursData){
     if (scheduledPromptTimeout) {
         clearTimeout(scheduledPromptTimeout);
@@ -172,11 +183,12 @@ async function schedulePost(activeHoursData){
     const now = moment().tz("America/New_York");
     const targetTime = now.clone().hour(hour).minute(minute).second(0);
 
-    if(now.isAfter(targetTime)){
+    if (now.isAfter(targetTime)) {
         //if current time is after target time, schedule for next day
         console.log("Current time is past target posting time. Scheduling for next available slot.\n");
         targetTime.add(1, 'day');
     }
+
         const timeDifference = targetTime.diff(now);
         console.log(`Now prompt is scheduled for: ${targetTime.format('MM-DD-YYYY @ HH:mm A')}`);
 
@@ -218,17 +230,19 @@ async function postPrompt(callingUser) {
     promptTimeout.setupPrompt(channelId, sentMessage, userToPrompt, randomPrompt, channelId);
 }
 
-async function triggerImmediatePost(callingUser){
-    try{
-        if(callingUser){
-            await postPrompt(callingUser); 
+
+async function triggerImmediatePost(callingUser) {
+    try {
+        if (callingUser) {
+            await postPrompt(callingUser);
         }
-        else{
+        else {
             await postPrompt();
         }
-    }catch (error){
+    } catch (error) {
         console.error('Failed to trigger immediate post:', error);
     }
+
 }
 
 client.sendMessageWithTimer = async (channelId, content) => {
@@ -236,6 +250,7 @@ client.sendMessageWithTimer = async (channelId, content) => {
     const channel = await client.channels.cache.get(channelId);
     if (!channel) {
         throw new Error("Channel not found");
+
     }
     
     const message = await channel.send(content);
@@ -243,24 +258,44 @@ client.sendMessageWithTimer = async (channelId, content) => {
     return message;
 }
 
-client.on('messageCreate', async msg => {
+
+client.on(Events.MessageCreate, async msg => {
     // Check if the message is from the bot itself
     if (msg.author.id === client.user.id) {
         // Check if the message is in the specified channel
         if (msg.channel.id === process.env.DISCORD_SUBMISSION_CHANNEL_ID) {
+            if (!msg.content.includes('\n **Prompt:**\n')) {
+                // bot posted an approved submission 
+                return;
+            }
+
             // If the timer is running, stop it and log the time
             if (timer.isRunning()) {
                 const elapsedSeconds = timer.stop();
                 console.log(`timeToRespond: ${elapsedSeconds} seconds.`);
             }
         }
-    } 
-    else if(msg.content === "!demoTrigger"){ //&& msg.author.id === process.env.ADMIN_USER_ID
-        await triggerImmediatePost();
-    }
-    else if(msg.content === "Prompt me"){ //&& msg.author.id === process.env.ADMIN_USER_ID
-        await triggerImmediatePost(msg.author);
+    } else {
+        //trigger
+        console.log("I caught that");
+        if (msg.content === "!demoTrigger") { 
+            await triggerImmediatePost();
+        } else if (msg.content === "Prompt me") { 
+            await triggerImmediatePost(msg.author);
+        }
+
+        // make sure it is a dm
+        if (msg.channel.type === ChannelType.DM) {
+            console.log("amogus");
+        } else {
+            return;
+        }
+
+        const guild = await client.guilds.fetch(process.env.DISCORD_GUILD_ID);
+		const caption = !msg.content.trim().length ? null : msg.content;
+		await handleUserSubmission(client, msg.attachments.first(), guild, caption, msg.author);
     }
 });
+
 // Make sure this line is the last line
 client.login(TOKEN);
