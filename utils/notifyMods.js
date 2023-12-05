@@ -1,6 +1,8 @@
-const {ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, Attachment} = require('discord.js');
+const { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder } = require('discord.js');
+
 
 async function notifyMods(attachments, guild, content, caption, author) {
+
     //Get role for mods
     const modRole = guild.roles.cache.find(role => role.name === 'bot mod'); //the current role name is bot mod for testing purpsoes
     await guild.members.fetch();
@@ -56,8 +58,7 @@ async function notifyMods(attachments, guild, content, caption, author) {
             console.error(`Could not send DM to ${moderator.user.tag}.`, error);
         }
     }
-
 	return { responses, moderators };
 }
 
-module.exports = notifyMods;
+module.exports = { notifyMods };
