@@ -1,9 +1,13 @@
-const { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder } = require('discord.js');
 
+const {ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder} = require('discord.js');
 
-async function notifyMods(attachments, guild, content, caption, author) {
+// async function notifyMods(guild, content, author, attachments) {
+async function notifyMods(guild, content, caption, author, attachments) {
+
+	//console.log('AAAA');
 
     //Get role for mods
+    //const modRole = guild.roles.cache.find(role => role.name === 'mod all');
     const modRole = guild.roles.cache.find(role => role.name === 'bot mod'); //the current role name is bot mod for testing purpsoes
     await guild.members.fetch();
 
@@ -11,12 +15,20 @@ async function notifyMods(attachments, guild, content, caption, author) {
         return console.error("Moderator role not found");
     }
 
-	if (!attachments || attachments.size == 0) { 
- 		return console.error("No attachment was provided");
+	if (!attachments || attachments.size == 0) {
+		return console.error("No attachment was provided");
 	}
+
+	//console.log('B');
 
     //Fetch memebrs with mod all role 
     const moderators = guild.members.cache.filter(member => member.roles.cache.has(modRole.id));
+    // console.log("List of mods");
+    // moderators.forEach(moderator => {
+    //     console.log(`Moderator: ${moderator.user.username} #${moderator.user.discriminator}`);
+    // });
+  
+	//console.log('C');
 
     //Embedd message to include images
     const embed = new EmbedBuilder()
@@ -31,6 +43,8 @@ async function notifyMods(attachments, guild, content, caption, author) {
 	if (image && image.url) {
 		embed.setImage(image.url); //embed image 
 	}
+
+	//console.log('D');
 
 	// create buttons
 	const approve = new ButtonBuilder()
@@ -47,14 +61,15 @@ async function notifyMods(attachments, guild, content, caption, author) {
 	const row = new ActionRowBuilder()
 		.addComponents(approve, deny);
 
+		//console.log('E');
+
     // send DM to all moderators
 	const responses = []
     for (const moderator of moderators.values()) {
         try {
             const response = await moderator.send({ content: 'Review This Image to Approve or Deny', components: [row], embeds: [embed] });
 			responses.push(response);
-			console.log(`sent dm to ${moderator} for approval`);
-		} catch (error) {
+        } catch (error) {
             console.error(`Could not send DM to ${moderator.user.tag}.`, error);
         }
     }
