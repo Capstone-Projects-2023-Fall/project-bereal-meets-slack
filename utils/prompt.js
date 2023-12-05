@@ -1,5 +1,6 @@
 class Prompt {
     prompt = '';
+    
 
     setPrompt(msg) {
         this.Prompt = msg;
