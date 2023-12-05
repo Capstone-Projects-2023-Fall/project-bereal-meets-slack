@@ -1,5 +1,7 @@
 const {SlashCommandBuilder} = require ('discord.js');
-const activeHoursUtils = require('../utils/activeHoursUtils');;
+const activeHoursUtils = require('../utils/activeHoursUtils');
+const activeEvents = require('../utils/activeEvents');
+
 
 
 module.exports = {
@@ -43,6 +45,9 @@ module.exports = {
                         const endTime = interaction.options.getString('end-time');
                             try{
                                 await activeHoursUtils.storeOperatingHours(guildId, startTime, endTime);
+                                // will emit signal to reschedule the posts (after active hours have been changed)
+                                activeEvents.emit('activeHoursUpdated', { guildId: interaction.guild.id, start_time: startTime, end_time: endTime });
+                                console.log("Post scheduling during new active hours");
                                 await interaction.followUp(`Active hours set from ${startTime} to ${endTime}`);
                             } catch (error){
                                 console.error('Failed to set active hours:', error);
