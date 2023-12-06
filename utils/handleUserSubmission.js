@@ -18,7 +18,7 @@ async function handleUserSubmission(client, attachment, guild, caption, submitte
         return;
     }
 
-    const { responses, moderators } = await notifyMods([attachment], guild, promptContent, caption, submitter);              
+    const { responses, moderators } = await notifyMods( guild, promptContent, caption, submitter, [attachment]);              
     const collectorFilter = i => moderators.has(i.user.id);
 
     const zip = (a, b) => a.map((k, i) => [i, k, Array.from(b)[i][1].user]); // just makes it easier to iterate through things
