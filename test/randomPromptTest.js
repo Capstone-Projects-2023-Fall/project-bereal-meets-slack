@@ -3,11 +3,8 @@ const sinon = require('sinon');
 const promptUtils = require('../utils/promptUtils');
 
 describe('getRandomPromppt', () => {
-    let interaction;
-
     beforeEach(() => {
         sinon.stub(promptUtils, 'getRandomPrompt');
-
     });
 
 
@@ -20,5 +17,6 @@ describe('getRandomPromppt', () => {
         console.log(randomPrompt);
 
         expect(randomPrompt).to.exist;
+        expect(promptUtils.getRandomPrompt.calledWith('guild123')).to.be.true;
     });
 }); 
