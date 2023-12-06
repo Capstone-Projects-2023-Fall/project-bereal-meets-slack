@@ -23,10 +23,9 @@ module.exports = {
 	async execute(interaction) {
 		const { user } = interaction;
 		if (user.id !== prompt.getUserId()) {
-			await interaction.deferReply();
-			await interaction.editReply('You were not prompted!');
+			await interaction.reply('You were not prompted!');
 			return;
-		}
+		};
 		
 		await interaction.deferReply();
 		await interaction.editReply('submitted to moderators!');
