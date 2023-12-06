@@ -201,19 +201,25 @@ async function postPrompt(callingUser) {
     const guildId = process.env.DISCORD_GUILD_ID;
     const randomPrompt = await promptUtils.getRandomPrompt(guildId);
     prompt.setPrompt(randomPrompt);
-        
+    
+    if (!client.toggles.has(userID)) {
+        client.toggles.set(userID, true);
+    }
+
+    const instruction = client.toggles.get(userID) ? 'Use /submit to submit your post!' : 'Attach an image and type a caption!';
+
     let messageContent;
     let userToPrompt;
 
     if (callingUser) {
-            userToPrompt = await client.users.fetch(callingUser.id); // this should store the calling user
-            messageContent = `${callingUser.toString()} Use /submit to submit your post!\n**Prompt:**\n${randomPrompt}`;
+        userToPrompt = await client.users.fetch(callingUser.id); // this should store the calling user
+        messageContent = `${callingUser.toString()} ${instruction}\n**Prompt:**\n${randomPrompt}`;
     } else {
         const list = client.guilds.cache.get(process.env.DISCORD_GUILD_ID);
         const userRand = await outputUsers(list);
         try {
             userToPrompt = await client.users.fetch(userRand); // this should fetch the user that was prompted
-            messageContent = `<@${userRand}> Use /submit to submit your post!\n**Prompt:**\n${randomPrompt}`;
+            messageContent = `<@${userRand}> ${instruction}\n**Prompt:**\n${randomPrompt}`;
         } catch (error) {
             console.error("Error fetching random user:", error);
             return;
@@ -225,8 +231,20 @@ async function postPrompt(callingUser) {
     }
     
     //for promptTimeout
-    const channelId = process.env.DISCORD_SUBMISSION_CHANNEL_ID;
-    const sentMessage = await client.sendMessageWithTimer(channelId, messageContent);
+    
+    let channelId;
+    let sentMessage;
+
+    if (client.toggles.get(userID)) {
+        // public
+        channelId = process.env.DISCORD_SUBMISSION_CHANNEL_ID;
+        sentMessage = await client.sendMessageWithTimer(channelId, messageContent);
+    } else {
+        // private
+        sentMessage = await userToPrompt.send(message); // sendMessageWithTimer???
+        channelId = sentMessage.channel.id;
+    }
+
     promptTimeout.setupPrompt(channelId, sentMessage, userToPrompt, randomPrompt, channelId);
 }
 

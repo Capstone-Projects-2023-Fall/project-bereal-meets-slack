@@ -1,5 +1,5 @@
 //in
-const {SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder } = require('discord.js');
 //Use toggle_private to toggle between public and private
 module.exports = {
 	data: new SlashCommandBuilder() 
