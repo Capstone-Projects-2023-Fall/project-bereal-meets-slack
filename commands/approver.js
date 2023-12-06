@@ -23,7 +23,7 @@ module.exports = {
 	async execute(interaction) {
 		const { user } = interaction;
 		if (user.id !== prompt.getUserId()) {
-			await interaction.reply('You were not prompted!');
+			await interaction.reply({content: 'No not you!', ephemeral: true});
 			return;
 		};
 		
