@@ -2,11 +2,12 @@ const {pool} = require('./dbconn.js');
 const {ChartJSNodeCanvas} = require('chartjs-node-canvas');
 
 
-async function fetchDataForGraph() {
-    const query = 'SELECT prompt_text, num_reactions FROM responses'; 
-    const [rows] = await pool.query(query);
+async function fetchDataForGraph(guildId) {
+    const query = 'SELECT prompt_text, num_reactions FROM responses WHERE guild_id = ?'; 
+    const [rows] = await pool.query(query, [guildId]);
     return rows;
 }
+
 
 const backgroundColorPlugin = {
     id: 'backgroundColorPlugin',
