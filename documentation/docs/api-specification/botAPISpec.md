@@ -125,6 +125,7 @@ Creates a promise-based connection pool based on the specified environment flag.
 
 
 
+
 **Bot Methods**
 >>>>>>> ebfa7b8 (active hours methods documented)
 
