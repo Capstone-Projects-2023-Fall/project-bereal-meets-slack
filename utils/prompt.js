@@ -2,6 +2,10 @@ class Prompt {
     prompt = '';
     userId = '';
 
+    isUserIdMatch(userId) {
+        return this.userId === userId;
+    }
+
     setPrompt(msg) {
         this.Prompt = msg;
     }

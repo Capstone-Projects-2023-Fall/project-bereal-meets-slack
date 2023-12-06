@@ -22,7 +22,7 @@ module.exports = {
 		
 	async execute(interaction) {
 		const { user } = interaction;
-		if (user.id !== prompt.getUserId()) {
+		if (!prompt.isUserIdMatch(user.id)) {
 			await interaction.reply({content: 'No not you!', ephemeral: true});
 			return;
 		};
@@ -43,10 +43,7 @@ module.exports = {
 					const caption = interaction.options.getString('caption');
           			const { responses, moderators } = await notifyMods(interaction.guild, prompt.getPrompt(), caption, interaction.user, [attachment]);
 									
-
 					const collectorFilter = i => moderators.has(i.user.id);
-
-					
 
 					// const zip = (a, b) => a.map((k, i) => [k, Array.from(b)[i][1].user.globalName]);
 					const zip = (a, b) => a.map((k, i) => [k, Array.from(b)[i][1].user]);
@@ -55,7 +52,6 @@ module.exports = {
 						let approved = false;
 						let approver = null;
 						
-
 						collectors = [];
 						for (const [response, moderator] of zip(responses, moderators)) {
 							const collector = response.createMessageComponentCollector({ componentType: ComponentType.Button,
@@ -70,7 +66,7 @@ module.exports = {
 									approved = true;
 									approver = moderator;
 									const file = new AttachmentBuilder(url);
-                  await interaction.channel.send({ content: `(${interaction.user}) responded to \"${prompt.getPrompt()}\" \n Caption: ${caption}`, files: [file]});
+                  					await interaction.channel.send({ content: `(${interaction.user}) responded to \"${prompt.getPrompt()}\" \n Caption: ${caption}`, files: [file]});
 
 									await interaction.channel.send(`${botUserRole} New post!`);
 									collectorStop();
