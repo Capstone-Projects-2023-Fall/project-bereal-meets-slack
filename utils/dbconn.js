@@ -26,6 +26,7 @@ function createConnectionPoolCloud(){
 };
 
 function createPromiseConnectionPool(){
+  let promisepool;
   var flag = process.env.PROD_FLAG;
   if(flag === "CLOUD"){
     console.log("CLOUD check");
