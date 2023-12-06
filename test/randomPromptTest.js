@@ -1,22 +1,28 @@
 const { expect } = require('chai');
 const sinon = require('sinon');
 const promptUtils = require('../utils/promptUtils');
+const {getRandomPrompt} = require('../utils/promptUtils');
 
-describe('getRandomPromppt', () => {
+describe('getRandomPrompt', () => {
     beforeEach(() => {
-        sinon.stub(promptUtils, 'getRandomPrompt');
+        const guildId = process.env.DISCORD_GUILD_ID;
+        sinon.stub(promptUtils, 'getRandomPrompt').resolves(guildId);
     });
-
 
     afterEach(() => {
         sinon.restore();
     });
 
     it('should return a random prompt', async () => {
-        const randomPrompt = await promptUtils.getRandomPrompt('guild123');
-        console.log(randomPrompt);
+        const guildId = process.env.DISCORD_GUILD_ID;
+        const randomPrompt = await getRandomPrompt(guildId);
 
         expect(randomPrompt).to.exist;
-        expect(promptUtils.getRandomPrompt.calledWith('guild123')).to.be.true;
+    });
+
+    it('should not return a random prompt', async () => {
+        const randomPrompt = await getRandomPrompt('');
+
+        expect(randomPrompt).to.not.exist;
     });
 }); 
