@@ -53,7 +53,7 @@ async function handleUserSubmission(client, attachment, guild, caption, submitte
                     }
                     const file = new AttachmentBuilder(attachment.url);
                     const submit_channel = await client.channels.fetch(process.env.DISCORD_SUBMISSION_CHANNEL_ID);
-                    await submit_channel.send({ content: `${botUserRole} New post!\n${submitter} responded to "${promptContent}":\n${caption ?? '[no caption provided]'}`, files: [file] });
+                    await submit_channel.send({ content: `${botUserRole} New post!\n${submitter} responded to "${promptContent}":\n${caption ?? ''}`, files: [file] });
                 }
                 // check if someone press deny
                 else if (i.customId === 'deny') {
