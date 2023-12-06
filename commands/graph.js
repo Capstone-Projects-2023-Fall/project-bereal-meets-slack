@@ -1,5 +1,5 @@
 const {SlashCommandBuilder} = require('discord.js');
-const {AttachmentBuilder} = require('discord.js');
+const {AttachmentBuilder,PermissionsBitField} = require('discord.js');
 const {fetchDataForGraph, generateGraph} = require('../utils/dataGraph'); 
 
 module.exports = {
@@ -8,10 +8,26 @@ module.exports = {
         .setDescription('Displays a graph based on the data'),
 
     async execute(interaction) {
+
+        // this will check if the user has permission
+        if (!interaction.member.permissions.has(PermissionsBitField.Flags.ManageGuild)) {
+            return await interaction.reply({ content: 'You do not have permission to use this command.', ephemeral: true });
+        }
+
         await interaction.deferReply();
-        const data = await fetchDataForGraph();
-        const imageBuffer = await generateGraph(data);
-        const attachment = new AttachmentBuilder(imageBuffer, { name: 'graph.png' });
-        await interaction.editReply({ files: [attachment] });
+        try {
+            const data = await fetchDataForGraph(interaction.guild.id);
+            if (data.length === 0) {
+                //incase the graph is blank, it will instead give a message now
+                return await interaction.editReply({ content: 'No data available to generate a graph.' });
+            }
+
+            const imageBuffer = await generateGraph(data);
+            const attachment = new AttachmentBuilder(imageBuffer, { name: 'graph.png' });
+            await interaction.editReply({ files: [attachment] });
+        } catch (error) {
+            console.error('Error generating graph:', error);
+            await interaction.editReply({ content: 'An error occurred while generating the graph.' });
+        }
     }
 };
