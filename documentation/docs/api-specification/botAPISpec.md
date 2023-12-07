@@ -8,50 +8,55 @@ Bot Api Spec
 **Introduction**
 This outlines the API specification for the Bot. It provides details on the methods available, their parameters, return values, and the usage.
 
-## getRandomUser
 
-### Description
 
-The `getRandomUser` function is used to retrieve a random non-bot user from a Discord guild. It excludes users who are blacklisted and bots. The function ensures that there is at least one eligible non-bot user in the guild.
+## getRandom Methods
+### `getRandomUser(guild)`
 
-### Parameters
+#### `getRandomUser(guild) → {string | null}`
 
-- `guild`: The Discord guild for which the random user needs to be retrieved.
+Generates a random non-blacklisted, non-bot user ID from a guild's members.
 
-### Returns
+##### Parameters:
 
-- Type: `string` | `null`
-- Description: The function returns the user ID of a randomly selected non-bot user in the guild. If no eligible non-bot users are found, it returns `null`.
+| Name    | Type   | Description                           |
+|---------|--------|---------------------------------------|
+| `guild` | Object | The Discord guild object.             |
 
-## getRandomUser
+##### Returns:
 
-### Description
+- A string representing the user ID of a randomly selected non-blacklisted, non-bot user.
+- Returns `null` if no eligible non-bot users are found.
 
-The `getRandomUser` function is used to retrieve a random non-bot user from a Discord guild. It excludes users who are blacklisted and bots. The function ensures that there is at least one eligible non-bot user in the guild.
+  **Type:** `string | null`
 
-### Parameters
 
-- `guild`: The Discord guild for which the random user needs to be retrieved.
 
-### Returns
 
-- Type: `string` | `null`
-- Description: The function returns the user ID of a randomly selected non-bot user in the guild. If no eligible non-bot users are found, it returns `null`.
 
-  ## getRandomUser
 
-### Description
 
-The `getRandomUser` function is used to retrieve a random non-bot user from a Discord guild. It excludes users who are blacklisted and bots. The function ensures that there is at least one eligible non-bot user in the guild.
 
-### Parameters
+## activeHours Methods
 
-- `guild`: The Discord guild for which the random user needs to be retrieved.
+### `fetchActiveHoursFromDB(guildId)`
 
-### Returns
+#### `(async) fetchActiveHoursFromDB(guildId) → {Promise.<{start_time: string, end_time: string}>}`
 
-- Type: `string` | `null`
-- Description: The function returns the user ID of a randomly selected non-bot user in the guild. If no eligible non-bot users are found, it returns `null`.
+Fetches active operating hours for a guild from the database.
+
+##### Parameters:
+
+| Name      | Type   | Description                                   |
+|-----------|--------|-----------------------------------------------|
+| `guildId` | string | The ID of the Discord guild.                   |
+
+##### Returns:
+
+- A promise that resolves to an object containing `start_time` and `end_time` representing the active operating hours for the guild.
+
+  **Type:** `Promise.<{start_time: string, end_time: string}>`
+
 
 
 
