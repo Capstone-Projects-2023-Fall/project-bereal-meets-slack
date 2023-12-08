@@ -59,7 +59,14 @@ async function handleUserSubmission(client, attachment, guild, caption, submitte
                 else if (i.customId === 'deny') {
                     await i.deferUpdate();
                     console.log(`${modName} denied`);
-                    await i.editReply({ content: '**DENIED**', components: [] });
+                    for (const [idx2, response] of responses.entries()) {
+                        await response.edit({ content: '**DENIED**', components: [] });
+                    }
+                    for (const collector of collectors) {
+                        if (!collector.ended) {
+                            collector.stop();
+                        }
+                    }
 
                     try {
                         const messageFilter = m => m.author.id === moderator.id

@@ -128,30 +128,31 @@ client.on(Events.InteractionCreate, async interaction => {
 client.on('ready', async () => {
     console.log(`Logged in as ${client.user.tag}!`);
     registrar.registercommands();
-    const guildId = process.env.DISCORD_GUILD_ID;
 
-    //setup cron
-    cron.schedule('0 0 8 * * *', async () => {
-    //try to schedule post 
-    try{
-        const activeHoursData = await activeHoursUtils.fetchActiveHoursFromDB(guildId);
-        await schedulePost(activeHoursData);
-    } catch (error) {
-        console.error('Error scheduling post', error);
-    }
-  });
-    console.log('scheduling data collector\n')
-    cron.schedule('59 23 * * *', async () => { //scheduled to run every day at 11:59 PM
-        try {
-            console.log('Running daily saveDB task');
-            await saveDB(client, process.env.DISCORD_SUBMISSION_CHANNEL_ID); //this is hard coded for the submissions channel
-            console.log('Daily saveDB task completed');
+    client.guilds.cache.forEach(async (guild) => {
+        //setup cron
+        cron.schedule('0 0 8 * * *', async () => {
+        //try to schedule post 
+        try{
+            const activeHoursData = await activeHoursUtils.fetchActiveHoursFromDB(guild.id);
+            await schedulePost(guild.id, activeHoursData);
         } catch (error) {
-            console.error('Error running daily saveDB task:', error);
+            console.error('Error scheduling post', error);
         }
-    }, {
-        scheduled: true,
-        timezone: "America/New_York"
+    });
+        console.log('scheduling data collector\n')
+        cron.schedule('59 23 * * *', async () => { //scheduled to run every day at 11:59 PM
+            try {
+                console.log('Running daily saveDB task');
+                await saveDB(client, guild.id); //this is hard coded for the submissions channel
+                console.log('Daily saveDB task completed');
+            } catch (error) {
+                console.error('Error running daily saveDB task:', error);
+            }
+        }, {
+            scheduled: true,
+            timezone: "America/New_York"
+        });
     });
 });
 let scheduledPromptTimeout;
@@ -161,7 +162,7 @@ activeEvents.on('activeHoursUpdated', async (data) => {
     await schedulePost(activeHoursData);
 });
 
-async function schedulePost(activeHoursData){
+async function schedulePost(activeHoursData, guildId){
     if (scheduledPromptTimeout) {
         clearTimeout(scheduledPromptTimeout);
     }
@@ -181,12 +182,11 @@ async function schedulePost(activeHoursData){
         console.log(`Now prompt is scheduled for: ${targetTime.format('MM-DD-YYYY @ HH:mm A')}`);
 
         scheduledPromptTimeout = setTimeout(async () => {
-          await postPrompt();
+          await postPrompt(guildId);
         }, timeDifference);
 }
 
-async function postPrompt(callingUser) {
-    const guildId = process.env.DISCORD_GUILD_ID;
+async function postPrompt(guildId, callingUser) {
     const randomPrompt = await promptUtils.getRandomPrompt(guildId);
     prompt.setPrompt(randomPrompt);
         
@@ -197,7 +197,7 @@ async function postPrompt(callingUser) {
             userToPrompt = await client.users.fetch(callingUser.id); // this should store the calling user
             messageContent = `${callingUser.toString()} Use /submit to submit your post!\n**Prompt:**\n${randomPrompt}`;
     } else {
-        const list = client.guilds.cache.get(process.env.DISCORD_GUILD_ID);
+        const list = client.guilds.cache.get(guildId);
         const userRand = await outputUsers(list);
         try {
             userToPrompt = await client.users.fetch(userRand); // this should fetch the user that was prompted
@@ -218,14 +218,9 @@ async function postPrompt(callingUser) {
     promptTimeout.setupPrompt(channelId, sentMessage, userToPrompt, randomPrompt, channelId);
 }
 
-async function triggerImmediatePost(callingUser){
+async function triggerImmediatePost(guildId, callingUser){
     try{
-        if(callingUser){
-            await postPrompt(callingUser); 
-        }
-        else{
-            await postPrompt();
-        }
+        await postPrompt(guildId, callingUser);    
     }catch (error){
         console.error('Failed to trigger immediate post:', error);
     }
@@ -256,10 +251,10 @@ client.on('messageCreate', async msg => {
         }
     } 
     else if(msg.content === "!demoTrigger"){ //&& msg.author.id === process.env.ADMIN_USER_ID
-        await triggerImmediatePost();
+        await triggerImmediatePost(msg.guildId);
     }
     else if(msg.content === "Prompt me"){ //&& msg.author.id === process.env.ADMIN_USER_ID
-        await triggerImmediatePost(msg.author);
+        await triggerImmediatePost(msg.guildId, msg.author);
     }
 });
 // Make sure this line is the last line

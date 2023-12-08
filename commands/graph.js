@@ -9,11 +9,6 @@ module.exports = {
 
     async execute(interaction) {
 
-        // this will check if the user has permission
-        if (!interaction.member.permissions.has(PermissionsBitField.Flags.ManageGuild)) {
-            return await interaction.reply({ content: 'You do not have permission to use this command.', ephemeral: true });
-        }
-
         await interaction.deferReply();
         try {
             const data = await fetchDataForGraph(interaction.guild.id);
