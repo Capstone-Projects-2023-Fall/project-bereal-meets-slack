@@ -415,6 +415,7 @@ Generates a random hour within the active operating hours for a guild.
 <<<<<<< HEAD
 ## `storeOperatingHours(guildId, startTime, endTime) → {Promise.<void>}`
 
+<<<<<<< HEAD
 Stores or updates operating hours for a guild in the database.
 
 ### Parameters:
@@ -487,6 +488,7 @@ Creates a promise-based connection pool based on the specified environment flag.
 
 
 
+<<<<<<< HEAD
 
 
 **Bot Methods**
@@ -1254,6 +1256,10 @@ Generates a random hour within the active operating hours for a guild.
 
 
 
+=======
+## saveDB Methods
+
+>>>>>>> 5d0c1de (working on saveDB documentation)
 ### `fetchImageMessagesUntilPrompt(client, channelId)`
 
 #### `fetchImageMessagesUntilPrompt(client, channelId) → {Promise.<Array.<Object>>}`
@@ -1273,9 +1279,12 @@ Fetches image messages from a Discord channel until a message containing "Prompt
 
   **Type:** `Promise.<Array.<Object>>`
 
+<<<<<<< HEAD
 
   
 
+=======
+>>>>>>> 5d0c1de (working on saveDB documentation)
 ### `countReactions(message)`
 
 #### `countReactions(message) → {number}`
@@ -1296,8 +1305,11 @@ Counts the total number of reactions on a Discord message.
 
 
 
+<<<<<<< HEAD
 
 
+=======
+>>>>>>> 5d0c1de (working on saveDB documentation)
 ### `getImageLinkFromMessage(message)`
 
 #### `getImageLinkFromMessage(message) → {string | null}`
@@ -1331,6 +1343,7 @@ Inserts response data into the database, avoiding duplicates based on the messag
 |---------------|--------|------------------------------------|
 | `messageData` | Object | Data object for the response.       |
 
+<<<<<<< HEAD
 
 
 ### `findTimeDifferenceToPrompt(client, channelId, referenceMessage)`
@@ -1456,5 +1469,12 @@ Checks if the timer is currently running.
 
 ##### Returns:
 - `boolean`: `true` if the timer is running; `false` otherwise.
+=======
+>>>>>>> 94595ee (deleted all the original documentation since it wasn't up to date or navigable)
 
 
+=======
+##### Returns:
+
+- No direct return value.
+>>>>>>> 5d0c1de (working on saveDB documentation)
