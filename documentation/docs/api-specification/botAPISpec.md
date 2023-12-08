@@ -170,9 +170,6 @@ Sets up a timed prompt in a specific channel for user interaction.
 | `user`             | Object | The Discord user object for whom the prompt is set up.         |
 | `originalPrompt`   | Object | The original prompt object or content for reference.           |
 
-##### Returns:
-
-- This function does not return a value.
 
 
 
@@ -197,9 +194,6 @@ Sets a timeout for a prompt identified by `promptId`.
 | `originalPrompt`   | any       | Original prompt content.                               |
 | `channelId`        | string    | ID of the Discord channel where the prompt is active. |
 
-##### Returns:
-
-- This function does not return a value.
 
 
 
@@ -218,15 +212,9 @@ Handles reprompting the user.
 | `channelId`       | string   | The ID of the channel where the reprompt message will be sent.        |
 | `originalMessage` | Object   | The original message that triggered the reprompt.                     |
 
-##### Returns:
 
-- No direct return value.
 
-##### Notes:
 
-- Sets up a reprompt by creating a unique identifier and setting a timeout.
-- Sends a reprompt message to the user in the specified channel with the original prompt.
-- Deletes the reprompt message after the specified reprompt duration.
 
 ## promptUtils Methods
 
@@ -404,6 +392,9 @@ Fetches image messages from a Discord channel until a message containing "Prompt
 
   **Type:** `Promise.<Array.<Object>>`
 
+
+  
+
 ### `countReactions(message)`
 
 #### `countReactions(message) → {number}`
@@ -459,9 +450,6 @@ Inserts response data into the database, avoiding duplicates based on the messag
 |---------------|--------|------------------------------------|
 | `messageData` | Object | Data object for the response.       |
 
-##### Returns:
-
-- This function does not return a value.
 
 
 ### `findTimeDifferenceToPrompt(client, channelId, referenceMessage)`
@@ -522,6 +510,3 @@ Inserts response data into the database, avoiding duplicates based on the messag
 |---------------|--------|------------------------------------|
 | `messageData` | Object | Data object for the response.       |
 
-##### Returns:
-
-- This function does not return a value.
