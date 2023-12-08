@@ -205,6 +205,33 @@ Sets a timeout for a prompt identified by `promptId`.
 - This function does not return a value.
 
 
+### `handleReprompt(user, originalPrompt, channelId, originalMessage)`
+
+#### `handleReprompt(user, originalPrompt, channelId, originalMessage)`
+
+Handles reprompting the user.
+
+##### Parameters:
+
+| Name              | Type     | Description                                                           |
+|-------------------|----------|-----------------------------------------------------------------------|
+| `user`            | Object   | The user object.                                                      |
+| `originalPrompt`  | string   | The original prompt message.                                          |
+| `channelId`       | string   | The ID of the channel where the reprompt message will be sent.        |
+| `originalMessage` | Object   | The original message that triggered the reprompt.                     |
+
+##### Returns:
+
+- No direct return value.
+
+##### Notes:
+
+- Sets up a reprompt by creating a unique identifier and setting a timeout.
+- Sends a reprompt message to the user in the specified channel with the original prompt.
+- Deletes the reprompt message after the specified reprompt duration.
+
+
+
 
 
 
