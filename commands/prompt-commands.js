@@ -74,7 +74,7 @@ module.exports = {
       : subcommand === 'search'
       ? await promptUtils.searchPrompts(guildId, interaction.options.getString('search-term'))
       : '';
-
+      
       await interaction.followUp(reply);
   },
 };
