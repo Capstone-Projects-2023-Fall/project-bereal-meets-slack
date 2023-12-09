@@ -41,12 +41,12 @@ function registercommands(){
       console.log(`Started refreshing ${commands.length} application (/) commands.`);
   
       // The put method is used to fully refresh all commands in the guild with the current set
-      const data = rest.put(
+      const data = await rest.put(
         Routes.applicationCommands(CLIENT_ID),
         { body: commands },
       );
     
-       await console.log(`Successfully reloaded ${data.length} application (/) commands.`);
+      console.log(`Successfully reloaded ${data.length} application (/) commands.`);
     })();
     } catch (error) {
       console.error(error);
