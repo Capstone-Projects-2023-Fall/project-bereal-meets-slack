@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require('discord.js');
-const promptUtils = require('../utils/promptUtils.js');
+const {addPrompt, listPrompts, searchPrompts, deletePrompt, getPrompts} = require('../utils/promptUtils.js')
 
 module.exports = {
   data: new SlashCommandBuilder()
