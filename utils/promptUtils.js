@@ -69,14 +69,15 @@ async function getRandomPrompt(){
   const query = "SELECT prompt_text, channel_id FROM prompts ORDER BY RAND() LIMIT 1";
   const [rows] = await pool.query(query);
 
-  if (rows.length > 0) {
+  if (rows.length > 0 && rows[0].channel_id) {
     return{
       promptText: rows[0].prompt_text,
       channelId: rows[0].channel_id
     };
-  }
+  } else{
 
   return null;
+  }
 }
 
 // async function getRandomPrompt(guildId){
