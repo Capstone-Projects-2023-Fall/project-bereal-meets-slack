@@ -42,7 +42,7 @@ async function listPrompts(guildId, client){
 
   let response = 'Current Prompts:\n';
   for (const row of rows){
-    const channelName = row.channel_id ? client.channels.cache.get(row.channel.id)?.name : 'No channel';
+    const channelName = row.channel_id ? client.channels.cache.get(row.channel_id)?.name : 'No channel';
     response += `Prompt: ${row.prompt_text} - Channel: ${channelName}\n`;
   }
   return response;
