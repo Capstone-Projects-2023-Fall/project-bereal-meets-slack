@@ -102,7 +102,6 @@ describe('prompt command', () => {
         interaction.options.getString.returns('New Prompt');
 
         const addPromptStub = sinon.stub(promptUtils, 'addPrompt').resolves('Prompt "New Prompt" has been added to the list.');
-
         await promptCommand.execute(interaction);
 
         expect(interaction.deferReply.calledOnce).to.be.true;
