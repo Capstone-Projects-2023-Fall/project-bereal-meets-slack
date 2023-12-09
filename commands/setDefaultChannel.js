@@ -5,18 +5,22 @@ module.exports = {
     data: new SlashCommandBuilder()
         .setName('setsubmissionchannel')
         .setDescription('Set the submission channel for the guild.')
-        .addStringOption(option => 
+        .addChannelOption(option => 
             option.setName('channel')
-                .setDescription('The ID of the submission channel')
+                .setDescription('The channel for submissions')
                 .setRequired(true)),
 
     async execute(interaction) {
-        const channelId = interaction.options.getString('channel');
+        if (!interaction.member.permissions.has('mod all')){
+            return await interaction.reply({ content: 'You do not have permission to use this command.', ephemeral: true});
+        }
+
+        const channelId = interaction.options.getChannel('channel');
         const guildId = interaction.guild.id;
 
         try{
-            const queryText = 'INSERT INTO settings (submission_channel_id, guild_id) VALUES (?, ?) ON DUPLICATE KEY UPDATE submission_channel_id = VALUES(submission_channel_id)';
-            await pool.execute(queryText, [channelId, guildId]);
+            const query = 'INSERT INTO settings (submission_channel_id, guild_id) VALUES (?, ?) ON DUPLICATE KEY UPDATE submission_channel_id = VALUES(submission_channel_id)';
+            await pool.execute(query, [channelId, guildId]);
             await interaction.reply({ content: `Submission channel set to ${channelId} for this guild.`, ephemeral: true});
         } catch (error) {
             console.error('Error in setChannel command:', error);
