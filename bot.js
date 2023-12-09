@@ -191,9 +191,6 @@ async function schedulePost(activeHoursData){
 }
 
 async function postPrompt(callingUser) {
-    let guildId;
-    let submissionChannel;
-
     const promptData = await promptUtils.getRandomPrompt(guildId);
 
     if (!promptData) {
@@ -202,17 +199,14 @@ async function postPrompt(callingUser) {
     }
 
     const { promptText, channelId } = promptData;
+    prompt.setPrompt(promptText);
 
     // Fetch the target channel using the channel ID
-    submissionChannel = await client.channels.fetch(channelId);
+    const submissionChannel = await client.channels.fetch(channelId);
     if (!submissionChannel) {
         console.error(`Could not find channel with ID: ${channelId}`);
         return;
     }
-
-    // Determine guildId based on callingUser or submissionChannel
-    guildId = callingUser ? callingUser.guild.id : submissionChannel.guild.id;
-    prompt.setPrompt(promptText);
 
     let messageContent;
     let userToPrompt;
