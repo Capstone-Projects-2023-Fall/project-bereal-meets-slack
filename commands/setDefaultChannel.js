@@ -16,11 +16,11 @@ module.exports = {
 
         try{
             const queryText = 'INSERT INTO settings (submission_channel_id, guild_id) VALUES (?, ?) ON DUPLICATE KEY UPDATE submission_channel_id = VALUES(submission_channel_id)';
-            await pool.execute(queryText, [guildId, channelId]);
-            await interaction.reply(`Submission channel set to ${channelId} for this guild.`);
+            await pool.execute(queryText, [channelId, guildId]);
+            await interaction.reply({ content: `Submission channel set to ${channelId} for this guild.`, ephemeral: true});
         } catch (error) {
             console.error('Error in setChannel command:', error);
-            await interaction.reply('Failed to set the submission channel.');
+            await interaction.reply({ content: 'Failed to set the submission channel.', ephemeral: true});
         }
     }
 };
