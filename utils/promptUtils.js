@@ -1,5 +1,11 @@
 const {pool} = require('./dbconn.js');
 
+async function getDefaultChannelId(guildId){
+  const query = 'SELECT default_channel_id FROM guild_settings WHERE guild_id = ?';
+  const [rows] = await pool.execute(query, [guildId]);
+  return rows.length > 0 ? rows[0].default_channel_id : null;
+}
+
 async function getPrompts(guildId){
   const [rows] = await pool.query("SELECT prompt_text FROM bot.prompts WHERE guild_id = ?", [guildId]);
   return rows.map(row => row.prompt_text);
