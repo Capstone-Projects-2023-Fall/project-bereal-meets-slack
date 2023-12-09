@@ -5,9 +5,15 @@ const { prompt } = require('./prompt.js');
 
 let deniedUsers = new Map(); //keep track of user denial counts
 
-async function handleUserSubmission(client, attachment, guild, caption, submitter) {
+async function handleUserSubmission(client, attachment, guild, caption, submitter, promptChannelId) {
     const botUserRole = guild.roles.cache.find(role => role.name === 'Bot User'); //Bot User, bot mod, mod all
     const promptContent = prompt.getPrompt();
+
+    const submissionChannel = await client.channels.fetch(promptChannelId);
+    if(!submissionChannel){
+        console.error(`Could not find channel: ${promptChannelId}`);
+        return;
+    }
 
     if (!attachment) {
         return;
@@ -52,8 +58,8 @@ async function handleUserSubmission(client, attachment, guild, caption, submitte
                         await response.edit({ content: approve_msg, components: [] });
                     }
                     const file = new AttachmentBuilder(attachment.url);
-                    const submit_channel = await client.channels.fetch(process.env.DISCORD_SUBMISSION_CHANNEL_ID);
-                    await submit_channel.send({ content: `${botUserRole} New post!\n${submitter} responded to "${promptContent}":\n${caption ?? ''}`, files: [file] });
+                    //const submit_channel = await client.channels.fetch(process.env.DISCORD_SUBMISSION_CHANNEL_ID);
+                    await submissionChannel.send({ content: `${botUserRole} New post!\n${submitter} responded to "${promptContent}":\n${caption ?? ''}`, files: [file] });
                 }
                 // check if someone press deny
                 else if (i.customId === 'deny') {
