@@ -1,6 +1,11 @@
 const {SlashCommandBuilder} = require('discord.js');
 const {pool} = require('../utils/dbconn.js');
 
+async function setDefaultChannel(guildId, channelId){
+    const query = 'INSERT INTO guild_settings (guild_id, default_channel_id) VALUES (?, ?) ON DUPLICATE KEY UPDATE default_channel_id = VALUES(default_channel_id)';
+    await pool.execute(query, [guildId, channelId]);
+}
+
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('setsubmissionchannel')
