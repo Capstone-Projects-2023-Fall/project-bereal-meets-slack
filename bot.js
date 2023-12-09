@@ -191,20 +191,6 @@ async function schedulePost(activeHoursData){
 }
 
 async function postPrompt(callingUser) {
-    const query = 'SELECT submission_channel_id FROM settings WHERE guild_id = ?';
-    const [rows] = await pool.execute(query, [process.env.DISCORD_GUILD_ID]);
-
-    let submissionChannel;
-    if(rows.length > 0){
-        const submissionChannelId = rows[0].submission_channel_id;
-        submissionChannel = await client.channels.fetch(submissionChannelId);
-    }
-
-    if(!submissionChannel){
-        console.error("Submission channel is not set or invalid.");
-        return;
-    }
-
     const guildId = process.env.DISCORD_GUILD_ID;
     const randomPrompt = await promptUtils.getRandomPrompt(guildId);
     prompt.setPrompt(randomPrompt);
@@ -232,7 +218,6 @@ async function postPrompt(callingUser) {
     }
     
     //for promptTimeout
-    const message = await submissionChannel.send(messageContent);
     const channelId = process.env.DISCORD_SUBMISSION_CHANNEL_ID;
     const sentMessage = await client.sendMessageWithTimer(channelId, messageContent);
     promptTimeout.setupPrompt(channelId, sentMessage, userToPrompt, randomPrompt, channelId);

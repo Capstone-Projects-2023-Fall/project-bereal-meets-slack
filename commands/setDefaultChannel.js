@@ -13,7 +13,7 @@ module.exports= {
 
     async execute(interaction) {
         if (!interaction.member.permissions.has('mod all')) {
-            return await interaction.reply({content: 'You do nott have permission to use this command.', ephemeral: true});
+            return await interaction.reply({content: 'You do not have permission to use this command.', ephemeral: true});
         }
 
         const channel = interaction.options.getChannel('channel');
@@ -30,7 +30,7 @@ module.exports= {
             return await interaction.reply({content: 'Channel does not exist in the guild.', ephemeral: true});
         }
 
-        const query = 'UPDATE settings SET submission_channel_id = ? WHERE guild_id = ?';
+        const query = 'INSERT settings SET submission_channel_id = ? WHERE guild_id = ?';
 
         console.log('Executing SQL Query:', query);
 
