@@ -7,7 +7,7 @@ describe(('prompt command'), () => {
     let interaction;
 
     beforeEach(() => {
-        sinon.stub(promptUtils, 'deletePrompt');
+        // sinon.stub(promptUtils, 'deletePrompt');
 
         interaction = {
             options: {
@@ -57,5 +57,29 @@ describe(('prompt command'), () => {
         expect(interaction.deferReply.called).to.be.true;
         expect(promptUtils.addPrompt.called).to.be.true;
         addPromptStub.restore(); 
+    });
+
+    it('should execute the add prompt command', async () => {
+        const addPromptStub = sinon.stub(promptUtils, 'addPrompt');
+        interaction.options.getSubcommand.returns('add');
+        promptUtils.addPrompt.resolves('Adding a test prompt');
+        
+        await promptCommand.execute(interaction);
+
+        expect(interaction.deferReply.called).to.be.true;
+        expect(promptUtils.addPrompt.called).to.be.true;
+        addPromptStub.restore(); 
+    });
+
+    it('should execute the delete prompt command', async () => {
+        const deletePromptStub = sinon.stub(promptUtils, 'deletePrompt');
+        interaction.options.getSubcommand.returns('delete');
+        // promptUtils.deletePrompt.resolves('');
+        
+        await promptCommand.execute(interaction);
+
+        expect(interaction.deferReply.called).to.be.true;
+        expect(promptUtils.deletePrompt.called).to.be.true;
+        deletePromptStub.restore(); 
     });
 });
