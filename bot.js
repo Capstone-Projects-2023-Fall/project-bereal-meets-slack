@@ -139,8 +139,11 @@ client.on('ready', async () => {
     cron.schedule('0 0 8 * * *', async () => {
     //try to schedule post 
     try{
-        const activeHoursData = await activeHoursUtils.fetchActiveHoursFromDB(guildId);
-        await schedulePost(activeHoursData);
+        const guilds = client.guilds.cache.map(guild => guild.id);
+        for(const guildId of guilds){
+            const activeHoursData = await activeHoursUtils.fetchActiveHoursFromDB(guildId);
+            await schedulePost(activeHoursData);
+        }
     } catch (error) {
         console.error('Error scheduling post', error);
     }
@@ -149,7 +152,7 @@ client.on('ready', async () => {
     cron.schedule('59 23 * * *', async () => { //scheduled to run every day at 11:59 PM
         try {
             console.log('Running daily saveDB task');
-            await saveDB(client, process.env.DISCORD_SUBMISSION_CHANNEL_ID); //this is hard coded for the submissions channel
+            await saveDB(client); //this is hard coded for the submissions channel
             console.log('Daily saveDB task completed');
         } catch (error) {
             console.error('Error running daily saveDB task:', error);
