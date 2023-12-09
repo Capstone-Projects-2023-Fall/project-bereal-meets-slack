@@ -5,10 +5,16 @@ async function getPrompts(guildId){
   return rows.map(row => row.prompt_text);
 }
 
-async function addPrompt(guildId, prompt) {
- await pool.query("INSERT INTO bot.prompts (guild_id, prompt_text) VALUES (?, ?)", [guildId, prompt]);
- return `Prompt "${prompt}" has been added to the list.`;
+async function addPrompt(guildId, prompt, channelId) {
+  const query = "INSERT INTO bot.prompts (guild_id, prompt_text, channel_id) VALUES (?, ?, ?)";
+  await pool.query(query, [guildId, prompt, channelId]);
+  return `Prompt "${prompt}" has been added to the list in <#${channelId}>.`;
 }
+
+// async function addPrompt(guildId, prompt) {
+//  await pool.query("INSERT INTO bot.prompts (guild_id, prompt_text) VALUES (?, ?)", [guildId, prompt]);
+//  return `Prompt "${prompt}" has been added to the list.`;
+// }
 
 async function deletePrompt(guildId, promptToDelete) {
   const [rows] = await pool.query("SELECT prompt_id, prompt_text FROM bot.prompts WHERE guild_id = ? AND prompt_text LIKE ?", [guildId, `%${promptToDelete}%`]);
