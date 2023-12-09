@@ -13,11 +13,15 @@ async function getPrompts(guildId){
 
 async function addPrompt(guildId, prompt, channelId) {
   if(!channelId){
-    channelId = await getDefaultChannelId(guildId);
-    if(!channelId){
-      return "Error: No defualt channel set for this guild."
+    const defaultChannelQuery = 'SELECT submission_channel_id FROM settings WHERE guild_id = ?';
+    const [defaultChannelRows] = await pool.query(defaultChannelQuery, [guildId]);
+    if (defaultChannelRows.length > 0){
+      channelId = defaultChannelRows[0].submission_channel_id;
+    } else {
+      return 'No channel selected and no default channel set for this guild.';
     }
   }
+  
   const query = "INSERT INTO bot.prompts (guild_id, prompt_text, channel_id) VALUES (?, ?, ?)";
   await pool.query(query, [guildId, prompt, channelId]);
   return `Prompt "${prompt}" has been added to the list in <#${channelId}>.`;
