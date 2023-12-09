@@ -192,6 +192,7 @@ async function schedulePost(activeHoursData){
 
 async function postPrompt(callingUser) {
     const promptData = await promptUtils.getRandomPrompt();
+    console.log("Fetched Prompt Data:", promptData);
 
     if (!promptData) {
         console.error("No prompt found for the guild.");
