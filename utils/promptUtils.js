@@ -21,11 +21,6 @@ async function addPrompt(guildId, prompt, channelId) {
   return `Prompt "${prompt}" has been added to the list in <#${channelId}>.`;
 }
 
-// async function addPrompt(guildId, prompt) {
-//  await pool.query("INSERT INTO bot.prompts (guild_id, prompt_text) VALUES (?, ?)", [guildId, prompt]);
-//  return `Prompt "${prompt}" has been added to the list.`;
-// }
-
 async function deletePrompt(guildId, promptToDelete) {
   const [rows] = await pool.query("SELECT prompt_id, prompt_text FROM bot.prompts WHERE guild_id = ? AND prompt_text LIKE ?", [guildId, `%${promptToDelete}%`]);
  
@@ -58,11 +53,6 @@ async function listPrompts(guildId, client){
   return response;
 }
 
-// async function listPrompts(guildId) {
-//   const prompts = await getPrompts(guildId);
-//   return `Current Prompts: \n${prompts.join('\n')}`;
-// }
-
 async function searchPrompts(guildId, query) {
   const prompts = await getPrompts(guildId);
   console.log(prompts);
@@ -75,15 +65,19 @@ async function searchPrompts(guildId, query) {
     : `Search results for "${query}":\n${partialMatches.join('\n')}`;
 }
 
-async function getRandomPrompt(guildId) {
-  // this should go through the database and select a random prompt
-  const [rows] = await pool.query("SELECT prompt_text FROM bot.prompts WHERE guild_id = ? ORDER BY RAND() LIMIT 1", [guildId]);
-  
-  if (rows.length > 0) {
-    return rows[0].prompt_text;
-  }
 
+async function getRandomPrompt(guildId){
+  const query = "SELECT prompt_text, channel_id FROM prompts WHERE guild_id = ? ORDER BY RAND() LIMIT 1";
+  const [rows] = await pool.query(query, [guildId]);
+
+  if (rows.length > 0 && rows[0].channel_id) {
+    return{
+      promptText: rows[0].prompt_text,
+      channelId: rows[0].channel_id
+    };
+  } else{
   return null;
+  }
 }
 
 module.exports = {

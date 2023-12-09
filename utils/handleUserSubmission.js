@@ -5,6 +5,7 @@ const { prompt } = require('./prompt.js');
 
 let deniedUsers = new Map(); //keep track of user denial counts
 
+
 async function handleUserSubmission(attachment, caption, interaction) {
     const {client, guild, user: submitter} = interaction;
 
@@ -62,10 +63,10 @@ async function handleUserSubmission(attachment, caption, interaction) {
                         await response.edit({ content: approve_msg, components: [] });
                     }
                     const file = new AttachmentBuilder(attachment.url);
-                    const submit_channel = await client.channels.fetch(process.env.DISCORD_SUBMISSION_CHANNEL_ID);
-                    await submit_channel.send({ content: `${botUserRole} New post!\n${submitter} responded to "${promptContent}":\n${caption ?? ''}`, files: [file] });
+                    await prompt.getChannel().send({ content: `${botUserRole} New post!\n${submitter} responded to "${promptContent}":\n${caption ?? ''}`, files: [file] });
                     await interaction.deleteReply(); //remove clutter
                     prompt.setUserId(client.user.id); //prompt has been responded to, default the value to prevent extraneous post spam.
+
                 }
                 // check if someone press deny
                 else if (i.customId === 'deny') {

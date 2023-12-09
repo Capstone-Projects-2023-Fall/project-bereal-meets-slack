@@ -20,7 +20,7 @@ module.exports = {
         const guildId = interaction.guild.id;
 
         try{
-            const query = 'INSERT settings (submission_channel_id, guild_id) VALUES (?, ?) ON DUPLICATE KEY UPDATE submission_channel_id = VALUES(submission_channel_id)';
+            const query = 'INSERT INTO settings (submission_channel_id, guild_id) VALUES (?, ?) ON DUPLICATE KEY UPDATE submission_channel_id = VALUES(submission_channel_id)';
             await pool.execute(query, [channelId, guildId]);
             await interaction.reply({ content: `Submission channel set to ${channel} for this guild.`, ephemeral: true});
         } catch (error) {
