@@ -7,7 +7,6 @@ describe(('prompt command'), () => {
     let interaction;
 
     beforeEach(() => {
-        sinon.stub(promptUtils, 'addPrompt');
         sinon.stub(promptUtils, 'deletePrompt');
 
         interaction = {
@@ -36,8 +35,9 @@ describe(('prompt command'), () => {
         listPromptsStub.restore(); 
     });
 
-    it('should return a prompt when searching with a keyword', async () => {
+    it('should execute the search prompt command with a keyword', async () => {
         const searchPromptStub = sinon.stub(promptUtils, 'searchPrompts');
+        interaction.options.getSubcommand.returns('search');
         promptUtils.searchPrompts.resolves('lunch');
         
         await promptCommand.execute(interaction);
@@ -45,5 +45,17 @@ describe(('prompt command'), () => {
         expect(interaction.deferReply.called).to.be.true;
         expect(promptUtils.searchPrompts.called).to.be.true;
         searchPromptStub.restore(); 
+    });
+
+    it('should execute the add prompt command', async () => {
+        const addPromptStub = sinon.stub(promptUtils, 'addPrompt');
+        interaction.options.getSubcommand.returns('add');
+        promptUtils.addPrompt.resolves('Adding a test prompt');
+        
+        await promptCommand.execute(interaction);
+
+        expect(interaction.deferReply.called).to.be.true;
+        expect(promptUtils.addPrompt.called).to.be.true;
+        addPromptStub.restore(); 
     });
 });
