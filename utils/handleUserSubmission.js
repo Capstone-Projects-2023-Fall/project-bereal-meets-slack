@@ -12,7 +12,7 @@ async function handleUserSubmission(attachment, caption, interaction) {
     const promptContent = prompt.getPrompt();
 
     if (!prompt.isUserIdMatch(submitter.id)) {
-        await interaction.reply({content: 'No not you!', ephemeral: true});
+        await interaction.reply({content: 'Either you were not prompted, or there is no active prompt.', ephemeral: true});
         return;
     } else {
         await interaction.deferReply();
@@ -64,13 +64,15 @@ async function handleUserSubmission(attachment, caption, interaction) {
                     const file = new AttachmentBuilder(attachment.url);
                     const submit_channel = await client.channels.fetch(process.env.DISCORD_SUBMISSION_CHANNEL_ID);
                     await submit_channel.send({ content: `${botUserRole} New post!\n${submitter} responded to "${promptContent}":\n${caption ?? ''}`, files: [file] });
+                    await interaction.deleteReply(); //remove clutter
+                    prompt.setUserId(client.user.id); //prompt has been responded to, default the value to prevent extraneous post spam.
                 }
                 // check if someone press deny
                 else if (i.customId === 'deny') {
                     await i.deferUpdate();
                     console.log(`${modName} denied`);
                     await i.editReply({ content: '**DENIED**', components: [] });
-
+                    await interaction.deleteReply(); //remove clutter
                     try {
                         const messageFilter = m => m.author.id === moderator.id
                         const denyMessage = await moderator.send({content: `<@${moderator.id}> Please give the reason for denying the post` });
@@ -93,10 +95,15 @@ async function handleUserSubmission(attachment, caption, interaction) {
                     if (deniedUser) {
                         const denialCount = (deniedUsers.get(deniedUser.id) || 0) + 1;
                         deniedUsers.set(deniedUser.id, denialCount);
-                        console.log(deniedUsers.get(deniedUser.id));
-                        if (denialCount >= 2) {
+                        await interaction.user.send(`Because your post was denied you now have ${denialCount} strikes, be careful not to get anymore or you may be blacklisted from participation in the prompts`);
+
+                        if (denialCount >= 3) {
+                            prompt.setUserId(client.user.id); //prompt has been exhausted, default the value to prevent extraneous post spam.
                             //add user to blacklist
                             await blacklistAddUser(guild.id, submitter.id);
+
+                            await interaction.user.send(`You have reached the strike limit and were added to the blacklist. Please refer to your moderators for recourse.`);
+
                             for (const moderator of moderators.values()) {
                                 try {
                                     await moderator.user.send({ content: `${submitter} was added to the blacklist`});
