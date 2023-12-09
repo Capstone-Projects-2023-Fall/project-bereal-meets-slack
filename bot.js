@@ -133,7 +133,6 @@ client.on(Events.InteractionCreate, async interaction => {
 client.on('ready', async () => {
     console.log(`Logged in as ${client.user.tag}!`);
     registrar.registercommands();
-    const guildId = process.env.DISCORD_GUILD_ID;
 
     //setup cron
     cron.schedule('0 0 8 * * *', async () => {
@@ -200,7 +199,7 @@ async function schedulePost(activeHoursData){
 }
 
 async function postPrompt(callingUser) {
-    const promptData = await promptUtils.getRandomPrompt();
+    const promptData = await promptUtils.getRandomPrompt(process.env.DISCORD_GUILD_ID);
 
     if (!promptData) {
         console.error("No prompt found.");
