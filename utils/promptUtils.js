@@ -66,15 +66,29 @@ async function searchPrompts(guildId, query) {
 }
 
 async function getRandomPrompt(guildId){
-  // this should go through the database and select a random prompt
-  const [rows] = await pool.query("SELECT prompt_text FROM bot.prompts WHERE guild_id = ? ORDER BY RAND() LIMIT 1", [guildId]);
-  
+  const query = "SELECT prompt_text, channel_id FROM bot.prompts WHERE guild_id = ? ORDER BY RAND() LIMIT 1";
+  const [rows] = await pool.query(query, [guildId]);
+
   if (rows.length > 0) {
-    return rows[0].prompt_text;
+    return{
+      promptText: rows[0].prompt_text,
+      channelId: rows[0].channel_id
+    };
   }
 
   return null;
 }
+
+// async function getRandomPrompt(guildId){
+//   // this should go through the database and select a random prompt
+//   const [rows] = await pool.query("SELECT prompt_text FROM bot.prompts WHERE guild_id = ? ORDER BY RAND() LIMIT 1", [guildId]);
+  
+//   if (rows.length > 0) {
+//     return rows[0].prompt_text;
+//   }
+
+//   return null;
+// }
 
 module.exports = {
     getPrompts,
