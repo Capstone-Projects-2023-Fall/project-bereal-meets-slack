@@ -63,7 +63,7 @@ async function handleUserSubmission(attachment, caption, interaction) {
                         await response.edit({ content: approve_msg, components: [] });
                     }
                     const file = new AttachmentBuilder(attachment.url);
-                    await submissionChannel.send({ content: `${botUserRole} New post!\n${submitter} responded to "${promptContent}":\n${caption ?? ''}`, files: [file] });
+                    await prompt.getChannel().send({ content: `${botUserRole} New post!\n${submitter} responded to "${promptContent}":\n${caption ?? ''}`, files: [file] });
                     await interaction.deleteReply(); //remove clutter
                     prompt.setUserId(client.user.id); //prompt has been responded to, default the value to prevent extraneous post spam.
 
