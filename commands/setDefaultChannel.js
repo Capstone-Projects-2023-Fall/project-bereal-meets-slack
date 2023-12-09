@@ -15,13 +15,14 @@ module.exports = {
             return await interaction.reply({ content: 'You do not have permission to use this command.', ephemeral: true});
         }
 
-        const channelId = interaction.options.getChannel('channel');
+        const channel = interaction.options.getChannel('channel');
+        const channelId = channel.id;
         const guildId = interaction.guild.id;
 
         try{
             const query = 'INSERT INTO settings (submission_channel_id, guild_id) VALUES (?, ?) ON DUPLICATE KEY UPDATE submission_channel_id = VALUES(submission_channel_id)';
             await pool.execute(query, [channelId, guildId]);
-            await interaction.reply({ content: `Submission channel set to ${channelId} for this guild.`, ephemeral: true});
+            await interaction.reply({ content: `Submission channel set to ${channel} for this guild.`, ephemeral: true});
         } catch (error) {
             console.error('Error in setChannel command:', error);
             await interaction.reply({ content: 'Failed to set the submission channel.', ephemeral: true});
