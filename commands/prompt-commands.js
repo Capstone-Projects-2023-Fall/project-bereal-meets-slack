@@ -79,7 +79,7 @@ module.exports = {
       const promptText = interaction.options.getString('prompt');
       reply = await deletePrompt(guildId, promptText);
   } else if (subcommand === 'list') {
-      reply = await listPrompts(guildId);
+      reply = await listPrompts(guildId, interaction.client);
   } else if (subcommand === 'search') {
       const searchPrompts = interaction.options.getString('search-term');
       reply = await searchPrompts(guildId, searchPrompts);
