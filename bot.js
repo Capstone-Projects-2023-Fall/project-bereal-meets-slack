@@ -191,24 +191,28 @@ async function schedulePost(activeHoursData){
 }
 
 async function postPrompt(callingUser) {
-    const guildId = process.env.DISCORD_GUILD_ID;
+    let guildId;
+    let submissionChannel;
+
     const promptData = await promptUtils.getRandomPrompt(guildId);
 
-    // Check if a prompt was successfully retrieved
     if (!promptData) {
         console.error("No prompt found for the guild.");
         return;
     }
 
     const { promptText, channelId } = promptData;
-    prompt.setPrompt(promptText);
 
     // Fetch the target channel using the channel ID
-    const submissionChannel = await client.channels.fetch(channelId);
+    submissionChannel = await client.channels.fetch(channelId);
     if (!submissionChannel) {
         console.error(`Could not find channel with ID: ${channelId}`);
         return;
     }
+
+    // Determine guildId based on callingUser or submissionChannel
+    guildId = callingUser ? callingUser.guild.id : submissionChannel.guild.id;
+    prompt.setPrompt(promptText);
 
     let messageContent;
     let userToPrompt;
@@ -236,6 +240,54 @@ async function postPrompt(callingUser) {
     const sentMessage = await submissionChannel.send(messageContent);
     promptTimeout.setupPrompt(channelId, sentMessage, userToPrompt, promptText, channelId);
 }
+
+
+// async function postPrompt(callingUser) {
+//     const guildId = process.env.DISCORD_GUILD_ID;
+//     const promptData = await promptUtils.getRandomPrompt(guildId);
+
+//     // Check if a prompt was successfully retrieved
+//     if (!promptData) {
+//         console.error("No prompt found for the guild.");
+//         return;
+//     }
+
+//     const { promptText, channelId } = promptData;
+//     prompt.setPrompt(promptText);
+
+//     // Fetch the target channel using the channel ID
+//     const submissionChannel = await client.channels.fetch(channelId);
+//     if (!submissionChannel) {
+//         console.error(`Could not find channel with ID: ${channelId}`);
+//         return;
+//     }
+
+//     let messageContent;
+//     let userToPrompt;
+
+//     if (callingUser) {
+//         userToPrompt = await client.users.fetch(callingUser.id);
+//         messageContent = `${callingUser.toString()} Use /submit to submit your post!\n**Prompt:**\n${promptText}`;
+//     } else {
+//         const userRand = await outputUsers(submissionChannel.guild);
+//         try {
+//             userToPrompt = await client.users.fetch(userRand);
+//             messageContent = `<@${userRand}> Use /submit to submit your post!\n**Prompt:**\n${promptText}`;
+//         } catch (error) {
+//             console.error("Error fetching random user:", error);
+//             return;
+//         }
+//     }
+
+//     if (!userToPrompt || !messageContent) {
+//         console.error("Error: User or message content is not defined.");
+//         return;
+//     }
+
+//     // Send the message in the specified channel
+//     const sentMessage = await submissionChannel.send(messageContent);
+//     promptTimeout.setupPrompt(channelId, sentMessage, userToPrompt, promptText, channelId);
+// }
 
 
 // async function postPrompt(callingUser) {
