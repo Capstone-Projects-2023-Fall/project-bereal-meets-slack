@@ -300,7 +300,7 @@ client.on('messageCreate', async msg => {
     // Check if the message is from the bot itself
     if (msg.author.id === client.user.id) {
         // Check if the message is in the specified channel
-        if (msg.channel.id === process.env.DISCORD_SUBMISSION_CHANNEL_ID) {
+         {
             // If the timer is running, stop it and log the time
             if (timer.isRunning()) {
                 const elapsedSeconds = timer.stop();
