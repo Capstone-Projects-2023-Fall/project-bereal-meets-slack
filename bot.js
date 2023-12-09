@@ -13,6 +13,7 @@ const saveDB = require('./utils/saveDB');
 const { prompt } = require('./utils/prompt.js');
 const PromptTimeout = require('./utils/promptTimeout');
 const activeEvents = require('./utils/activeEvents')
+const setDefaultChannel = require('./commands/setDefaultChannel.js');
 
 
 //for cloud run, serverless application needs a server to listen.
@@ -109,7 +110,11 @@ client.on(Events.InteractionCreate, async interaction => {
             return;
         }
 	    try {
+            if(interaction.commandName === 'setsubmissionchannel'){
+                await setDefaultChannel.execute(interaction);
+            } else {
 		    await command.execute(interaction);
+            }
 	    } catch (error) {
 		    console.error(error);
 		    if (interaction.replied || interaction.deferred) {
@@ -187,35 +192,54 @@ async function schedulePost(activeHoursData, guildId){
 }
 
 async function postPrompt(guildId, callingUser) {
-    const randomPrompt = await promptUtils.getRandomPrompt(guildId);
-    prompt.setPrompt(randomPrompt);
-        
+    const promptData = await promptUtils.getRandomPrompt(process.env.DISCORD_GUILD_ID);
+
+    if (!promptData) {
+        console.error("No prompt found.");
+        return;
+    }
+
+    const { promptText, channelId } = promptData;
+    prompt.setPrompt(promptText);
+
+    // Fetch the target channel using the channel ID
+    const submissionChannel = await client.channels.fetch(channelId);
+    if (!submissionChannel) {
+        console.error(`Could not find channel with ID: ${channelId}`);
+        return;
+    }
+
+    prompt.setChannel(submissionChannel);
+
     let messageContent;
     let userToPrompt;
 
     if (callingUser) {
-            userToPrompt = await client.users.fetch(callingUser.id); // this should store the calling user
-            messageContent = `${callingUser.toString()} Use /submit to submit your post!\n**Prompt:**\n${randomPrompt}`;
+        userToPrompt = await client.users.fetch(callingUser.id);
+        messageContent = `${callingUser.toString()} Use /submit to submit your post!\n**Prompt:**\n${promptText}`;
     } else {
-        const list = client.guilds.cache.get(guildId);
-        const userRand = await outputUsers(list);
+        const userRand = await outputUsers(submissionChannel.guild);
+
         try {
-            userToPrompt = await client.users.fetch(userRand); // this should fetch the user that was prompted
-            messageContent = `<@${userRand}> Use /submit to submit your post!\n**Prompt:**\n${randomPrompt}`;
+            userToPrompt = await client.users.fetch(userRand);
+            messageContent = `<@${userRand}> Use /submit to submit your post!\n**Prompt:**\n${promptText}`;
         } catch (error) {
             console.error("Error fetching random user:", error);
             return;
         }
     }
+
     if (!userToPrompt || !messageContent) {
         console.error("Error: User or message content is not defined.");
         return;
     }
-    
-    //for promptTimeout
-    const channelId = process.env.DISCORD_SUBMISSION_CHANNEL_ID;
-    const sentMessage = await client.sendMessageWithTimer(channelId, messageContent);
-    promptTimeout.setupPrompt(channelId, sentMessage, userToPrompt, randomPrompt, channelId);
+
+
+    // Send the message in the specified channel
+    prompt.setUserId(userToPrompt.id);
+    const sentMessage = await submissionChannel.send(messageContent);
+    promptTimeout.setupPrompt(channelId, sentMessage, userToPrompt, promptText, channelId);
+
 }
 
 async function triggerImmediatePost(guildId, callingUser){
@@ -242,7 +266,7 @@ client.on('messageCreate', async msg => {
     // Check if the message is from the bot itself
     if (msg.author.id === client.user.id) {
         // Check if the message is in the specified channel
-        if (msg.channel.id === process.env.DISCORD_SUBMISSION_CHANNEL_ID) {
+         {
             // If the timer is running, stop it and log the time
             if (timer.isRunning()) {
                 const elapsedSeconds = timer.stop();

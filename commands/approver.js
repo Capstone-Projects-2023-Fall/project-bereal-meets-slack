@@ -16,12 +16,9 @@ module.exports = {
 				.setDescription('Please enter a caption: ')
 		}),
 		
-	async execute(interaction) {
-		await interaction.deferReply();
-		await interaction.editReply('submitted to moderators!');
+	async execute(interaction) {		
 		const attachment = interaction.options.getAttachment('file');
 		const caption = interaction.options.getString('caption');
-		await handleUserSubmission(interaction.client, attachment, interaction.guild, caption, interaction.user);	
-	}
+		await handleUserSubmission(attachment, caption, interaction);	
 
 }

@@ -8,25 +8,344 @@ Bot Api Spec
 **Introduction**
 This outlines the API specification for the Bot. It provides details on the methods available, their parameters, return values, and the usage.
 
-**Bot Methods**
+
+
+## getRandom Methods
+### `getRandomUser(guild)`
+
+#### `getRandomUser(guild) → {string | null}`
+
+Generates a random non-blacklisted, non-bot user ID from a guild's members.
+
+##### Parameters:
+
+| Name    | Type   | Description                           |
+|---------|--------|---------------------------------------|
+| `guild` | Object | The Discord guild object.             |
+
+##### Returns:
+
+- A string representing the user ID of a randomly selected non-blacklisted, non-bot user.
+- Returns `null` if no eligible non-bot users are found.
+
+  **Type:** `string | null`
+
+
+
+
+
+
+
+
+## activeHours Methods
 
 ### `fetchActiveHoursFromDB(guildId)`
 
-#### (async) fetchActiveHoursFromDB(guildId) → {Promise.<{start_time: string, end_time: string}>}
+#### `(async) fetchActiveHoursFromDB(guildId) → {Promise.<{start_time: string, end_time: string}>}`
 
 Fetches active operating hours for a guild from the database.
 
 ##### Parameters:
 
-#### `fetchActiveHoursFromDB(guildId)`
+| Name      | Type   | Description                                   |
+|-----------|--------|-----------------------------------------------|
+| `guildId` | string | The ID of the Discord guild.                   |
 
-| Name      | Type   | Description                           |
-|-----------|--------|---------------------------------------|
-| `guildId` | string | The ID of the Discord guild.           |
+##### Returns:
 
-#### Returns:
+- A promise that resolves to an object containing `start_time` and `end_time` representing the active operating hours for the guild.
 
-A Promise that resolves to an object with `start_time` and `end_time` properties.
+  **Type:** `Promise.<{start_time: string, end_time: string}>`
+
+
+
+
+
+
+### `storeOperatingHours(guildId, startTime, endTime)`
+
+#### `(async) storeOperatingHours(guildId, startTime, endTime) → {Promise.<void>}`
+
+Stores or updates operating hours for a guild in the database.
+
+##### Parameters:
+
+| Name       | Type   | Description                              |
+|------------|--------|------------------------------------------|
+| `guildId`  | string | The ID of the Discord guild.              |
+| `startTime`| string | The start time of the operating hours.    |
+| `endTime`  | string | The end time of the operating hours.      |
+
+##### Returns:
+
+- A Promise that resolves when the operating hours are successfully stored or updated.
+
+  **Type:** `Promise<void>`
+
+
+
+
+
+
+
+
+
+### `getRandomHourWithinActiveHours(activeHoursData)`
+
+#### `getRandomHourWithinActiveHours(activeHoursData) → {string}`
+
+Generates a random hour within the active operating hours for a guild.
+
+##### Parameters:
+
+| Name               | Type   | Description                                           |
+|--------------------|--------|-------------------------------------------------------|
+| `activeHoursData`  | Object | An object containing `start_time` and `end_time`.      |
+
+##### Returns:
+
+- A formatted string representing a random hour within the active hours.
+
+  **Type:** `string`
+
+
+
+## dbConn Methods
+
+### `createConnectionPoolLocal()`
+
+#### `createConnectionPoolLocal() → {Object}`
+
+Creates a connection pool for local database calls during testing.
+
+##### Returns:
+
+- MySQL connection pool object.
+
+  **Type:** `Object`
+
+### `createConnectionPoolCloud()`
+
+#### `createConnectionPoolCloud() → {Object}`
+
+Creates a connection pool for cloud database calls.
+
+##### Returns:
+
+- An object representing a MySQL connection pool.
+
+  **Type:** `Object`
+
+
+
+### `createPromiseConnectionPool()`
+
+#### `createPromiseConnectionPool() → {Object}`
+
+Creates a promise-based connection pool based on the specified environment flag.
+
+##### Returns:
+
+- A Promise-based MySQL connection pool.
+
+  **Type:** `Object`
+
+
+
+## promptTimeout Methods
+
+
+### `setupPrompt(channelId, message, user, originalPrompt)`
+
+#### `setupPrompt(channelId, message, user, originalPrompt) → {void}`
+
+Sets up a timed prompt in a specific channel for user interaction.
+
+##### Parameters:
+
+| Name               | Type   | Description                                                   |
+|--------------------|--------|---------------------------------------------------------------|
+| `channelId`        | string | The ID of the Discord channel where the prompt is set up.      |
+| `message`          | string | The message content for the prompt.                            |
+| `user`             | Object | The Discord user object for whom the prompt is set up.         |
+| `originalPrompt`   | Object | The original prompt object or content for reference.           |
+
+
+
+
+
+
+
+### `setPromptTimeout(promptId, duration, message, expiredContent, user, originalPrompt, channelId)`
+
+#### `setPromptTimeout(promptId, duration, message, expiredContent, user, originalPrompt, channelId) → {void}`
+
+Sets a timeout for a prompt identified by `promptId`.
+
+##### Parameters:
+
+| Name               | Type      | Description                                           |
+|--------------------|-----------|-------------------------------------------------------|
+| `promptId`         | any       | Identifier for the prompt.                             |
+| `duration`         | number    | Duration of the timeout in milliseconds.               |
+| `message`          | Object    | Discord message object associated with the prompt.    |
+| `expiredContent`   | string    | Content to display when the prompt expires.            |
+| `user`             | Object    | Discord user object associated with the prompt.       |
+| `originalPrompt`   | any       | Original prompt content.                               |
+| `channelId`        | string    | ID of the Discord channel where the prompt is active. |
+
+
+
+
+### `handleReprompt(user, originalPrompt, channelId, originalMessage)`
+
+#### `handleReprompt(user, originalPrompt, channelId, originalMessage)`
+
+Handles reprompting the user.
+
+##### Parameters:
+
+| Name              | Type     | Description                                                           |
+|-------------------|----------|-----------------------------------------------------------------------|
+| `user`            | Object   | The user object.                                                      |
+| `originalPrompt`  | string   | The original prompt message.                                          |
+| `channelId`       | string   | The ID of the channel where the reprompt message will be sent.        |
+| `originalMessage` | Object   | The original message that triggered the reprompt.                     |
+
+
+
+
+
+## promptUtils Methods
+
+### `getPrompts(guildId)`
+
+#### `getPrompts(guildId) → {Promise<Array.<string>>}`
+
+Retrieves a list of prompts for a specified guild from the database.
+
+##### Parameters:
+
+| Name      | Type   | Description                                   |
+|-----------|--------|-----------------------------------------------|
+| `guildId` | string | The ID of the Discord guild.                   |
+
+##### Returns:
+
+- A promise that resolves to an array of prompt texts.
+
+  **Type:** `Promise<Array.<string>>`
+
+---
+
+### `addPrompt(guildId, prompt)`
+
+#### `addPrompt(guildId, prompt) → {Promise<string>}`
+
+Adds a new prompt to the database for a specified guild.
+
+##### Parameters:
+
+| Name       | Type   | Description                                   |
+|------------|--------|-----------------------------------------------|
+| `guildId`  | string | The ID of the Discord guild.                   |
+| `prompt`   | string | The text of the prompt to be added.           |
+
+##### Returns:
+
+- A promise that resolves to a message confirming the addition of the prompt.
+
+  **Type:** `Promise<string>`
+
+---
+
+### `deletePrompt(guildId, promptToDelete)`
+
+#### `deletePrompt(guildId, promptToDelete) → {Promise<string>}`
+
+Deletes a prompt from the database for a specified guild.
+
+##### Parameters:
+
+| Name              | Type   | Description                                           |
+|-------------------|--------|-------------------------------------------------------|
+| `guildId`         | string | The ID of the Discord guild.                           |
+| `promptToDelete`  | string | The text of the prompt to be deleted or matched.       |
+
+##### Returns:
+
+- A promise that resolves to a message confirming the deletion or suggesting similar prompts.
+
+  **Type:** `Promise<string>`
+
+---
+
+### `listPrompts(guildId)`
+
+#### `listPrompts(guildId) → {Promise<string>}`
+
+Retrieves and lists all prompts for a specified guild.
+
+##### Parameters:
+
+| Name      | Type   | Description                                   |
+|-----------|--------|-----------------------------------------------|
+| `guildId` | string | The ID of the Discord guild.                   |
+
+##### Returns:
+
+- A promise that resolves to a string listing all prompts.
+
+  **Type:** `Promise<string>`
+
+---
+
+### `searchPrompts(guildId, query)`
+
+#### `searchPrompts(guildId, query) → {Promise<string>}`
+
+Searches for prompts that match a specified query for a specified guild.
+
+##### Parameters:
+
+| Name      | Type   | Description                                   |
+|-----------|--------|-----------------------------------------------|
+| `guildId` | string | The ID of the Discord guild.                   |
+| `query`   | string | The search query.                             |
+
+##### Returns:
+
+- A promise that resolves to a string listing matching prompts or suggesting alternatives.
+
+  **Type:** `Promise<string>`
+
+---
+
+### `getRandomPrompt(guildId)`
+
+#### `getRandomPrompt(guildId) → {Promise<string | null>}`
+
+Retrieves a random prompt for a specified guild from the database.
+
+##### Parameters:
+
+| Name      | Type   | Description                                   |
+|-----------|--------|-----------------------------------------------|
+| `guildId` | string | The ID of the Discord guild.                   |
+
+##### Returns:
+
+- A promise that resolves to a random prompt text or `null` if no prompts are found.
+
+  **Type:** `Promise<string | null>`
+
+
+
+
+
+
+
+
 
 ### `getRandomHourWithinActiveHours(activeHoursData)`
 
@@ -47,283 +366,147 @@ Generates a random hour within the active operating hours for a guild.
   **Type:** `string`
 
 
-**getCSV()**  
 
-Description: Gets the CSV fields
 
-Parameters: None
 
-Data Types: None
+## saveDB Methods
 
-Return Value: CSV fields (e.g., a list or string)
 
-Output Variables: None
 
+### `fetchImageMessagesUntilPrompt(client, channelId)`
 
-**getDatavis()**
+#### `fetchImageMessagesUntilPrompt(client, channelId) → {Promise.<Array.<Object>>}`
 
-Description:Checks for CSV fields by parsing lines from a file
+Fetches image messages from a Discord channel until a message containing "Prompt" is found.
 
-Parameters: None or a file path
+##### Parameters:
 
-Data Types: String (file path)
+| Name        | Type   | Description                                      |
+|-------------|--------|--------------------------------------------------|
+| `client`    | Object | The Discord client object.                       |
+| `channelId` | string | The ID of the Discord channel to fetch messages. |
 
-Return Value: Parsed CSV fields or data visualization
+##### Returns:
 
-Output Variables: None
+- A promise that resolves to an array of Discord message objects containing images.
 
+  **Type:** `Promise.<Array.<Object>>`
 
-**getOperatingHours()**
 
-Description:Gets the operation hours of the bot
+  
 
-Parameters: None
+### `countReactions(message)`
 
-Data Types: None
+#### `countReactions(message) → {number}`
 
-Return Value: Operating hours (e.g., start and end times)
+Counts the total number of reactions on a Discord message.
 
-Output Variables: None
+##### Parameters:
 
-**sendPrompt()**
+| Name      | Type     | Description                               |
+|-----------|----------|-------------------------------------------|
+| `message` | Object   | The Discord message object.               |
 
-Description:Sends a prompt to a user
+##### Returns:
 
-Parameters: User ID or message content
+- The total count of reactions on the message.
 
-Data Types: String (User ID) or message data
+  **Type:** `number`
 
-Return Value: Status of the prompt being sent (e.g., success or failure)
 
-Output Variables: None
 
-**getResponseDelay()**
 
-Description:Gets the time it takes when the bot has to resend a prompt to the user
 
-Parameters: None
+### `getImageLinkFromMessage(message)`
 
-Data Types: None
+#### `getImageLinkFromMessage(message) → {string | null}`
 
-Return Value: Response delay time (e.g., integer or float)
+Extracts the image link from a Discord message, considering both attachments and embeds.
 
-Output Variables: None
+##### Parameters:
 
-**getResponse()**
+| Name      | Type   | Description                   |
+|-----------|--------|-------------------------------|
+| `message` | Object | The Discord message object.   |
 
-Description: Gets response from the user
+##### Returns:
 
-Parameters: None
+- A string representing the image link if found; otherwise, returns `null`.
 
-Data Types: None
+  **Type:** `string | null`
 
-Return Value: User response (e.g., string)
 
-Output Variables: None
 
-**setOperatingHours(int newStart, int newEnd)**
 
-Description:Sets the operating hours
+### `insertResponseData(messageData)`
 
-Parameters: New start and end times (integer)
+#### `(async) insertResponseData(messageData) → {void}`
 
-Data Types: Integer (newStart and newEnd)
+Inserts response data into the database, avoiding duplicates based on the message ID.
 
-Return Value: Status of operating hours update
+##### Parameters:
 
-Output Variables: None
+| Name          | Type   | Description                        |
+|---------------|--------|------------------------------------|
+| `messageData` | Object | Data object for the response.       |
 
-**generateRandomPromptTime()**
 
-Description:Generates a random time for when prompts are assigned
 
-Parameters: None
+### `findTimeDifferenceToPrompt(client, channelId, referenceMessage)`
 
-Data Types: None
+#### `(async) findTimeDifferenceToPrompt(client, channelId, referenceMessage) → {number | null}`
 
-Return Value: Random prompt assignment time (e.g., timestamp)
+Finds the time difference in seconds between a reference message and the first message containing the word "Prompt" within the last 100 messages in a channel.
 
-Output Variables: None
+##### Parameters:
 
-**generateRandomPrompt()**
+| Name               | Type     | Description                                     |
+|--------------------|----------|-------------------------------------------------|
+| `client`           | Object   | The Discord client object.                      |
+| `channelId`        | string   | The ID of the channel.                          |
+| `referenceMessage` | Object   | The reference message object.                   |
 
-Description:  Generates a random prompt
+##### Returns:
 
-Parameters: None
+- A number representing the time difference in seconds if a prompt message is found; otherwise, returns `null`.
 
-Data Types: None
+  **Type:** `number | null`
 
-Return Value: Randomly generated prompt (e.g., string)
 
-Output Variables: None
 
-**getPromptList()**
 
-Description: Gets the prompt list
 
-Parameters: None
+### `saveDB(client, channelId)`
 
-Data Types: None
+#### `(async) saveDB(client, channelId) → {Array}`
 
-Return Value: List of prompts
+Saves data to the database, including information about image messages, reactions, and time differences to prompts.
 
-Output Variables: None
+##### Parameters:
 
-**setPromptList()**
+| Name        | Type   | Description                    |
+|-------------|--------|--------------------------------|
+| `client`    | Object | The Discord client object.     |
+| `channelId` | string | The ID of the channel.          |
 
-Description: Sets the prompt list 
+##### Returns:
 
-Parameters: List of prompts
+- An array containing data for each saved message.
 
-Data Types: List of strings
+  **Type:** `Array`
 
-Return Value: Status of prompt list update
 
-Output Variables: None
+  
 
-**getResponsePostComment()**
+### `insertResponseData(messageData)`
 
-Description: Gets and stores the response of a post comment
+#### `(async) insertResponseData(messageData) → {void}`
 
-Parameters: None
+Inserts response data into the database, avoiding duplicates based on the message ID.
 
-Data Types: None
+##### Parameters:
 
-Return Value: User response to a post comment (e.g., string)
-
-Output Variables: None
-
-**setResponsePostComment()**
-
-Description:  Sets a response of a post comment
-
-Parameters: User response to a post comment (e.g., string)
-
-Data Types: String
-
-Return Value: Status of response update
-
-Output Variables: None
-
-**getBlackList()**
-
-Description: Shows the blacklist
-
-Parameters: None
-
-Data Types: None
-
-Return Value: List of blacklisted users
-
-Output Variables: None
-
-**addUserToBlackList()**
-
-Description: Adds users to the blacklist
-
-Parameters: User ID or username
-
-Data Types: String
-
-Return Value: Status of user addition to the blacklist
-
-Output Variables: None
-
-**removeUserFromBlackList()**
-
-Description: Removes a user from the blacklist
-
-Parameters: User ID or username
-
-Data Types: String
-
-Return Value: Status of user removal from the blacklist
-
-Output Variables: None
-
-**selectRandomUserToPrompt()**
-
-Description: Selects a random user to assign a prompt to
-
-Parameters: None
-
-Data Types: None
-
-Return Value: Selected user for prompt assignment (e.g., User ID or username)
-
-Output Variables: None
-
-**getApprovalStatus()**
-
-Description:Gets the approval status after sending a user response to the moderator
-
-Parameters: None
-
-Data Types: None
-
-Return Value: Approval status (e.g., boolean)
-
-Output Variables: None
-
-**setApprovalStatus()**
-
-Description: Sets the approval status after sending a user response to a moderator
-
-Parameters: Approval status (e.g., boolean)
-
-Data Types: Boolean
-
-Return Value: Status of approval status update
-
-Output Variables: None
-
-**sendToResponseToMod()**
-
-Description: Sends a user response to a prompt to a moderator
-
-Parameters: User response to a prompt
-
-Data Types: String
-
-Return Value: Status of sending to the moderator
-
-Output Variables: None
-
-**postResponseToChannel()**
-
-Description: Posts the response of a moderator to a user to a channel
-
-Parameters: Moderator's response to a user
-
-Data Types: String
-
-Return Value: Status of posting to a channel
-
-Output Variables: None
-
-**deleteOriginalPromptFromChannel()**
-
-Description:Deletes a prompt from a certain channel
-
-Parameters: Channel or prompt ID
-
-Data Types: String or identifier
-
-Return Value: Status of prompt deletion from the channel
-
-Output Variables: None
-
-**setUsersAlreadyPromptedList()**
-
-Description:  Sets a list of users that were already prompted by the bot
-
-Parameters: List of users
-
-Data Types: List of user IDs or usernames
-
-Return Value: Status of updating the list
-
-Output Variables: None
-
-
+| Name          | Type   | Description                        |
+|---------------|--------|------------------------------------|
+| `messageData` | Object | Data object for the response.       |
 

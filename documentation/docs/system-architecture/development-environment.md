@@ -1,5 +1,5 @@
 ---
-sidebar_position: 4
+sidebar_position: 2
 ---
 
 # Development Environment
@@ -16,7 +16,7 @@ sidebar_position: 4
 - discord.js module for interacting with the Discord API
 
 ### Database System:
-- SQL
+- mySQL
 
 ## Documentation Tools
 - Docasaurus

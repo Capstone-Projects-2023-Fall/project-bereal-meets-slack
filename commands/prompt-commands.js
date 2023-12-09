@@ -15,6 +15,11 @@ module.exports = {
             .setDescription('Enter a new prompt.')
             .setRequired(true),
         )
+        .addChannelOption(option => 
+          option
+            .setName('channel')
+            .setDescription('Select the channel for the prompt')
+            .setRequired(false))
     )
     .addSubcommand(subcommand =>
       subcommand
@@ -65,16 +70,21 @@ module.exports = {
     await interaction.deferReply({ephemeral: true});
     let reply = '';
 
-    reply = subcommand === 'add'
-      ? await addPrompt(guildId, interaction.options.getString('prompt'))
-      : subcommand === 'delete'
-      ? await deletePrompt(guildId, interaction.options.getString('prompt'))
-      : subcommand === 'list'
-      ? await listPrompts(guildId)
-      : subcommand === 'search'
-      ? await searchPrompts(guildId, interaction.options.getString('search-term'))
-      : '';
-  
+    if (subcommand === 'add') {
+      const promptText = interaction.options.getString('prompt');
+      const channel = interaction.options.getChannel('channel');
+      const channelId = channel ? channel.id : null; // Get the channel ID or null
+      reply = await addPrompt(guildId, promptText, channelId); // Pass channelId to addPrompt
+  } else if (subcommand === 'delete') {
+      const promptText = interaction.options.getString('prompt');
+      reply = await deletePrompt(guildId, promptText);
+  } else if (subcommand === 'list') {
+      reply = await listPrompts(guildId, interaction.client);
+  } else if (subcommand === 'search') {
+      const searchPrompts = interaction.options.getString('search-term');
+      reply = await searchPrompts(guildId, searchPrompts);
+  }
+
       await interaction.followUp(reply);
   },
 };
