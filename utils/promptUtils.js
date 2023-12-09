@@ -6,6 +6,16 @@ async function getPrompts(guildId){
 }
 
 async function addPrompt(guildId, prompt, channelId) {
+  if(!channelId){
+    const defaultChannelQuery = 'SELECT submission_channel_id FROM settings WHERE guild_id = ?';
+    const [defaultChannelRows] = await pool.query(defaultChannelQuery, [guildId]);
+    if (defaultChannelRows.length > 0){
+      channelId = defaultChannelRows[0].submission_channel_id;
+    } else {
+      return 'No channel selected and no default channel set for this guild.';
+    }
+  }
+  
   const query = "INSERT INTO bot.prompts (guild_id, prompt_text, channel_id) VALUES (?, ?, ?)";
   await pool.query(query, [guildId, prompt, channelId]);
   return `Prompt "${prompt}" has been added to the list in <#${channelId}>.`;
@@ -55,9 +65,10 @@ async function searchPrompts(guildId, query) {
     : `Search results for "${query}":\n${partialMatches.join('\n')}`;
 }
 
-async function getRandomPrompt(){
-  const query = "SELECT prompt_text, channel_id FROM prompts ORDER BY RAND() LIMIT 1";
-  const [rows] = await pool.query(query);
+
+async function getRandomPrompt(guildId){
+  const query = "SELECT prompt_text, channel_id FROM prompts WHERE guild_id = ? ORDER BY RAND() LIMIT 1";
+  const [rows] = await pool.query(query, [guildId]);
 
   if (rows.length > 0 && rows[0].channel_id) {
     return{
@@ -65,7 +76,6 @@ async function getRandomPrompt(){
       channelId: rows[0].channel_id
     };
   } else{
-
   return null;
   }
 }

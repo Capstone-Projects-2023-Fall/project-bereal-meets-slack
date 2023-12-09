@@ -239,9 +239,12 @@ async function postPrompt(callingUser) {
         return;
     }
 
+
     // Send the message in the specified channel
+    prompt.setUserId(userToPrompt.id);
     const sentMessage = await submissionChannel.send(messageContent);
     promptTimeout.setupPrompt(channelId, sentMessage, userToPrompt, promptText, channelId);
+
 }
 
 async function triggerImmediatePost(callingUser){
