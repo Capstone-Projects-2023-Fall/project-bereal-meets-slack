@@ -18,6 +18,18 @@ module.exports= {
 
         const channel = interaction.options.getChannel('channel');
 
+        const channelId = channel.id;
+        if (!/^\d{17,19}$/.test(channelId)){
+            console.error("Invalid channel ID format");
+            return await interaction.reply({content: 'Invalid channel ID format.', ephemeral: true});
+        }
+
+        const guildChannel = interaction.guild.channels.cache.get(channelId);
+        if(!guildChannel){
+            console.error("Channel does not exist in the guild");
+            return await interaction.reply({content: 'Channel does not exist in the guild.', ephemeral: true});
+        }
+
         const query = 'UPDATE settings SET submission_channel_id = ? WHERE guild_id = ?';
 
         console.log('Executing SQL Query:', query);
