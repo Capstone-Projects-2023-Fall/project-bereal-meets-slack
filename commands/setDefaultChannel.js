@@ -19,8 +19,17 @@ module.exports= {
         const channel = interaction.options.getChannel('channel');
 
         const query = 'UPDATE settings SET submission_channel_id = ? WHERE guild_id = ?';
-        await pool.execute(query, [channel.id, interaction.guild.id]); 
 
-        await interaction.reply({content: `Submission channel set to ${channel.name}`, ephemeral: true});
+        console.log('Executing SQL Query:', query);
+
+        try{
+            await pool.execute(query, [channel.id, interaction.guild.id]); 
+            console.log('Data Inserted Successfully');
+            await interaction.reply({content: `Submission channel set to ${channel.name}`, ephemeral: true});
+        } catch (error) {
+            console.error('Error Inserting Data:', error);
+            await interaction.reply({content: 'An error occurred while setting the submission channel,', ephemeral: true});
+        }
+        
     }
-}
+};
