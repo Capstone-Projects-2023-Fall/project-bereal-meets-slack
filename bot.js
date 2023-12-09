@@ -13,6 +13,7 @@ const saveDB = require('./utils/saveDB');
 const { prompt } = require('./utils/prompt.js');
 const PromptTimeout = require('./utils/promptTimeout');
 const activeEvents = require('./utils/activeEvents')
+const setDefaultChannel = require('./commands/setDefaultChannel.js');
 
 
 //for cloud run, serverless application needs a server to listen.
@@ -109,7 +110,11 @@ client.on(Events.InteractionCreate, async interaction => {
             return;
         }
 	    try {
+            if(interaction.commandName === 'setsubmissionchannel'){
+                await setDefaultChannel.execute(interaction);
+            } else {
 		    await command.execute(interaction);
+            }
 	    } catch (error) {
 		    console.error(error);
 		    if (interaction.replied || interaction.deferred) {
