@@ -1,47 +1,26 @@
 const {SlashCommandBuilder} = require('discord.js');
 const {pool} = require('../utils/dbconn.js');
 
-module.exports= {
+module.exports = {
     data: new SlashCommandBuilder()
         .setName('setsubmissionchannel')
-        .setDescription('Set the default submission channel')
-        .addChannelOption(option =>
+        .setDescription('Set the submission channel for the guild.')
+        .addStringOption(option => 
             option.setName('channel')
-            .setDescription('The channel for submissions')
-            .setRequired(true)
-            ),
+                .setDescription('The ID of the submission channel')
+                .setRequired(true)),
 
     async execute(interaction) {
-        if (!interaction.member.permissions.has('mod all')) {
-            return await interaction.reply({content: 'You do not have permission to use this command.', ephemeral: true});
-        }
-
-        const channel = interaction.options.getChannel('channel');
-
-        const channelId = channel.id;
-        if (!/^\d{17,19}$/.test(channelId)){
-            console.error("Invalid channel ID format");
-            return await interaction.reply({content: 'Invalid channel ID format.', ephemeral: true});
-        }
-
-        const guildChannel = interaction.guild.channels.cache.get(channelId);
-        if(!guildChannel){
-            console.error("Channel does not exist in the guild");
-            return await interaction.reply({content: 'Channel does not exist in the guild.', ephemeral: true});
-        }
-
-        const query = 'INSERT settings SET submission_channel_id = ? WHERE guild_id = ?';
-
-        console.log('Executing SQL Query:', query);
+        const channelId = interaction.options.getString('channel');
+        const guildId = interaction.guild.id;
 
         try{
-            await pool.execute(query, [channel.id, interaction.guild.id]); 
-            console.log('Data Inserted Successfully');
-            await interaction.reply({content: `Submission channel set to ${channel.name}`, ephemeral: true});
+            const queryText = 'INSERT INTO settings (submission_channel_id, guild_id) VALUES (?, ?) ON DUPLICATE KEY UPDATE submission_channel_id = VALUES(submission_channel_id)';
+            await pool.execute(queryText, [guildId, channelId]);
+            await interaction.reply(`Submission channel set to ${channelId} for this guild.`);
         } catch (error) {
-            console.error('Error Inserting Data:', error);
-            await interaction.reply({content: 'An error occurred while setting the submission channel,', ephemeral: true});
+            console.error('Error in setChannel command:', error);
+            await interaction.reply('Failed to set the submission channel.');
         }
-        
     }
 };
