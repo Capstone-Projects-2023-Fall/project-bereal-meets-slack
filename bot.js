@@ -212,11 +212,13 @@ async function postPrompt(callingUser) {
             return;
         }
     }
+
     if (!userToPrompt || !messageContent) {
         console.error("Error: User or message content is not defined.");
         return;
     }
     
+    prompt.setUserId(userToPrompt.id);
     //for promptTimeout
     const channelId = process.env.DISCORD_SUBMISSION_CHANNEL_ID;
     const sentMessage = await client.sendMessageWithTimer(channelId, messageContent);
