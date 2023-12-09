@@ -152,7 +152,13 @@ client.on('ready', async () => {
     cron.schedule('59 23 * * *', async () => { //scheduled to run every day at 11:59 PM
         try {
             console.log('Running daily saveDB task');
-            await saveDB(client); //this is hard coded for the submissions channel
+
+            const channelIds = await getChannelIdsToProcess();
+
+            for(const channelId of channelIds){
+            await saveDB(client, channelId);
+            }
+            
             console.log('Daily saveDB task completed');
         } catch (error) {
             console.error('Error running daily saveDB task:', error);
