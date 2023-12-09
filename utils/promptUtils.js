@@ -37,10 +37,21 @@ async function deletePrompt(guildId, promptToDelete) {
 
 }
 
-async function listPrompts(guildId) {
-  const prompts = await getPrompts(guildId);
-  return `Current Prompts: \n${prompts.join('\n')}`;
+async function listPrompts(guildId, client){
+  const[rows] = await pool.query("SELECT prompt_text, channel_id FROM bot.prompts WHERE guild_id = ?", [guildId]);
+
+  let response = 'Current Prompts:\n';
+  for (const row of rows){
+    const channelName = row.channel_id ? client.channels.cache.get(row.channel.id)?.name : 'No channel';
+    response += `Prompt: ${row.prompt_text} - Channel: ${channelName}\n`;
+  }
+  return response;
 }
+
+// async function listPrompts(guildId) {
+//   const prompts = await getPrompts(guildId);
+//   return `Current Prompts: \n${prompts.join('\n')}`;
+// }
 
 async function searchPrompts(guildId, query) {
   const prompts = await getPrompts(guildId);
