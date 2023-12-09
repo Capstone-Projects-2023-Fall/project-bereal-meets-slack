@@ -53,19 +53,6 @@ async function listPrompts(guildId, client){
   return response;
 }
 
-async function searchPrompts(guildId, query) {
-  const prompts = await getPrompts(guildId);
-  console.log(prompts);
-  const partialMatches = prompts.filter(prompt => prompt.includes(query));
-
-  console.log(partialMatches);
-
-  return partialMatches.length === 0
-    ? `No prompts found that match "${query}"\nall prompts: ${prompts.join('\n')}`
-    : `Search results for "${query}":\n${partialMatches.join('\n')}`;
-}
-
-
 async function getRandomPrompt(guildId){
   const query = "SELECT prompt_text, channel_id FROM prompts WHERE guild_id = ? ORDER BY RAND() LIMIT 1";
   const [rows] = await pool.query(query, [guildId]);
@@ -85,6 +72,5 @@ module.exports = {
     getRandomPrompt,
     addPrompt,
     deletePrompt,
-    listPrompts,
-    searchPrompts
+    listPrompts
 };

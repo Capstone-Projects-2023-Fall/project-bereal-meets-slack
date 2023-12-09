@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require('discord.js');
-const {addPrompt, listPrompts, searchPrompts, deletePrompt, getPrompts} = require('../utils/promptUtils.js')
+const {addPrompt, listPrompts, deletePrompt, getPrompts} = require('../utils/promptUtils.js')
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -37,17 +37,6 @@ module.exports = {
       subcommand
         .setName('list')
         .setDescription('List all prompts.')
-    )
-    .addSubcommand(subcommand =>
-      subcommand
-        .setName('search')
-        .setDescription('Search for prompts in the list.')
-        .addStringOption(option =>
-          option
-            .setName('search-term')
-            .setDescription('Search prompt list:')
-            .setRequired(true),
-        )
     ),
     
   async autocomplete(interaction) {
@@ -80,9 +69,6 @@ module.exports = {
       reply = await deletePrompt(guildId, promptText);
   } else if (subcommand === 'list') {
       reply = await listPrompts(guildId, interaction.client);
-  } else if (subcommand === 'search') {
-      const searchPrompts = interaction.options.getString('search-term');
-      reply = await searchPrompts(guildId, searchPrompts);
   }
 
       await interaction.followUp(reply);
