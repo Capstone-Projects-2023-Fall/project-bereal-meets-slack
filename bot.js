@@ -216,6 +216,8 @@ async function postPrompt(callingUser) {
         return;
     }
 
+    prompt.setChannel(submissionChannel);
+
     let messageContent;
     let userToPrompt;
 

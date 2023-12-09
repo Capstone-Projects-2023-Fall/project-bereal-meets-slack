@@ -1,7 +1,7 @@
 class Prompt {
     prompt = '';
     userId = '';
-    channelId = '';
+    channel = '';
 
     isUserIdMatch(userId) {
         return this.userId === userId;
@@ -15,8 +15,8 @@ class Prompt {
         this.userId = userId;
     }
     
-    setChannelId(channelId){
-        this.channelId = channelId;
+    setChannel(channel){
+        this.channel = channel;
     }
 
     getPrompt() {
@@ -27,8 +27,8 @@ class Prompt {
         return this.userId;
     }
 
-    getChannelId(){
-        return this.channelId;
+    getChannel(){
+        return this.channel;
     }
 
 }
