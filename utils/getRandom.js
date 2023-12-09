@@ -18,10 +18,11 @@ async function getRandomUser(guild) {
         const blacklistedUsers = [];
 
         guild.members.cache.forEach(member => {
-            if (blacklistArray.includes(member.user.id)) {
-                blacklistedUsers.push(member.user.id);
-            } else if (member.user.bot) {
+            if (member.user.bot) {
                 botUsers.push(member.user.id);
+            } 
+            else if (blacklistArray.includes(member.user.id)) {
+                blacklistedUsers.push(member.user.id);
             } else {
                 nonBotUsers.push(member.user.id);
             }
