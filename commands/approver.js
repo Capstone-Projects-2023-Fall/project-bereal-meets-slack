@@ -20,5 +20,5 @@ module.exports = {
 		const attachment = interaction.options.getAttachment('file');
 		const caption = interaction.options.getString('caption');
 		await handleUserSubmission(attachment, caption, interaction);	
-
+	}
 }
