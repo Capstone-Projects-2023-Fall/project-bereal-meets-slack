@@ -84,16 +84,6 @@ module.exports = {
       const searchPrompts = interaction.options.getString('search-term');
       reply = await searchPrompts(guildId, searchPrompts);
   }
-
-    // reply = subcommand === 'add'
-    //   ? await addPrompt(guildId, interaction.options.getString('prompt'))
-    //   : subcommand === 'delete'
-    //   ? await deletePrompt(guildId, interaction.options.getString('prompt'))
-    //   : subcommand === 'list'
-    //   ? await listPrompts(guildId)
-    //   : subcommand === 'search'
-    //   ? await searchPrompts(guildId, interaction.options.getString('search-term'))
-    //   : '';
   
       await interaction.followUp(reply);
   },
