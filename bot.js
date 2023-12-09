@@ -227,6 +227,7 @@ async function postPrompt(callingUser) {
     }
     
     //for promptTimeout
+    const message = await submissionChannel.send(messageContent);
     const channelId = process.env.DISCORD_SUBMISSION_CHANNEL_ID;
     const sentMessage = await client.sendMessageWithTimer(channelId, messageContent);
     promptTimeout.setupPrompt(channelId, sentMessage, userToPrompt, randomPrompt, channelId);
