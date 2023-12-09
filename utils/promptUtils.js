@@ -66,7 +66,7 @@ async function searchPrompts(guildId, query) {
 }
 
 async function getRandomPrompt(){
-  const query = "SELECT prompt_text, channel_id FROM bot.prompts WHERE guild_id = ? ORDER BY RAND() LIMIT 1";
+  const query = "SELECT prompt_text, channel_id FROM prompts ORDER BY RAND() LIMIT 1";
   const [rows] = await pool.query(query);
 
   if (rows.length > 0) {
