@@ -306,15 +306,20 @@ client.on('guildCreate', async guild => {
     await setDefaultChannel(guild.systemChannel.id, guild.id);
 
     const welcomeMessage = helpUtils.getHelpMessage();
-    guild.systemChannel.send(welcomeMessage);
-    guild.roles.create({
-        data: {name: 'bot mod', color:'RANDOM'},
-        reason: 'moderator role for BerealBot' 
+    await guild.systemChannel.send(welcomeMessage);
+    const modrole = await guild.roles.create({
+        name:'bot mod', 
+        color:'Random',
+        reason:'moderator role for BerealBot' 
     });
-    guild.roles.create({
-        data: {name: 'Bot User', color:'RANDOM'},
-        reason: 'Notification user role for BerealBot' 
+    const userrole = await guild.roles.create({
+        name:'Bot User', 
+        color:'Random',
+        reason:'Notification user role for BerealBot' 
     });
+
+    console.log(userrole.name);
+    console.log(modrole.name);
     
 });
 
