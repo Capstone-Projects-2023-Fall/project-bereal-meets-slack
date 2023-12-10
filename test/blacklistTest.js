@@ -59,4 +59,24 @@ describe('Blacklist Functions', () =>{
         });//end of it
     });//end of describe blackListDeleteUser
 
+    describe('blacklistListUsers', () =>{
+        it('shoild return a list of users on the blacklist', async () =>{
+            mockQuery.mockRejectedValueOnce({rows: [{user_id: '456'},{user_id: '789'}]});
+
+            const result = await blacklistListUsers('guildId');
+
+            expect(result).toEqual(['<@456>', '<@789>']);
+            expect(mockQuery).toHaveBeenCalledTimes(1);
+        });//end of it
+
+        it('should return an empty list if no users are on the blacklist', async () =>{
+            mockQuery.mockRejectedValueOnce({rows: []});
+
+            const result = await blacklistListUsers('guildId');
+
+            expect(result).toEqual([]);
+            expect(mockQuery).toHaveBeenCalledTimes(1);
+        });//end of it
+    });//end of blacklistListUsers
+
 });//end of beforeEach
