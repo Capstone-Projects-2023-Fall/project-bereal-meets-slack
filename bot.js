@@ -67,6 +67,7 @@ const client = new Client({
 ],
 }); //create new client
 
+client.toggles = new Collection();
 client.commands = new Collection(); // set up commands list
 const promptTimeout = new PromptTimeout(client);
 
