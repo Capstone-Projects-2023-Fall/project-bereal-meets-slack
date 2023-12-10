@@ -231,7 +231,9 @@ async function postPrompt(guildId, callingUser) {
     if (!client.toggles.has(userID)) {
         client.toggles.set(userID, true);
     }
-    const instruction = client.toggles.get(userID) ? 'Use /submit to submit your post!' : 'Attach an image and type a caption!';
+    const instruction = client.toggles.get(userID) ? 'Use /submit to submit your post!' : 
+    `You opted for private prompting!, use /submit in guild ${submissionChannel.guild.name} channel ${submissionChannel} to post!`;
+    
     messageContent = `${userToPrompt} ${instruction}\n**Prompt:**\n${promptText}`;
 
     if (!userToPrompt || !messageContent) {
@@ -251,7 +253,6 @@ async function postPrompt(guildId, callingUser) {
         sentMessage = await userToPrompt.send(messageContent); 
         sentChannel = sentMessage.channel.id;
     }
-
     // Send the message in the specified channel
     prompt.setUserId(userToPrompt.id);
     promptTimeout.setupPrompt(sentChannel, sentMessage, userToPrompt, promptText);
