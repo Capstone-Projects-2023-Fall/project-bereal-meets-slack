@@ -15,6 +15,7 @@ const PromptTimeout = require('./utils/promptTimeout');
 const activeEvents = require('./utils/activeEvents')
 const { setDefaultChannel } = require('./utils/setDefaultChannelUtils.js');
 const helpUtils = require('./utils/helpUtils.js');
+const { use } = require('chai');
 
 
 
@@ -317,10 +318,26 @@ client.on('guildCreate', async guild => {
         color:'Random',
         reason:'Notification user role for BerealBot' 
     });
-
-    console.log(userrole.name);
-    console.log(modrole.name);
     
+    await guild.members.fetch();
+    const guildMembers = guild.members.cache.values(); 
+    for(member of guildMembers){
+        await member.roles.add(userrole);
+    }
+
+});
+
+
+client.on('guildMemberAdd', async member => {
+
+    await member.guild.roles.fetch();
+    const role = await member.guild.roles.cache.find(role => role.name === 'Bot User');
+    try{
+        await member.roles.add(role);
+    }
+    catch(error){
+        console.error("Bot role is below specified user role");
+    }
 });
 
 // Make sure this line is the last line
