@@ -232,7 +232,7 @@ async function postPrompt(guildId, callingUser) {
         client.toggles.set(userID, true);
     }
     const instruction = client.toggles.get(userID) ? 'Use /submit to submit your post!' : 'Attach an image and type a caption!';
-    messageContent = `${messageUser} ${instruction}\n**Prompt:**\n${promptText}`;
+    messageContent = `${userToPrompt} ${instruction}\n**Prompt:**\n${promptText}`;
 
     if (!userToPrompt || !messageContent) {
         console.error("Error: User or message content is not defined.");
