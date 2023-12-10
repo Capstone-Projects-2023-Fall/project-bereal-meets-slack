@@ -2,6 +2,8 @@ const { expect } = require('chai');
 const sinon = require('sinon');
 const promptCommand = require('../commands/prompt-commands');
 const promptUtils = require('../utils/promptUtils');
+const { pool } = require('../utils/dbconn.js');
+
 
 describe(('prompt command'), () => {
     let interaction;
@@ -24,6 +26,22 @@ describe(('prompt command'), () => {
         sinon.restore();
     });
 
+    
+    it('should return an array of prompt texts when getPrompts is called', async () => {
+        //Mock pool.query to return specific set of rows
+        const mockRows = [{ prompt_text: 'Prompt1' }, { prompt_text: 'Prompt2' }];
+        const queryStub = sinon.stub(pool, 'query').resolves([mockRows]);
+    
+        const result = await promptUtils.getPrompts('guild123');
+
+        // check that pool.query was called with the correct SQL query and parameters
+        expect(queryStub.calledOnceWithExactly("SELECT prompt_text FROM bot.prompts WHERE guild_id = ?", ['guild123'])).to.be.true;
+        expect(result).to.deep.equal(['Prompt1', 'Prompt2']);
+    
+        queryStub.restore();
+    });
+    
+    
     it('should call the listPrompt util upon /prompt list execution', async () => {
         const listPromptsStub = sinon.stub(promptUtils, 'listPrompts');
         interaction.options.getSubcommand.returns('list');
@@ -35,7 +53,7 @@ describe(('prompt command'), () => {
         listPromptsStub.restore(); 
     });
 
-    it('should list all the prompts', async () => {
+    it('should list all the prompts for the user', async () => {
         interaction.options.getSubcommand.returns('list');
 
         const listPromptsStub = sinon.stub(promptUtils, 'listPrompts').resolves('Current Prompts: \nPrompt1\nPrompt2\nPrompt3');
@@ -93,32 +111,24 @@ describe(('prompt command'), () => {
     
     
 
-    it('should call the addPrompt util upon /prompt add execution', async () => {
-        const addPromptStub = sinon.stub(promptUtils, 'addPrompt');
-        interaction.options.getSubcommand.returns('add');
-        promptUtils.addPrompt.resolves('Adding a test prompt');
-        
-        await promptCommand.execute(interaction);
+    it('should add the user inputted prompt to the list', async () => {
+        const queryStub = sinon.stub(pool, 'query').resolves();
 
-        expect(interaction.deferReply.called).to.be.true;
-        expect(promptUtils.addPrompt.called).to.be.true;
-        addPromptStub.restore(); 
+        await promptUtils.addPrompt('guild123', 'New Prompt');
+
+        // check that pool.query was called with the correct SQL query and parameters
+        expect(queryStub.calledOnceWithExactly("INSERT INTO bot.prompts (guild_id, prompt_text) VALUES (?, ?)", ['guild123', 'New Prompt'])).to.be.true;
     });
 
-    it('should add a prompt to the list from user input', async () => {
-        interaction.options.getSubcommand.returns('add');
-        interaction.options.getString.returns('New Prompt');
-
-        const addPromptStub = sinon.stub(promptUtils, 'addPrompt').resolves('Prompt "New Prompt" has been added to the list.');
-
-        await promptCommand.execute(interaction);
-
-        expect(interaction.deferReply.calledOnce).to.be.true;
-        expect(addPromptStub.calledOnceWithExactly('guild123', 'New Prompt')).to.be.true;
-        expect(interaction.followUp.calledOnceWithExactly('Prompt "New Prompt" has been added to the list.')).to.be.true;
-
-        addPromptStub.restore();
+    it('should return the success message when adding a prompt', async () => {
+        sinon.stub(pool, 'query').resolves();
+        const result = await promptUtils.addPrompt('guild123', 'New Prompt');
+        expect(result).to.equal('Prompt "New Prompt" has been added to the list.');
     });
+
+    
+    
+
 
     it('should call the deletePrompt util upon /prompt delete executio', async () => {
         const deletePromptStub = sinon.stub(promptUtils, 'deletePrompt');
@@ -191,6 +201,34 @@ describe(('prompt command'), () => {
     
         deletePromptStub.restore();
     });
+
+    it('should return a random prompt when prompts are available', async () => {
+        //Mock pool.query to return specific set of rows
+        const mockRows = [{ prompt_text: 'Prompt1' }, { prompt_text: 'Prompt2' }];
+        const queryStub = sinon.stub(pool, 'query').resolves([[mockRows]]);
+
+        const result = await promptUtils.getRandomPrompt('guild123');
+
+        // Ensure that the result returned by getRandomPrompt matches the mocked row
+        expect(result).to.equal(mockRows.prompt_text);
+        // Ensure that pool.query was called with the correct SQL query and parameters
+        expect(queryStub.calledOnceWithExactly("SELECT prompt_text FROM bot.prompts WHERE guild_id = ? ORDER BY RAND() LIMIT 1", ['guild123'])).to.be.true;
+    });
+
+    it('should return null when no prompts are available', async () => {
+        //Mock pool.query to return empty result row
+        const queryStub = sinon.stub(pool, 'query').resolves([[]]);
+
+        const result = await promptUtils.getRandomPrompt('guild123');
+
+        // Ensure that the result returned by getRandomPrompt is null when no prompts are available
+        expect(result).to.be.null;
+        // Ensure that pool.query was called with the correct SQL query and parameters
+        expect(queryStub.calledOnceWithExactly("SELECT prompt_text FROM bot.prompts WHERE guild_id = ? ORDER BY RAND() LIMIT 1", ['guild123'])).to.be.true;
+    
+    
+    });
+    
     
 
 });
