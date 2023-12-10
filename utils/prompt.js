@@ -32,6 +32,5 @@ class Prompt {
     }
 
 }
-const prompt = new Prompt();
 
-module.exports = { prompt };
+module.exports = { Prompt };

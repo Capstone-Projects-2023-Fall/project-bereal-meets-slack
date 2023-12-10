@@ -1,12 +1,12 @@
 const { blacklistAddUser } = require('../utils/blacklistutils.js');
-const { AttachmentBuilder, ComponentType, EmbedBuilder } = require('discord.js');
+const { ComponentType, EmbedBuilder } = require('discord.js');
 const { notifyMods } = require('./notifyMods.js');
-const { prompt } = require('./prompt.js');
 
 let deniedUsers = new Map(); //keep track of user denial counts
 
 async function handleUserSubmission(attachment, caption, interaction) {
     const {client, guild, user: submitter} = interaction;
+    var prompt =  client.activePrompts.get(guild.id);
 
     const botUserRole = guild.roles.cache.find(role => role.name === 'Bot User'); //Bot User, bot mod, mod all
     const promptContent = prompt.getPrompt();
@@ -76,7 +76,7 @@ async function handleUserSubmission(attachment, caption, interaction) {
                     await prompt.getChannel().send({content:`\nAlert ${botUserRole}`, embeds: [embed] });
                     await interaction.deleteReply(); //remove clutter
                     prompt.setUserId(client.user.id); //prompt has been responded to, default the value to prevent extraneous post spam.
-
+                    client.activePrompts.set(guild.id, prompt);
                 }
                 // check if someone press deny
                 else if (i.customId === 'deny') {
@@ -119,6 +119,7 @@ async function handleUserSubmission(attachment, caption, interaction) {
 
                         if (denialCount >= 3) {
                             prompt.setUserId(client.user.id); //prompt has been exhausted, default the value to prevent extraneous post spam.
+                            client.activePrompts.set(guild.id, prompt);
                             //add user to blacklist
                             await blacklistAddUser(guild.id, submitter.id);
 
