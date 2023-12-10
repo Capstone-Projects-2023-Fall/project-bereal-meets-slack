@@ -202,4 +202,27 @@ async function insertResponseData(messageData) {
     }
 }
 
+async function fetchAllTextChannelIds(client) {
+    if (!client.isReady()) {
+        console.error('Client is not ready');
+        return [];
+    }
+
+    const channelIds = [];
+
+    // Iterate over all guilds the client is a part of
+    client.guilds.cache.forEach(guild => {
+        // Iterate over all channels in the guild
+        guild.channels.cache.forEach(channel => {
+            // Check if the channel is a text channel
+            if (channel.type === ChannelType.GuildText) {
+                // Add the channel ID to the list
+                channelIds.push(channel.id);
+            }
+        });
+    });
+
+    return channelIds;
+}
+
 module.exports = saveDB;
