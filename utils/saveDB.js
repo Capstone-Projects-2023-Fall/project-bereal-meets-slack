@@ -5,21 +5,21 @@ const {pool} = require('./dbconn.js');
 async function fetchImageMessagesUntilPrompt(client, channelId) {
     if (!client.isReady()) {
         console.error('Client is not ready');
-        return { imageMessagesList: [], promptText: null, promptUserId: null };
+        return { imageMessagesList: [], promptText: null, promptUserId: null, guild_id: null };
     }
     const channel = client.channels.cache.get(channelId);
     if (!channel || channel.type !== ChannelType.GuildText) {
         console.error('The channel was not found or it is not a text channel.');
-        return [];
+        return { imageMessagesList: [], promptText: null, promptUserId: null, guild_id: null };
     }
     let lastId;
     const imageMessagesList = [];
-    let foundPrompt = false;
     let promptText = null;
     let promptUserId = null;
-    let guild_id = null;
-    while (!foundPrompt) {
-        const options = { limit: 100 };
+    let guild_id = channel.guild.id;
+
+    const options = { limit: 100 };
+    while (true) {
         if (lastId) {
             options.before = lastId;
         }
@@ -29,37 +29,49 @@ async function fetchImageMessagesUntilPrompt(client, channelId) {
                 break; // No more messages left to fetch
             }
             for (const message of messages.values()) {
-                if (message.content.includes("Prompt")) {
-                    foundPrompt = true;
-                    promptText = extractPromptTextFromEmbed(message.content);
-                    promptUserId = message.author.id;
-                    guild_id = message.guild.id;
-                    break; // Stop if we find the "Prompt"
+                lastId = message.id; // Update the last ID for the next fetch
+
+                // Check if the message is from the bot
+                if (message.author.id === client.user.id) {
+                    // If the message does not have an embed with an image and contains "Prompt", stop scanning
+                    if (!message.embeds.some(embed => embed.image) && message.content.includes("Prompt")) {
+                        console.log("prompt message found sending list to saveDB()")
+                        //promptText = message.content;
+                        //promptUserId = message.author.id;
+                        return {imageMessagesList, guild_id}; //dont return the prompttext from here for right now we can get that from the message now from the embed
+                    }
+                    // If the message has an embed with an image, add it to the list
+                    if (message.embeds.some(embed => embed.image)) {
+                        console.log("message with image found, adding it to the list")
+                        imageMessagesList.push(message);
+                    }
                 }
-                // Check if the message has attachments and if any of them are images
-                const hasImage = message.attachments.some(attachment => attachment.contentType?.startsWith('image/'));
-                if (hasImage) {
-                    imageMessagesList.push(message); // Add the message to our list if it contains an image
-                }
-                lastId = message.id; // Set the last ID for the next fetch
             }
         } catch (error) {
             console.error('Error fetching messages: ', error);
             break; // Exit the loop in case of API error
         }
     }
+
+    // If the loop exits without finding a message with "Prompt" that has no embedded image
     return {imageMessagesList, promptText, promptUserId, guild_id};
 }
+
 //to clean prompt text to only provide the main prompt when adding to database
 function extractPromptTextFromEmbed(embed) {
     let promptText = null;
-    if (embed.title && embed.title.includes("Prompt:")) {
-        promptText = embed.title.split("Prompt:")[1].trim();
-    } else if (embed.description && embed.description.includes("Prompt:")) {
-        promptText = embed.description.split("Prompt:")[1].trim();
+
+    // Check if the embed and its fields are defined
+    if (embed && embed.fields) {
+        const promptField = embed.fields.find(field => field.name === 'Prompt:');
+        if (promptField) {
+            promptText = promptField.value;
+        }
     }
+
     return promptText;
 }
+
 
 function countReactions(message) {
     // Check if the message has reactions
@@ -110,14 +122,22 @@ async function findTimeDifferenceToPrompt(client, channelId, referenceMessage) {
 
 async function saveDB(client, channelId) {
     try {
-        const {imageMessagesList, promptText, promptUserId, guild_id} = await fetchImageMessagesUntilPrompt(client, channelId);
+
+        const {imageMessagesList, guild_id} = await fetchImageMessagesUntilPrompt(client, channelId);
+        console.log("This is the data")
+        console.log(imageMessagesList, guild_id); //what are we not getting from the data?
         const messagesData = [];
 
         for (const message of imageMessagesList) {
             const numOfReactions = countReactions(message);
-            const imageLink = getImageLinkFromEmbed(message);
+            // Assuming the relevant data is in the first embed of the message
+            const embed = message.embeds[0];
+            if (!embed) continue;  // Skip if there's no embed in the message
+            const imageLink = getImageLinkFromEmbed(embed);
             const timeToPost = await findTimeDifferenceToPrompt(client, channelId, message);
             const message_id = message.id;
+            const promptText = extractPromptTextFromEmbed(embed);
+            const promptUserId = extractPromptUserIdFromEmbed(embed);
             const messageData = {
                 message_id: message_id,
                 num_reactions: numOfReactions,
@@ -127,6 +147,8 @@ async function saveDB(client, channelId) {
                 user_id: promptUserId,
                 guild_id: guild_id
             };
+            console.log("saving the message data")
+            console.log(messageData);
             messagesData.push(messageData);
         }
         // Insert each messageData into the database
@@ -219,6 +241,23 @@ async function processAllChannels(client) {
         console.error('Error processing channels:', error);
     }
 }
+
+function extractPromptUserIdFromEmbed(embed) {
+    let promptUserId = null;
+    
+    // Check if the embed has a description
+    if (embed.description) {
+        // Regular expression to match the user mention format <@userId>
+        const userIdMatch = embed.description.match(/<@(\d+)>/);
+        if (userIdMatch && userIdMatch.length > 1) {
+            // Extract the user ID
+            promptUserId = userIdMatch[1];
+        }
+    }
+    console.log(promptUserId)
+    return promptUserId;
+}
+
 
 //TODO: Make chages to all methods to read from embeds to get the data it needs, then make it so it will scan for all channels in the discord, then fix exportCSV
 
