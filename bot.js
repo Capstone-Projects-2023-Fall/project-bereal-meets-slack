@@ -10,7 +10,7 @@ const promptUtils = require('./utils/promptUtils');
 const outputUsers = require('./utils/getRandom');
 const activeHoursUtils = require('./utils/activeHoursUtils');
 const saveDB = require('./utils/saveDB');
-const { prompt } = require('./utils/prompt.js');
+const { Prompt } = require('./utils/prompt.js');
 const PromptTimeout = require('./utils/promptTimeout');
 const activeEvents = require('./utils/activeEvents')
 const { setDefaultChannel } = require('./utils/setDefaultChannelUtils.js');
@@ -133,12 +133,15 @@ client.on(Events.InteractionCreate, async interaction => {
     }
 });
 
+client.activePrompts = new Map();
 
 client.on('ready', async () => {
     console.log(`Logged in as ${client.user.tag}!`);
     registrar.registercommands();
 
     client.guilds.cache.forEach(async (guild) => {
+        //create prompt map
+        client.activePrompts.set(guild.id, new Prompt());
         //setup cron
         cron.schedule('0 0 8 * * *', async () => {
         //try to schedule post 
@@ -196,6 +199,7 @@ async function schedulePost(activeHoursData, guildId){
 }
 
 async function postPrompt(guildId, callingUser) {
+    var prompt = client.activePrompts.get(guildId);
     const promptData = await promptUtils.getRandomPrompt(guildId);
     
     if (!promptData) {
@@ -258,6 +262,9 @@ async function postPrompt(guildId, callingUser) {
     }
     // Send the message in the specified channel
     prompt.setUserId(userToPrompt.id);
+
+    client.activePrompts.set(guildId, prompt);
+
     promptTimeout.setupPrompt(sentChannel, sentMessage, userToPrompt, promptText);
 
 }
