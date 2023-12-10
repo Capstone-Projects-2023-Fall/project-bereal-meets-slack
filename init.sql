@@ -7,7 +7,8 @@ FLUSH PRIVILEGES;
 CREATE TABLE IF NOT EXISTS prompts(
 prompt_id INT PRIMARY KEY AUTO_INCREMENT NOT NULL UNIQUE,
 prompt_text VARCHAR(400) NOT NULL,
-guild_id VARCHAR(45) NOT NULL
+guild_id VARCHAR(45) NOT NULL,
+channel_id VARCHAR(45)
 );
 
 CREATE TABLE IF NOT EXISTS blacklist(
@@ -31,4 +32,9 @@ time_to_respond INT,
 message_id VARCHAR(255),
 user_id VARCHAR(45),
 prompt_text VARCHAR(400)
+);
+
+CREATE TABLE IF NOT EXISTS settings(
+  submission_channel_id VARCHAR(45),
+  guild_id VARCHAR(45) PRIMARY KEY NOT NULL
 );
