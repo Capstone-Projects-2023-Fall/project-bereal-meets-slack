@@ -10,9 +10,10 @@ module.exports = {
                 .setRequired(true)),
 
     async execute(interaction) {
-        if (!interaction.member.permissions.has('bot mod')){
-            return await interaction.reply({ content: 'You do not have permission to use this command.', ephemeral: true});
-        }
+        const modRole = interaction.guild.roles.cache.find(role => role.name === 'bot mod');
+            
+        if (!(interaction.member.roles.cache.has(modRole.id))) return await interaction.reply({ content: 'Only **moderators** can use this command', ephemeral: true});
+
 
         const channel = interaction.options.getChannel('channel');
         const channelId = channel.id;

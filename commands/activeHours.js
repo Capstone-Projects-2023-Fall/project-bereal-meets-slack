@@ -27,6 +27,10 @@ module.exports = {
 
       
           async execute(interaction) {
+            const modRole = interaction.guild.roles.cache.find(role => role.name === 'bot mod');
+            
+            if (!(interaction.member.roles.cache.has(modRole.id))) return await interaction.reply({ content: 'Only **moderators** can use this command', ephemeral: true});
+
             const subcommand = interaction.options.getSubcommand();
             const guildId = interaction.guild.id;
     
