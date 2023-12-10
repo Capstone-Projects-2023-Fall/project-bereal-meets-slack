@@ -67,6 +67,7 @@ const client = new Client({
 ],
 }); //create new client
 
+client.toggles = new Collection();
 client.commands = new Collection(); // set up commands list
 const promptTimeout = new PromptTimeout(client);
 
@@ -216,29 +217,45 @@ async function postPrompt(guildId, callingUser) {
 
     if (callingUser) {
         userToPrompt = await client.users.fetch(callingUser.id);
-        messageContent = `${callingUser.toString()} Use /submit to submit your post!\n**Prompt:**\n${promptText}`;
     } else {
         const userRand = await outputUsers(submissionChannel.guild);
-
         try {
             userToPrompt = await client.users.fetch(userRand);
-            messageContent = `<@${userRand}> Use /submit to submit your post!\n**Prompt:**\n${promptText}`;
         } catch (error) {
             console.error("Error fetching random user:", error);
             return;
         }
     }
 
+    const userID = userToPrompt.id;
+    if (!client.toggles.has(userID)) {
+        client.toggles.set(userID, true);
+    }
+    const instruction = client.toggles.get(userID) ? 'Use /submit to submit your post!' : 
+    `You opted for private prompting!, use /submit in ${submissionChannel} (Click that link!) to post!`;
+
+    messageContent = `${userToPrompt} ${instruction}\n**Prompt:**\n${promptText}`;
+
     if (!userToPrompt || !messageContent) {
         console.error("Error: User or message content is not defined.");
         return;
     }
 
+    let sentMessage;
+    let sentChannel;
 
+    if (client.toggles.get(userID)) {
+        // public
+        sentMessage = await client.sendMessageWithTimer(submissionChannel.id, messageContent);
+        setchannel = submissionChannel.id;
+    } else {
+        // private
+        sentMessage = await userToPrompt.send(messageContent); 
+        sentChannel = sentMessage.channel.id;
+    }
     // Send the message in the specified channel
     prompt.setUserId(userToPrompt.id);
-    const sentMessage = await submissionChannel.send(messageContent);
-    promptTimeout.setupPrompt(channelId, sentMessage, userToPrompt, promptText, channelId);
+    promptTimeout.setupPrompt(sentChannel, sentMessage, userToPrompt, promptText);
 
 }
 
