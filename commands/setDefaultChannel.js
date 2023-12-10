@@ -1,6 +1,5 @@
 const {SlashCommandBuilder} = require('discord.js');
-const {pool} = require('../utils/dbconn.js');
-
+const {setDefaultChannel} = require('../utils/setDefaultChannelUtils.js');
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('setsubmissionchannel')
@@ -19,12 +18,12 @@ module.exports = {
         const channelId = channel.id;
         const guildId = interaction.guild.id;
 
-        try{
-            const query = 'INSERT INTO settings (submission_channel_id, guild_id) VALUES (?, ?) ON DUPLICATE KEY UPDATE submission_channel_id = VALUES(submission_channel_id)';
-            await pool.execute(query, [channelId, guildId]);
+        const rc = await setDefaultChannel(channelId, guildId);
+
+        if (rc === 0){
             await interaction.reply({ content: `Submission channel set to ${channel} for this guild.`, ephemeral: true});
-        } catch (error) {
-            console.error('Error in setChannel command:', error);
+        } else {
+           
             await interaction.reply({ content: 'Failed to set the submission channel.', ephemeral: true});
         }
     }
