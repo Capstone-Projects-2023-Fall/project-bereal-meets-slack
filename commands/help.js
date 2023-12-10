@@ -9,7 +9,7 @@ module.exports = {
     async execute(interaction){
         let role = 'Bot User';
 
-        if (interaction.member.roles.cache.some(r => r.name === 'bot mod')){
+        if (interaction.member.roles.cache.find(r => r.name === 'bot mod')){
             role = 'bot mod';
         }
 
