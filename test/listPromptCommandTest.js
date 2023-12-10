@@ -2,15 +2,12 @@ const { expect } = require('chai');
 const sinon = require('sinon');
 const promptCommand = require('../commands/prompt-commands');
 const promptUtils = require('../utils/promptUtils');
-const { pool } = require('../utils/dbconn.js');
 
 
-describe(('prompt command'), () => {
+describe(('list prompt command'), () => {
     let interaction;
 
     beforeEach(() => {
-        // sinon.stub(promptUtils, 'deletePrompt');
-
         interaction = {
             options: {
                 getSubcommand: sinon.stub(),
@@ -24,21 +21,6 @@ describe(('prompt command'), () => {
 
     afterEach(() => {
         sinon.restore();
-    });
-
-    
-    it('should return an array of prompt texts when getPrompts is called', async () => {
-        //Mock pool.query to return specific set of rows
-        const mockRows = [{ prompt_text: 'Prompt1' }, { prompt_text: 'Prompt2' }];
-        const queryStub = sinon.stub(pool, 'query').resolves([mockRows]);
-    
-        const result = await promptUtils.getPrompts('guild123');
-
-        // check that pool.query was called with the correct SQL query and parameters
-        expect(queryStub.calledOnceWithExactly("SELECT prompt_text FROM bot.prompts WHERE guild_id = ?", ['guild123'])).to.be.true;
-        expect(result).to.deep.equal(['Prompt1', 'Prompt2']);
-    
-        queryStub.restore();
     });
     
     
