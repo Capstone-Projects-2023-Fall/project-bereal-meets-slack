@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require('discord.js');
-const {addPrompt, listPrompts, searchPrompts, deletePrompt, getPrompts} = require('../utils/promptUtils.js')
+const promptUtils = require('../utils/promptUtils.js');
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -66,15 +66,15 @@ module.exports = {
     let reply = '';
 
     reply = subcommand === 'add'
-      ? await addPrompt(guildId, interaction.options.getString('prompt'))
+      ? await promptUtils.addPrompt(guildId, interaction.options.getString('prompt'))
       : subcommand === 'delete'
-      ? await deletePrompt(guildId, interaction.options.getString('prompt'))
+      ? await promptUtils.deletePrompt(guildId, interaction.options.getString('prompt'))
       : subcommand === 'list'
-      ? await listPrompts(guildId)
+      ? await promptUtils.listPrompts(guildId)
       : subcommand === 'search'
-      ? await searchPrompts(guildId, interaction.options.getString('search-term'))
+      ? await promptUtils.searchPrompts(guildId, interaction.options.getString('search-term'))
       : '';
-  
+      
       await interaction.followUp(reply);
   },
 };
