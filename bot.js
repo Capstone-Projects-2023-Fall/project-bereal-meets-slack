@@ -312,7 +312,7 @@ client.on('guildCreate', async guild => {
     \n Use /graphdata to show a graph of the reaction data on screen.
     \n Users can use /notifications to enable or disable notifications of new posts.
     \n Users can use /toggle_private to receive their message prompt as a DM. 
-    \n Users should use /submit when prompted to upload their images with a caption in the corresponding channel. //fix me 
+    \n Users should use /submit when prompted to upload their images with a caption in the corresponding channel.
     \n
     \n Use /help to review this message again. `) //fix me
 })
