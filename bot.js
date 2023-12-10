@@ -240,21 +240,21 @@ async function postPrompt(guildId, callingUser) {
     }
 
     let sentMessage;
+    let sentChannel;
 
     if (client.toggles.get(userID)) {
         // public
         sentMessage = await sendMessageWithTimer(submissionChannel.id, messageContent);
-        channelId = sentMessage.channel.id;
+        setchannel = submissionChannel.id;
     } else {
         // private
         sentMessage = await userToPrompt.send(messageContent); 
-        channelId = sentMessage.channel.id;
+        sentChannel = sentMessage.channel.id;
     }
 
     // Send the message in the specified channel
     prompt.setUserId(userToPrompt.id);
-
-    promptTimeout.setupPrompt(channelId, sentMessage, userToPrompt, promptText, channelId);
+    promptTimeout.setupPrompt(sentChannel, sentMessage, userToPrompt, promptText);
 
 }
 
