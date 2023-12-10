@@ -216,35 +216,43 @@ async function postPrompt(guildId, callingUser) {
 
     if (callingUser) {
         userToPrompt = await client.users.fetch(callingUser.id);
-        messageContent = `${callingUser.toString()} Use /submit to submit your post!\n**Prompt:**\n${promptText}`;
     } else {
         const userRand = await outputUsers(submissionChannel.guild);
-
         try {
             userToPrompt = await client.users.fetch(userRand);
-            messageContent = `<@${userRand}> Use /submit to submit your post!\n**Prompt:**\n${promptText}`;
         } catch (error) {
             console.error("Error fetching random user:", error);
             return;
         }
     }
 
-
     const userID = userToPrompt.id;
     if (!client.toggles.has(userID)) {
         client.toggles.set(userID, true);
     }
     const instruction = client.toggles.get(userID) ? 'Use /submit to submit your post!' : 'Attach an image and type a caption!';
-    messageContent = `${messageUser} ${instruction}\n**Prompt:**\n${randomPrompt}`;
+    messageContent = `${messageUser} ${instruction}\n**Prompt:**\n${promptText}`;
+
     if (!userToPrompt || !messageContent) {
         console.error("Error: User or message content is not defined.");
         return;
     }
 
+    let sentMessage;
+
+    if (client.toggles.get(userID)) {
+        // public
+        sentMessage = await sendMessageWithTimer(submissionChannel.id, messageContent);
+        channelId = sentMessage.channel.id;
+    } else {
+        // private
+        sentMessage = await userToPrompt.send(messageContent); 
+        channelId = sentMessage.channel.id;
+    }
 
     // Send the message in the specified channel
     prompt.setUserId(userToPrompt.id);
-    const sentMessage = await submissionChannel.send(messageContent);
+
     promptTimeout.setupPrompt(channelId, sentMessage, userToPrompt, promptText, channelId);
 
 }
