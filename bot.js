@@ -14,7 +14,7 @@ const { prompt } = require('./utils/prompt.js');
 const PromptTimeout = require('./utils/promptTimeout');
 const activeEvents = require('./utils/activeEvents')
 const setDefaultChannel = require('./commands/setDefaultChannel.js');
-const helpUtils = require('../utils/helpUtils.js');
+const helpUtils = require('./utils/helpUtils.js');
 
 
 
