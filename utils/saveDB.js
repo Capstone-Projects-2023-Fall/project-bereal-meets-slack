@@ -31,7 +31,7 @@ async function fetchImageMessagesUntilPrompt(client, channelId) {
             for (const message of messages.values()) {
                 if (message.content.includes("Prompt")) {
                     foundPrompt = true;
-                    promptText = extractPromptText(message.content);
+                    promptText = extractPromptTextFromEmbed(message.content);
                     promptUserId = message.author.id;
                     guild_id = message.guild.id;
                     break; // Stop if we find the "Prompt"
@@ -51,12 +51,14 @@ async function fetchImageMessagesUntilPrompt(client, channelId) {
     return {imageMessagesList, promptText, promptUserId, guild_id};
 }
 //to clean prompt text to only provide the main prompt when adding to database
-function extractPromptText(fullMessage) {
-    const promptStartIndex = fullMessage.indexOf("**Prompt:**");
-    if (promptStartIndex !== -1) {
-        return fullMessage.substring(promptStartIndex + "**Prompt:**".length).trim();
+function extractPromptTextFromEmbed(embed) {
+    let promptText = null;
+    if (embed.title && embed.title.includes("Prompt:")) {
+        promptText = embed.title.split("Prompt:")[1].trim();
+    } else if (embed.description && embed.description.includes("Prompt:")) {
+        promptText = embed.description.split("Prompt:")[1].trim();
     }
-    return fullMessage;
+    return promptText;
 }
 
 function countReactions(message) {
@@ -71,57 +73,38 @@ function countReactions(message) {
     }
 }
 
-function getImageLinkFromMessage(message) {
-    // Initialize the image link variable
-    let imageLink = null;
-    // Check for attachments in the message
-    message.attachments.forEach(attachment => {
-        // Check if the attachment is an image based on its content type
-        if (attachment.contentType && attachment.contentType.startsWith('image/')) {
-            // Set the image link
-            imageLink = attachment.url;
-        }
-    });
-    // If no image was found in attachments, check embeds as Discord automatically embeds some image links
-    if (!imageLink) {
-        message.embeds.forEach(embed => {
-            if (embed.type === 'image' && embed.url) {
-                imageLink = embed.url;
-            }
-            // Some embeds might contain an image within them rather than being of type 'image'
-            else if (embed.image && embed.image.url) {
-                imageLink = embed.image.url;
-            }
-        });
+function getImageLinkFromEmbed(embed) {
+    if (embed.image) {
+        return embed.image.url;
     }
-    return imageLink;
+    return null;
 }
 
 async function findTimeDifferenceToPrompt(client, channelId, referenceMessage) {
     if (!client.isReady()) {
-      throw new Error('Client is not ready');
+        throw new Error('Client is not ready');
     }
-    // Fetch the channel object using the provided channelId
     const channel = client.channels.cache.get(channelId);
     if (!channel || channel.type !== ChannelType.GuildText) {
-      throw new Error('The channel was not found or it is not a text channel.');
+        throw new Error('The channel was not found or it is not a text channel.');
     }
     try {
-      // Fetch the last 100 messages in the channel
-      const messages = await channel.messages.fetch({ limit: 100 });
-      // Find the first message that contains the word "Prompt"
-      const promptMessage = messages.find(m => m.content.includes("Prompt"));
-      if (!promptMessage) {
-        console.log('No prompt message found.');
-        return null;
-      }
-      // Calculate the time difference in seconds between the reference message and the prompt message
-      const timeDifferenceSeconds = Math.abs(referenceMessage.createdTimestamp - promptMessage.createdTimestamp) / 1000;
-      console.log(`Time difference: ${timeDifferenceSeconds} seconds.`);
-      return timeDifferenceSeconds;
+        const messages = await channel.messages.fetch({ limit: 100 });
+        let promptMessage = messages.find(m => m.content.includes("Prompt"));
+        // If prompt is not found in message content, check the embeds
+        if (!promptMessage) {
+            promptMessage = messages.find(m => m.embeds.some(embed => extractPromptTextFromEmbed(embed) !== null));
+        }
+        if (!promptMessage) {
+            console.log('No prompt message found.');
+            return null;
+        }
+        const timeDifferenceSeconds = Math.abs(referenceMessage.createdTimestamp - promptMessage.createdTimestamp) / 1000;
+        console.log(`Time difference: ${timeDifferenceSeconds} seconds.`);
+        return timeDifferenceSeconds;
     } catch (error) {
-      console.error('Error fetching messages:', error);
-      throw error;
+        console.error('Error fetching messages:', error);
+        throw error;
     }
 }
 
@@ -132,7 +115,7 @@ async function saveDB(client, channelId) {
 
         for (const message of imageMessagesList) {
             const numOfReactions = countReactions(message);
-            const imageLink = getImageLinkFromMessage(message);
+            const imageLink = getImageLinkFromEmbed(message);
             const timeToPost = await findTimeDifferenceToPrompt(client, channelId, message);
             const message_id = message.id;
             const messageData = {
@@ -237,5 +220,6 @@ async function processAllChannels(client) {
     }
 }
 
+//TODO: Make chages to all methods to read from embeds to get the data it needs, then make it so it will scan for all channels in the discord, then fix exportCSV
 
 module.exports = saveDB;
