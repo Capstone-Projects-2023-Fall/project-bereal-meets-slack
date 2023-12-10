@@ -7,7 +7,7 @@ module.exports = {
 
     async execute(interaction){
         const helpMessage = `
-        Hello! It is the bot.
+        Hello! It is the bot, beep bop boop.
         \n Please make sure to use /setsubmissionchannel to change the default channel of the bot.
         \n Use /prompts add to add new prompts, /prompt delete to delete a prompt, and /prompt list to list all of your prompts. Be sure to assign them to the corresponding channel.
         \n Use /activehours set to setup the random prompting feature.
