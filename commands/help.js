@@ -7,8 +7,13 @@ module.exports = {
         .setDescription('Displays help information.'),
 
     async execute(interaction){
-        const helpMessage = helpUtils.getHelpMessage();
+        let role = 'Bot User';
 
+        if (interaction.member.roles.cache.some(r => r.name === 'bot mod')){
+            role = 'bot mod';
+        }
+
+        const helpMessage = helpUtils.getHelpMessage(role);
         await interaction.reply({content: helpMessage, ephemeral: true});
     }
 };
