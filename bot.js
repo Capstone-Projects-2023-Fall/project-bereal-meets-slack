@@ -13,7 +13,7 @@ const saveDB = require('./utils/saveDB');
 const { prompt } = require('./utils/prompt.js');
 const PromptTimeout = require('./utils/promptTimeout');
 const activeEvents = require('./utils/activeEvents')
-const setDefaultChannel = require('./commands/setDefaultChannel.js');
+const { setDefaultChannel } = require('./utils/setDefaultChannelUtils.js');
 const helpUtils = require('./utils/helpUtils.js');
 
 
@@ -307,6 +307,14 @@ client.on('guildCreate', async guild => {
 
     const welcomeMessage = helpUtils.getHelpMessage();
     guild.systemChannel.send(welcomeMessage);
+    guild.roles.create({
+        data: {name: 'bot mod', color:'RANDOM'},
+        reason: 'moderator role for BerealBot' 
+    });
+    guild.roles.create({
+        data: {name: 'Bot User', color:'RANDOM'},
+        reason: 'Notification user role for BerealBot' 
+    });
     
 });
 
