@@ -11,7 +11,7 @@ module.exports = {
                 .setRequired(true)),
 
     async execute(interaction) {
-        if (!interaction.member.permissions.has('mod all')){
+        if (!interaction.member.permissions.has('bot mod')){
             return await interaction.reply({ content: 'You do not have permission to use this command.', ephemeral: true});
         }
 

@@ -41,8 +41,8 @@ function getRandomHourWithinActiveHours(activeHoursData){
 
     //if current time is before start time, set random time after start time 
     //else, set random time after current time
-    const referenceTime = now.isBefore(startTime) ? startTime : now.add(1, 'minutes');
-
+    const referenceTime = now.isBefore(startTime) ? now.add(1, 'minutes') : startTime;
+    
     const diffMinutes = endTime.diff(referenceTime, 'minutes');
     const randomMinute = Math.floor(Math.random() * diffMinutes);
     const randomTime = referenceTime.add(randomMinute, 'minutes');

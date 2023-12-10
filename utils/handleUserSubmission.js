@@ -5,7 +5,6 @@ const { prompt } = require('./prompt.js');
 
 let deniedUsers = new Map(); //keep track of user denial counts
 
-
 async function handleUserSubmission(attachment, caption, interaction) {
     const {client, guild, user: submitter} = interaction;
 
@@ -72,7 +71,16 @@ async function handleUserSubmission(attachment, caption, interaction) {
                 else if (i.customId === 'deny') {
                     await i.deferUpdate();
                     console.log(`${modName} denied`);
-                    await i.editReply({ content: '**DENIED**', components: [] });
+
+                    for (const [idx2, response] of responses.entries()) {
+                        await response.edit({ content: '**DENIED**', components: [] });
+                    }
+                    for (const collector of collectors) {
+                        if (!collector.ended) {
+                            collector.stop();
+                        }
+                    }
+
                     await interaction.deleteReply(); //remove clutter
                     try {
                         const messageFilter = m => m.author.id === moderator.id
@@ -104,7 +112,6 @@ async function handleUserSubmission(attachment, caption, interaction) {
                             await blacklistAddUser(guild.id, submitter.id);
 
                             await interaction.user.send(`You have reached the strike limit and were added to the blacklist. Please refer to your moderators for recourse.`);
-
                             for (const moderator of moderators.values()) {
                                 try {
                                     await moderator.user.send({ content: `${submitter} was added to the blacklist`});
@@ -131,4 +138,6 @@ async function handleUserSubmission(attachment, caption, interaction) {
     }
 }
 
+
 module.exports = handleUserSubmission;
+
