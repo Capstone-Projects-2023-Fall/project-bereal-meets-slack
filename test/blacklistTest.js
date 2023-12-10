@@ -48,5 +48,15 @@ describe('Blacklist Functions', () =>{
         });
     })//end of describe balcklistAddUser
 
-    
+    describe('blacklistDeleteUser', () => {
+        it('should delete a user from the blacklist', async () =>{
+            mockQuery.mockRejectedValueOnce({affectedRows: 1});
+
+            const result = await blacklistDeleteUser('guildId', 'dbuser');
+
+            expect(result).toBe(0);
+            expect(mockQuery).toHaveBeenCalledTimes(1);
+        });//end of it
+    });//end of describe blackListDeleteUser
+
 });//end of beforeEach
