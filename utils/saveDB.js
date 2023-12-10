@@ -225,4 +225,17 @@ async function fetchAllTextChannelIds(client) {
     return channelIds;
 }
 
+async function processAllChannels(client) {
+    try {
+        const channelIds = await fetchAllTextChannelIds(client);
+        for (const channelId of channelIds) {
+            const data = await fetchImageMessagesUntilPrompt(client, channelId);
+            // Process the data as needed
+        }
+    } catch (error) {
+        console.error('Error processing channels:', error);
+    }
+}
+
+
 module.exports = saveDB;
