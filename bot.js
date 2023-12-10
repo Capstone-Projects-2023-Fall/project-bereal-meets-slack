@@ -13,7 +13,10 @@ const saveDB = require('./utils/saveDB');
 const { prompt } = require('./utils/prompt.js');
 const PromptTimeout = require('./utils/promptTimeout');
 const activeEvents = require('./utils/activeEvents')
-const setDefaultChannel = require('./commands/setDefaultChannel.js');
+const { setDefaultChannel } = require('./utils/setDefaultChannelUtils.js');
+const helpUtils = require('./utils/helpUtils.js');
+const { use } = require('chai');
+
 
 
 //for cloud run, serverless application needs a server to listen.
@@ -298,5 +301,44 @@ client.on('messageCreate', async msg => {
         await triggerImmediatePost(msg.guildId, msg.author);
     }
 });
+
+
+client.on('guildCreate', async guild => {
+    await setDefaultChannel(guild.systemChannel.id, guild.id);
+
+    const welcomeMessage = helpUtils.getHelpMessage();
+    await guild.systemChannel.send(welcomeMessage);
+    const modrole = await guild.roles.create({
+        name:'bot mod', 
+        color:'Random',
+        reason:'moderator role for BerealBot' 
+    });
+    const userrole = await guild.roles.create({
+        name:'Bot User', 
+        color:'Random',
+        reason:'Notification user role for BerealBot' 
+    });
+    
+    await guild.members.fetch();
+    const guildMembers = guild.members.cache.values(); 
+    for(member of guildMembers){
+        await member.roles.add(userrole);
+    }
+
+});
+
+
+client.on('guildMemberAdd', async member => {
+
+    await member.guild.roles.fetch();
+    const role = await member.guild.roles.cache.find(role => role.name === 'Bot User');
+    try{
+        await member.roles.add(role);
+    }
+    catch(error){
+        console.error("Bot role is below specified user role");
+    }
+});
+
 // Make sure this line is the last line
 client.login(TOKEN);
