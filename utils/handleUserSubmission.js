@@ -1,5 +1,5 @@
 const { blacklistAddUser } = require('../utils/blacklistutils.js');
-const { AttachmentBuilder, ComponentType } = require('discord.js');
+const { AttachmentBuilder, ComponentType, EmbedBuilder } = require('discord.js');
 const { notifyMods } = require('./notifyMods.js');
 const { prompt } = require('./prompt.js');
 
@@ -61,8 +61,19 @@ async function handleUserSubmission(attachment, caption, interaction) {
                         approve_msg = idx == idx2 ? '**APPROVED**' : `**APPROVED BY ${modName}**`;
                         await response.edit({ content: approve_msg, components: [] });
                     }
-                    const file = new AttachmentBuilder(attachment.url);
-                    await prompt.getChannel().send({ content: `${botUserRole} New post!\n${submitter} responded to "${promptContent}":\n${caption ?? ''}`, files: [file] });
+                    const embed = new EmbedBuilder()
+                        .setTitle('New post!') //title of embedded message
+                        .setDescription(`From: ${submitter}`) //who submitted post
+                        .setColor('Blue')
+                        .setImage(attachment.url)
+    	                .addFields({name: 'Prompt:', value: promptContent ?? '[no prompt provided]'});
+                        if(caption){
+                            embed.addFields({name: 'Caption:', value: caption});
+                        }
+                         //include prompt with image
+                        
+                    //console.log(embed);
+                    await prompt.getChannel().send({content:`\nAlert ${botUserRole}`, embeds: [embed] });
                     await interaction.deleteReply(); //remove clutter
                     prompt.setUserId(client.user.id); //prompt has been responded to, default the value to prevent extraneous post spam.
 
