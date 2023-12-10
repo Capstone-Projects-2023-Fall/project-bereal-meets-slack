@@ -1,6 +1,7 @@
 class Prompt {
     prompt = '';
     userId = '';
+    channel = '';
 
     isUserIdMatch(userId) {
         return this.userId === userId;
@@ -13,6 +14,10 @@ class Prompt {
     setUserId(userId) {
         this.userId = userId;
     }
+    
+    setChannel(channel){
+        this.channel = channel;
+    }
 
     getPrompt() {
         return this.Prompt; 
@@ -21,6 +26,11 @@ class Prompt {
     getUserId() {
         return this.userId;
     }
+
+    getChannel(){
+        return this.channel;
+    }
+
 }
 const prompt = new Prompt();
 

@@ -13,6 +13,7 @@ const saveDB = require('./utils/saveDB');
 const { prompt } = require('./utils/prompt.js');
 const PromptTimeout = require('./utils/promptTimeout');
 const activeEvents = require('./utils/activeEvents')
+const setDefaultChannel = require('./commands/setDefaultChannel.js');
 
 
 //for cloud run, serverless application needs a server to listen.
@@ -109,7 +110,11 @@ client.on(Events.InteractionCreate, async interaction => {
             return;
         }
 	    try {
+            if(interaction.commandName === 'setsubmissionchannel'){
+                await setDefaultChannel.execute(interaction);
+            } else {
 		    await command.execute(interaction);
+            }
 	    } catch (error) {
 		    console.error(error);
 		    if (interaction.replied || interaction.deferred) {
@@ -128,30 +133,31 @@ client.on(Events.InteractionCreate, async interaction => {
 client.on('ready', async () => {
     console.log(`Logged in as ${client.user.tag}!`);
     registrar.registercommands();
-    const guildId = process.env.DISCORD_GUILD_ID;
 
-    //setup cron
-    cron.schedule('0 0 8 * * *', async () => {
-    //try to schedule post 
-    try{
-        const activeHoursData = await activeHoursUtils.fetchActiveHoursFromDB(guildId);
-        await schedulePost(activeHoursData);
-    } catch (error) {
-        console.error('Error scheduling post', error);
-    }
-  });
-    console.log('scheduling data collector\n')
-    cron.schedule('59 23 * * *', async () => { //scheduled to run every day at 11:59 PM
-        try {
-            console.log('Running daily saveDB task');
-            await saveDB(client, process.env.DISCORD_SUBMISSION_CHANNEL_ID); //this is hard coded for the submissions channel
-            console.log('Daily saveDB task completed');
+    client.guilds.cache.forEach(async (guild) => {
+        //setup cron
+        cron.schedule('0 0 8 * * *', async () => {
+        //try to schedule post 
+        try{
+            const activeHoursData = await activeHoursUtils.fetchActiveHoursFromDB(guild.id);
+            await schedulePost(guild.id, activeHoursData);
         } catch (error) {
-            console.error('Error running daily saveDB task:', error);
+            console.error('Error scheduling post', error);
         }
-    }, {
-        scheduled: true,
-        timezone: "America/New_York"
+    });
+        console.log('scheduling data collector\n')
+        cron.schedule('59 23 * * *', async () => { //scheduled to run every day at 11:59 PM
+            try {
+                console.log('Running daily saveDB task');
+                await saveDB(client, guild.id); //this is hard coded for the submissions channel
+                console.log('Daily saveDB task completed');
+            } catch (error) {
+                console.error('Error running daily saveDB task:', error);
+            }
+        }, {
+            scheduled: true,
+            timezone: "America/New_York"
+        });
     });
 });
 let scheduledPromptTimeout;
@@ -161,7 +167,7 @@ activeEvents.on('activeHoursUpdated', async (data) => {
     await schedulePost(activeHoursData);
 });
 
-async function schedulePost(activeHoursData){
+async function schedulePost(activeHoursData, guildId){
     if (scheduledPromptTimeout) {
         clearTimeout(scheduledPromptTimeout);
     }
@@ -181,28 +187,42 @@ async function schedulePost(activeHoursData){
         console.log(`Now prompt is scheduled for: ${targetTime.format('MM-DD-YYYY @ HH:mm A')}`);
 
         scheduledPromptTimeout = setTimeout(async () => {
-          await postPrompt();
+          await postPrompt(guildId);
         }, timeDifference);
 }
 
-async function postPrompt(callingUser) {
-    const guildId = process.env.DISCORD_GUILD_ID;
-    const randomPrompt = await promptUtils.getRandomPrompt(guildId);
-    prompt.setPrompt(randomPrompt);
+async function postPrompt(guildId, callingUser) {
+    const promptData = await promptUtils.getRandomPrompt(guildId);
+    
+    if (!promptData) {
+        console.error("No prompt found.");
+        return;
+    }
 
-    let messageUser;
+    const { promptText, channelId } = promptData;
+    prompt.setPrompt(promptText);
+
+    // Fetch the target channel using the channel ID
+    const submissionChannel = await client.channels.fetch(channelId);
+    if (!submissionChannel) {
+        console.error(`Could not find channel with ID: ${channelId}`);
+        return;
+    }
+
+    prompt.setChannel(submissionChannel);
+
     let messageContent;
     let userToPrompt;
 
     if (callingUser) {
-        userToPrompt = await client.users.fetch(callingUser.id); // this should store the calling user
-        messageUser = `${callingUser.toString()}`;
+        userToPrompt = await client.users.fetch(callingUser.id);
+        messageContent = `${callingUser.toString()} Use /submit to submit your post!\n**Prompt:**\n${promptText}`;
     } else {
-        const list = client.guilds.cache.get(process.env.DISCORD_GUILD_ID);
-        const userRand = await outputUsers(list);
+        const userRand = await outputUsers(submissionChannel.guild);
+
         try {
-            userToPrompt = await client.users.fetch(userRand); // this should fetch the user that was prompted
-            messageUser = `<@${userRand}>`;
+            userToPrompt = await client.users.fetch(userRand);
+            messageContent = `<@${userRand}> Use /submit to submit your post!\n**Prompt:**\n${promptText}`;
         } catch (error) {
             console.error("Error fetching random user:", error);
             return;
@@ -221,30 +241,17 @@ async function postPrompt(callingUser) {
         return;
     }
 
-    let channelId;
-    let sentMessage;
 
-    if (client.toggles.get(userID)) {
-        // public
-        channelId = process.env.DISCORD_SUBMISSION_CHANNEL_ID;
-        sentMessage = await client.sendMessageWithTimer(channelId, messageContent);
-    } else {
-        // private
-        sentMessage = await userToPrompt.send(messageContent); // sendMessageWithTimer???
-        channelId = sentMessage.channel.id;
-    }
+    // Send the message in the specified channel
+    prompt.setUserId(userToPrompt.id);
+    const sentMessage = await submissionChannel.send(messageContent);
+    promptTimeout.setupPrompt(channelId, sentMessage, userToPrompt, promptText, channelId);
 
-    promptTimeout.setupPrompt(channelId, sentMessage, userToPrompt, randomPrompt, channelId);
 }
 
-async function triggerImmediatePost(callingUser){
+async function triggerImmediatePost(guildId, callingUser){
     try{
-        if(callingUser){
-            await postPrompt(callingUser); 
-        }
-        else{
-            await postPrompt();
-        }
+        await postPrompt(guildId, callingUser);    
     }catch (error){
         console.error('Failed to trigger immediate post:', error);
     }
@@ -266,7 +273,7 @@ client.on('messageCreate', async msg => {
     // Check if the message is from the bot itself
     if (msg.author.id === client.user.id) {
         // Check if the message is in the specified channel
-        if (msg.channel.id === process.env.DISCORD_SUBMISSION_CHANNEL_ID) {
+         {
             // If the timer is running, stop it and log the time
             if (timer.isRunning()) {
                 const elapsedSeconds = timer.stop();
@@ -275,10 +282,10 @@ client.on('messageCreate', async msg => {
         }
     } 
     else if(msg.content === "!demoTrigger"){ //&& msg.author.id === process.env.ADMIN_USER_ID
-        await triggerImmediatePost();
+        await triggerImmediatePost(msg.guildId);
     }
     else if(msg.content === "Prompt me"){ //&& msg.author.id === process.env.ADMIN_USER_ID
-        await triggerImmediatePost(msg.author);
+        await triggerImmediatePost(msg.guildId, msg.author);
     }
 });
 // Make sure this line is the last line

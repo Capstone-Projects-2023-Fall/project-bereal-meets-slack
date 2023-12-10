@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require('discord.js');
-const promptUtils = require('../utils/promptUtils.js');
+const {addPrompt, listPrompts, deletePrompt, getPrompts} = require('../utils/promptUtils.js')
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -15,6 +15,11 @@ module.exports = {
             .setDescription('Enter a new prompt.')
             .setRequired(true),
         )
+        .addChannelOption(option => 
+          option
+            .setName('channel')
+            .setDescription('Select the channel for the prompt')
+            .setRequired(false))
     )
     .addSubcommand(subcommand =>
       subcommand
@@ -32,17 +37,6 @@ module.exports = {
       subcommand
         .setName('list')
         .setDescription('List all prompts.')
-    )
-    .addSubcommand(subcommand =>
-      subcommand
-        .setName('search')
-        .setDescription('Search for prompts in the list.')
-        .addStringOption(option =>
-          option
-            .setName('search-term')
-            .setDescription('Search prompt list:')
-            .setRequired(true),
-        )
     ),
     
   async autocomplete(interaction) {
@@ -65,16 +59,18 @@ module.exports = {
     await interaction.deferReply({ephemeral: true});
     let reply = '';
 
-    reply = subcommand === 'add'
-      ? await promptUtils.addPrompt(guildId, interaction.options.getString('prompt'))
-      : subcommand === 'delete'
-      ? await promptUtils.deletePrompt(guildId, interaction.options.getString('prompt'))
-      : subcommand === 'list'
-      ? await promptUtils.listPrompts(guildId)
-      : subcommand === 'search'
-      ? await promptUtils.searchPrompts(guildId, interaction.options.getString('search-term'))
-      : '';
-      
+    if (subcommand === 'add') {
+      const promptText = interaction.options.getString('prompt');
+      const channel = interaction.options.getChannel('channel');
+      const channelId = channel ? channel.id : null; // Get the channel ID or null
+      reply = await addPrompt(guildId, promptText, channelId); // Pass channelId to addPrompt
+  } else if (subcommand === 'delete') {
+      const promptText = interaction.options.getString('prompt');
+      reply = await deletePrompt(guildId, promptText);
+  } else if (subcommand === 'list') {
+      reply = await listPrompts(guildId, interaction.client);
+  }
+
       await interaction.followUp(reply);
   },
 };

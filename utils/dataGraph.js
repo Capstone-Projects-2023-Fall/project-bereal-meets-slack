@@ -2,23 +2,13 @@ const {pool} = require('./dbconn.js');
 const {ChartJSNodeCanvas} = require('chartjs-node-canvas');
 
 
-async function fetchDataForGraph() {
-    const query = 'SELECT prompt_text, num_reactions FROM responses'; 
-    const [rows] = await pool.query(query);
+async function fetchDataForGraph(guildId) {
+    const query = 'SELECT prompt_text, num_reactions FROM responses WHERE guild_id = ?'; 
+    const [rows] = await pool.query(query, [guildId]);
+    console.log(rows);
+    console.log(guildId);
     return rows;
 }
-
-const backgroundColorPlugin = {
-    id: 'backgroundColorPlugin',
-    beforeDraw: (chart) => {
-        const ctx = chart.ctx;
-        ctx.save();
-        ctx.fillStyle = 'white';
-        ctx.fillRect(0, 0, 800, 600);
-        ctx.restore();
-    }
-};
-
 
 const generateGraph = async (data) => {
     const width = 800; //width of the graph
@@ -52,7 +42,7 @@ const generateGraph = async (data) => {
                     }
                 }
             }, 
-            plugins: [backgroundColorPlugin]
+            plugins: []
         }
     };
 

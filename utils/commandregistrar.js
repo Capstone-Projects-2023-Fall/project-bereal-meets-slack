@@ -9,7 +9,6 @@ const { Routes, Guild } = require('discord.js');
 
 const TOKEN = process.env.DISCORD_TOKEN;
 const CLIENT_ID = process.env.DISCORD_CLIENT_ID;
-const GUILD_ID = process.env.DISCORD_GUILD_ID;
 
 const commands = [];
 
@@ -42,12 +41,12 @@ function registercommands(){
       console.log(`Started refreshing ${commands.length} application (/) commands.`);
   
       // The put method is used to fully refresh all commands in the guild with the current set
-      const data = rest.put(
-        Routes.applicationGuildCommands(CLIENT_ID, GUILD_ID),
+      const data = await rest.put(
+        Routes.applicationCommands(CLIENT_ID),
         { body: commands },
       );
     
-       await console.log(`Successfully reloaded ${data.length} application (/) commands.`);
+      console.log(`Successfully reloaded ${data.length} application (/) commands.`);
     })();
     } catch (error) {
       console.error(error);

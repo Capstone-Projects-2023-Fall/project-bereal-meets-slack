@@ -17,6 +17,7 @@ async function fetchImageMessagesUntilPrompt(client, channelId) {
     let foundPrompt = false;
     let promptText = null;
     let promptUserId = null;
+    let guild_id = null;
     while (!foundPrompt) {
         const options = { limit: 100 };
         if (lastId) {
@@ -32,6 +33,7 @@ async function fetchImageMessagesUntilPrompt(client, channelId) {
                     foundPrompt = true;
                     promptText = extractPromptText(message.content);
                     promptUserId = message.author.id;
+                    guild_id = message.guild.id;
                     break; // Stop if we find the "Prompt"
                 }
                 // Check if the message has attachments and if any of them are images
@@ -46,7 +48,7 @@ async function fetchImageMessagesUntilPrompt(client, channelId) {
             break; // Exit the loop in case of API error
         }
     }
-    return {imageMessagesList, promptText, promptUserId};
+    return {imageMessagesList, promptText, promptUserId, guild_id};
 }
 //to clean prompt text to only provide the main prompt when adding to database
 function extractPromptText(fullMessage) {
@@ -125,7 +127,7 @@ async function findTimeDifferenceToPrompt(client, channelId, referenceMessage) {
 
 async function saveDB(client, channelId) {
     try {
-        const {imageMessagesList, promptText, promptUserId} = await fetchImageMessagesUntilPrompt(client, channelId);
+        const {imageMessagesList, promptText, promptUserId, guild_id} = await fetchImageMessagesUntilPrompt(client, channelId);
         const messagesData = [];
 
         for (const message of imageMessagesList) {
@@ -139,7 +141,8 @@ async function saveDB(client, channelId) {
                 response_image: imageLink,
                 time_to_respond: timeToPost,
                 prompt_text: promptText,
-                user_id: promptUserId
+                user_id: promptUserId,
+                guild_id: guild_id
             };
             messagesData.push(messageData);
         }
@@ -161,24 +164,35 @@ async function insertResponseData(messageData) {
         // First, check if a record with the same message_id already exists
         const checkQuery = 'SELECT * FROM responses WHERE message_id = ?';
         const [existingRecords] = await pool.query(checkQuery, [messageData.message_id]);
-        const values = [
-            messageData.response_image,
-            messageData.num_reactions,
-            messageData.time_to_respond,
-            messageData.message_id,
-            messageData.prompt_text,
-            messageData.user_id
-        ];
+        
         // If no existing record is found, proceed to insert the new record
         if (existingRecords.length === 0) {
+            const values = [
+                messageData.response_image,
+                messageData.num_reactions,
+                messageData.time_to_respond,
+                messageData.message_id,
+                messageData.prompt_text,
+                messageData.user_id,
+                messageData.guild_id
+            ];
             const insertQuery = `
-                INSERT INTO responses (response_image, num_reactions, time_to_respond, message_id, prompt_text, user_id) 
-                VALUES (?, ?, ?, ?, ?, ?)
+                INSERT INTO responses (response_image, num_reactions, time_to_respond, message_id, prompt_text, user_id, guild_id) 
+                VALUES (?, ?, ?, ?, ?, ?, ?)
             `;
             await pool.query(insertQuery, values)
             console.log('Data inserted successfully');
         } else {
-            const updateQuery = `UPDATE bot.responses SET response_image = ? , num_reactions = ? , time_to_respond = ? , prompt_text = ? , user_id = ? WHERE (message_id= ? ) `;
+            const values = [
+                messageData.response_image,
+                messageData.num_reactions,
+                messageData.time_to_respond,
+                messageData.prompt_text,
+                messageData.user_id,
+                messageData.guild_id,
+                messageData.message_id
+            ];
+            const updateQuery = `UPDATE bot.responses SET response_image = ? , num_reactions = ? , time_to_respond = ? , prompt_text = ? , user_id = ? , guild_id = ? WHERE (message_id= ? ) `;
             pool.query(updateQuery, values);
             console.log(`Record with message_id ${messageData.message_id} already exists. Updating`);
         }

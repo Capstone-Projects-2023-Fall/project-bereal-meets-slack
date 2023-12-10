@@ -22,4 +22,3 @@ module.exports = {
 		await handleUserSubmission(attachment, caption, interaction);	
 	}
 }
-

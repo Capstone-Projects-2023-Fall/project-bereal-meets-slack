@@ -62,16 +62,25 @@ async function handleUserSubmission(attachment, caption, interaction) {
                         await response.edit({ content: approve_msg, components: [] });
                     }
                     const file = new AttachmentBuilder(attachment.url);
-                    const submit_channel = await client.channels.fetch(process.env.DISCORD_SUBMISSION_CHANNEL_ID);
-                    await submit_channel.send({ content: `${botUserRole} New post!\n${submitter} responded to "${promptContent}":\n${caption ?? ''}`, files: [file] });
+                    await prompt.getChannel().send({ content: `${botUserRole} New post!\n${submitter} responded to "${promptContent}":\n${caption ?? ''}`, files: [file] });
                     await interaction.deleteReply(); //remove clutter
                     prompt.setUserId(client.user.id); //prompt has been responded to, default the value to prevent extraneous post spam.
+
                 }
                 // check if someone press deny
                 else if (i.customId === 'deny') {
                     await i.deferUpdate();
                     console.log(`${modName} denied`);
-                    await i.editReply({ content: '**DENIED**', components: [] });
+
+                    for (const [idx2, response] of responses.entries()) {
+                        await response.edit({ content: '**DENIED**', components: [] });
+                    }
+                    for (const collector of collectors) {
+                        if (!collector.ended) {
+                            collector.stop();
+                        }
+                    }
+
                     await interaction.deleteReply(); //remove clutter
                     try {
                         const messageFilter = m => m.author.id === moderator.id
@@ -103,7 +112,6 @@ async function handleUserSubmission(attachment, caption, interaction) {
                             await blacklistAddUser(guild.id, submitter.id);
 
                             await interaction.user.send(`You have reached the strike limit and were added to the blacklist. Please refer to your moderators for recourse.`);
-
                             for (const moderator of moderators.values()) {
                                 try {
                                     await moderator.user.send({ content: `${submitter} was added to the blacklist`});
@@ -130,4 +138,6 @@ async function handleUserSubmission(attachment, caption, interaction) {
     }
 }
 
+
 module.exports = handleUserSubmission;
+
