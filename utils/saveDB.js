@@ -5,21 +5,19 @@ const {pool} = require('./dbconn.js');
 async function fetchImageMessagesUntilPrompt(client, channelId) {
     if (!client.isReady()) {
         console.error('Client is not ready');
-        return { imageMessagesList: [], promptText: null, promptUserId: null };
+        return { imageMessagesList: [], promptText: null, promptUserId: null, guild_id: null };
     }
     const channel = client.channels.cache.get(channelId);
     if (!channel || channel.type !== ChannelType.GuildText) {
         console.error('The channel was not found or it is not a text channel.');
-        return [];
+        return { imageMessagesList: [], promptText: null, promptUserId: null, guild_id: null };
     }
     let lastId;
     const imageMessagesList = [];
-    let foundPrompt = false;
-    let promptText = null;
-    let promptUserId = null;
-    let guild_id = null;
-    while (!foundPrompt) {
-        const options = { limit: 100 };
+    let guild_id = channel.guild.id;
+
+    const options = { limit: 100 };
+    while (true) {
         if (lastId) {
             options.before = lastId;
         }
@@ -29,35 +27,47 @@ async function fetchImageMessagesUntilPrompt(client, channelId) {
                 break; // No more messages left to fetch
             }
             for (const message of messages.values()) {
-                if (message.content.includes("Prompt")) {
-                    foundPrompt = true;
-                    promptText = extractPromptText(message.content);
-                    promptUserId = message.author.id;
-                    guild_id = message.guild.id;
-                    break; // Stop if we find the "Prompt"
+                lastId = message.id; // Update the last ID for the next fetch
+
+                // Check if the message is from the bot
+                if (message.author.id === client.user.id) {
+                    // If the message does not have an embed with an image and contains "Prompt", stop scanning
+                    if (!message.embeds.some(embed => embed.image) && message.content.includes("Prompt")) {
+                        console.log("prompt message found sending list to saveDB()")
+                        return {imageMessagesList, guild_id}; //dont return the prompttext from here for right now we can get that from the message now from the embed
+                    }
+                    // If the message has an embed with an image, add it to the list
+                    if (message.embeds.some(embed => embed.image)) {
+                        console.log("message with image found, adding it to the list")
+                        imageMessagesList.push(message);
+                    }
                 }
-                // Check if the message has attachments and if any of them are images
-                const hasImage = message.attachments.some(attachment => attachment.contentType?.startsWith('image/'));
-                if (hasImage) {
-                    imageMessagesList.push(message); // Add the message to our list if it contains an image
-                }
-                lastId = message.id; // Set the last ID for the next fetch
             }
         } catch (error) {
             console.error('Error fetching messages: ', error);
             break; // Exit the loop in case of API error
         }
     }
-    return {imageMessagesList, promptText, promptUserId, guild_id};
+
+    // If the loop exits without finding a message with "Prompt" that has no embedded image
+    return {imageMessagesList, guild_id};
 }
+
 //to clean prompt text to only provide the main prompt when adding to database
-function extractPromptText(fullMessage) {
-    const promptStartIndex = fullMessage.indexOf("**Prompt:**");
-    if (promptStartIndex !== -1) {
-        return fullMessage.substring(promptStartIndex + "**Prompt:**".length).trim();
+function extractPromptTextFromEmbed(embed) {
+    let promptText = null;
+
+    // Check if the embed and its fields are defined
+    if (embed && embed.fields) {
+        const promptField = embed.fields.find(field => field.name === 'Prompt:');
+        if (promptField) {
+            promptText = promptField.value;
+        }
     }
-    return fullMessage;
+
+    return promptText;
 }
+
 
 function countReactions(message) {
     // Check if the message has reactions
@@ -71,70 +81,62 @@ function countReactions(message) {
     }
 }
 
-function getImageLinkFromMessage(message) {
-    // Initialize the image link variable
-    let imageLink = null;
-    // Check for attachments in the message
-    message.attachments.forEach(attachment => {
-        // Check if the attachment is an image based on its content type
-        if (attachment.contentType && attachment.contentType.startsWith('image/')) {
-            // Set the image link
-            imageLink = attachment.url;
-        }
-    });
-    // If no image was found in attachments, check embeds as Discord automatically embeds some image links
-    if (!imageLink) {
-        message.embeds.forEach(embed => {
-            if (embed.type === 'image' && embed.url) {
-                imageLink = embed.url;
-            }
-            // Some embeds might contain an image within them rather than being of type 'image'
-            else if (embed.image && embed.image.url) {
-                imageLink = embed.image.url;
-            }
-        });
+function getImageLinkFromEmbed(embed) {
+    if (embed.image) {
+        return embed.image.url;
     }
-    return imageLink;
+    return null;
 }
 
 async function findTimeDifferenceToPrompt(client, channelId, referenceMessage) {
     if (!client.isReady()) {
-      throw new Error('Client is not ready');
+        throw new Error('Client is not ready');
     }
-    // Fetch the channel object using the provided channelId
     const channel = client.channels.cache.get(channelId);
     if (!channel || channel.type !== ChannelType.GuildText) {
-      throw new Error('The channel was not found or it is not a text channel.');
+        throw new Error('The channel was not found or it is not a text channel.');
     }
     try {
-      // Fetch the last 100 messages in the channel
-      const messages = await channel.messages.fetch({ limit: 100 });
-      // Find the first message that contains the word "Prompt"
-      const promptMessage = messages.find(m => m.content.includes("Prompt"));
-      if (!promptMessage) {
-        console.log('No prompt message found.');
-        return null;
-      }
-      // Calculate the time difference in seconds between the reference message and the prompt message
-      const timeDifferenceSeconds = Math.abs(referenceMessage.createdTimestamp - promptMessage.createdTimestamp) / 1000;
-      console.log(`Time difference: ${timeDifferenceSeconds} seconds.`);
-      return timeDifferenceSeconds;
+        const messages = await channel.messages.fetch({ limit: 100 });
+        let promptMessage = messages.find(m => m.content.includes("Prompt"));
+        // If prompt is not found in message content, check the embeds
+        if (!promptMessage) {
+            promptMessage = messages.find(m => m.embeds.some(embed => extractPromptTextFromEmbed(embed) !== null));
+        }
+        if (!promptMessage) {
+            console.log('No prompt message found.');
+            return null;
+        }
+        const timeDifferenceSeconds = Math.abs(referenceMessage.createdTimestamp - promptMessage.createdTimestamp) / 1000;
+        console.log(`Time difference: ${timeDifferenceSeconds} seconds.`);
+        return timeDifferenceSeconds;
     } catch (error) {
-      console.error('Error fetching messages:', error);
-      throw error;
+        console.error('Error fetching messages:', error);
+        throw error;
     }
 }
 
 async function saveDB(client, channelId) {
     try {
-        const {imageMessagesList, promptText, promptUserId, guild_id} = await fetchImageMessagesUntilPrompt(client, channelId);
+        const { imageMessagesList, guild_id } = await fetchImageMessagesUntilPrompt(client, channelId);
+        console.log("This is the data");
+        console.log(imageMessagesList, guild_id);
         const messagesData = [];
 
         for (const message of imageMessagesList) {
             const numOfReactions = countReactions(message);
-            const imageLink = getImageLinkFromMessage(message);
+            const embed = message.embeds[0];
+            if (!embed) continue;  // Skip if there's no embed in the message
+
+            const imageLink = getImageLinkFromEmbed(embed);
             const timeToPost = await findTimeDifferenceToPrompt(client, channelId, message);
             const message_id = message.id;
+            const promptText = extractPromptTextFromEmbed(embed);
+            const promptUserId = extractPromptUserIdFromEmbed(embed);
+            const messageUrl = `https://discord.com/channels/${guild_id}/${channelId}/${message_id}`;
+
+            console.log("Message URL:", messageUrl); // Print the message URL
+
             const messageData = {
                 message_id: message_id,
                 num_reactions: numOfReactions,
@@ -144,8 +146,12 @@ async function saveDB(client, channelId) {
                 user_id: promptUserId,
                 guild_id: guild_id
             };
+
+            console.log("saving the message data");
+            console.log(messageData);
             messagesData.push(messageData);
         }
+
         // Insert each messageData into the database
         for (const messageData of messagesData) {
             await insertResponseData(messageData);
@@ -202,4 +208,62 @@ async function insertResponseData(messageData) {
     }
 }
 
-module.exports = saveDB;
+async function fetchTextChannelIdsFromGuild(interaction) {
+    if (!interaction.guild) {
+        console.error('This command can only be used in a guild.');
+        return [];
+    }
+
+    const channelIds = [];
+
+    // Iterate over all channels in the guild
+    interaction.guild.channels.cache.forEach(channel => {
+        // Check if the channel is a text channel
+        if (channel.type === ChannelType.GuildText) {
+            // Add the channel ID to the list
+            channelIds.push(channel.id);
+        }
+    });
+
+    return channelIds;
+}
+
+
+async function processAllChannels(client, interaction) {
+    try {
+        const channelIds = await fetchTextChannelIdsFromGuild(interaction);
+        let allMessagesData = [];
+
+        for (const channelId of channelIds) {
+            const messagesData = await saveDB(client, channelId);
+            allMessagesData = allMessagesData.concat(messagesData);
+        }
+
+        console.log('All channel data has been processed and saved.');
+        return allMessagesData;
+    } catch (error) {
+        console.error('Error processing channels:', error);
+    }
+}
+
+
+function extractPromptUserIdFromEmbed(embed) {
+    let promptUserId = null;
+    
+    // Check if the embed has a description
+    if (embed.description) {
+        // Regular expression to match the user mention format <@userId>
+        const userIdMatch = embed.description.match(/<@(\d+)>/);
+        if (userIdMatch && userIdMatch.length > 1) {
+            // Extract the user ID
+            promptUserId = userIdMatch[1];
+        }
+    }
+    console.log(promptUserId)
+    return promptUserId;
+}
+
+module.exports = {
+    saveDB,
+    processAllChannels
+};

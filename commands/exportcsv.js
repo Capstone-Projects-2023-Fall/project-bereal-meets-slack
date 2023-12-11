@@ -1,7 +1,6 @@
 const { SlashCommandBuilder, AttachmentBuilder } = require('discord.js');
-require('dotenv').config();
-const saveDB = require('../utils/saveDB');
 const { Parser } = require('json2csv');
+const { processAllChannels } = require('../utils/saveDB');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -10,14 +9,17 @@ module.exports = {
     async execute(interaction) {
         const modRole = interaction.guild.roles.cache.find(role => role.name === 'bot mod');
             
-        if (!(interaction.member.roles.cache.has(modRole.id))) return await interaction.reply({ content: 'Only **moderators** can use this command', ephemeral: true});
+        if (!(interaction.member.roles.cache.has(modRole.id))) {
+            return await interaction.reply({ content: 'Only **moderators** can use this command', ephemeral: true});
+        }
         
         await interaction.deferReply();
-        const channelId = process.env.DISCORD_SUBMISSION_CHANNEL_ID;
-        const savedData = await saveDB(interaction.client, channelId);
+
         try {
+            // Process channels from the guild where the command is executed
+            const allChannelsData = await processAllChannels(interaction.client, interaction);
             const parser = new Parser();
-            const csvData = parser.parse(savedData);
+            const csvData = parser.parse(allChannelsData);
 
             const buffer = Buffer.from(csvData, 'utf-8');
             const fileAttachment = new AttachmentBuilder(buffer, { name: 'saved_data.csv' });
