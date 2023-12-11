@@ -5,7 +5,6 @@ const fs = require('fs');
 const registrar = require('./utils/commandregistrar'); 
 const cron = require('node-cron');
 const moment = require('moment-timezone');
-const http = require('http');
 const promptUtils = require('./utils/promptUtils');
 const outputUsers = require('./utils/getRandom');
 const activeHoursUtils = require('./utils/activeHoursUtils');
@@ -15,24 +14,6 @@ const PromptTimeout = require('./utils/promptTimeout');
 const activeEvents = require('./utils/activeEvents')
 const { setDefaultChannel } = require('./utils/setDefaultChannelUtils.js');
 const helpUtils = require('./utils/helpUtils.js');
-const { use } = require('chai');
-
-
-
-//for cloud run, serverless application needs a server to listen.
-const port = 8080;
-
-const server = http.createServer((req, res) => {
-// Set the response HTTP header with HTTP status and Content type
-res.writeHead(200, {'Content-Type': 'text/plain'});
-// Send the response body "Hello World"
-res.end('BeRealBot lives here\n');
-});
-
-server.listen(port, () => {
-console.log('Hello world listening on port', port);
-});
-
 
 const TOKEN = process.env.DISCORD_TOKEN;
 
@@ -140,16 +121,20 @@ client.on('ready', async () => {
         //create prompt map
         client.activePrompts.set(guild.id, new Prompt());
         //setup cron
-        cron.schedule('0 0 8 * * *', async () => {
+        const activeHoursData = await activeHoursUtils.fetchActiveHoursFromDB(guild.id);
+        //await schedulePost(guild.id, activeHoursData); //schedule a post at first whenever the bot loads up.
+        cron.schedule('30 36 16 * * *', async () => {
         //try to schedule post 
         try{
-            const activeHoursData = await activeHoursUtils.fetchActiveHoursFromDB(guild.id);
             await schedulePost(guild.id, activeHoursData);
         } catch (error) {
             console.error('Error scheduling post', error);
         }
+    }, {
+        scheduled: true,
+        timezone: "America/New_York"
     });
-        console.log('scheduling data collector\n')
+        console.log('scheduling data collector\n');
         cron.schedule('59 23 * * *', async () => { //scheduled to run every day at 11:59 PM
             try {
                 console.log('Running daily saveDB task');
@@ -169,6 +154,10 @@ let scheduledPromptTimeout;
 activeEvents.on('activeHoursUpdated', async (data) => {
     const activeHoursData = await activeHoursUtils.fetchActiveHoursFromDB(data.guildId);
     await schedulePost(activeHoursData);
+});
+
+activeEvents.on('activePromptExpired', async (data) => {
+    await postPrompt(data.guildId);
 });
 
 async function schedulePost(activeHoursData, guildId){
@@ -192,6 +181,7 @@ async function schedulePost(activeHoursData, guildId){
 
         scheduledPromptTimeout = setTimeout(async () => {
           await postPrompt(guildId);
+          schedulePost(activeHoursData, guildId); //reschedule to keep convo going 
         }, timeDifference);
 }
 
@@ -251,7 +241,7 @@ async function postPrompt(guildId, callingUser) {
     if (client.toggles.get(userID)) {
         // public
         sentMessage = await client.sendMessageWithTimer(submissionChannel.id, messageContent);
-        setchannel = submissionChannel.id;
+        sentChannel = submissionChannel.id;
     } else {
         // private
         sentMessage = await userToPrompt.send(messageContent); 
@@ -259,20 +249,11 @@ async function postPrompt(guildId, callingUser) {
     }
     // Send the message in the specified channel
     prompt.setUserId(userToPrompt.id);
-
     client.activePrompts.set(guildId, prompt);
-
     promptTimeout.setupPrompt(sentChannel, sentMessage, userToPrompt, promptText);
 
 }
 
-async function triggerImmediatePost(guildId, callingUser){
-    try{
-        await postPrompt(guildId, callingUser);    
-    }catch (error){
-        console.error('Failed to trigger immediate post:', error);
-    }
-}
 
 client.sendMessageWithTimer = async (channelId, content) => {
     timer.start(); // Ensure the timer starts when the message is sent
@@ -299,10 +280,10 @@ client.on('messageCreate', async msg => {
         }
     } 
     else if(msg.content === "!demoTrigger"){ //&& msg.author.id === process.env.ADMIN_USER_ID
-        await triggerImmediatePost(msg.guildId);
+        await postPrompt(msg.guildId);
     }
     else if(msg.content === "Prompt me"){ //&& msg.author.id === process.env.ADMIN_USER_ID
-        await triggerImmediatePost(msg.guildId, msg.author);
+        await postPrompt(msg.guildId, msg.author);
     }
 });
 
