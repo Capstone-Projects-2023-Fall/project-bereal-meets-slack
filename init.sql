@@ -1,0 +1,40 @@
+USE bot;
+
+CREATE USER 'berealbot'@'%' IDENTIFIED BY '${DB_PASS}';
+GRANT ALL PRIVILEGES ON bot.* TO 'berealbot'@'%';
+FLUSH PRIVILEGES;
+
+CREATE TABLE IF NOT EXISTS prompts(
+prompt_id INT PRIMARY KEY AUTO_INCREMENT NOT NULL UNIQUE,
+prompt_text VARCHAR(400) NOT NULL,
+guild_id VARCHAR(45) NOT NULL,
+channel_id VARCHAR(45)
+);
+
+CREATE TABLE IF NOT EXISTS blacklist(
+blacklist_id INT PRIMARY KEY AUTO_INCREMENT NOT NULL UNIQUE,
+user_id VARCHAR(45) NOT NULL,
+guild_id VARCHAR(45) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS operating_hours(
+operating_hours_id INT PRIMARY KEY NOT NULL AUTO_INCREMENT UNIQUE,
+start_time TIME NOT NULL,
+end_time TIME NOT NULL,
+guild_id VARCHAR(45) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS responses(
+response_id INT PRIMARY KEY NOT NULL UNIQUE AUTO_INCREMENT,
+response_image VARCHAR(3000) NOT NULL,
+num_reactions INT,
+time_to_respond INT,
+message_id VARCHAR(255),
+user_id VARCHAR(45),
+prompt_text VARCHAR(400)
+);
+
+CREATE TABLE IF NOT EXISTS settings(
+  submission_channel_id VARCHAR(45),
+  guild_id VARCHAR(45) PRIMARY KEY NOT NULL
+);

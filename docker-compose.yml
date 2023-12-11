@@ -1,0 +1,32 @@
+ 
+version: '3'
+
+services:
+  berealbotdb:
+    image: mysql/mysql-server:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_DATABASE: bot
+      MYSQL_ROOT_HOST: '%'
+    networks:
+      - brbnet
+    volumes:
+     - 'mysql-data:/var/lib/mysql'
+     - './init.sql:/docker-entrypoint-initdb.d/init.sql'  # Mount custom scripts
+  berealbot:
+    image: berealbot:latest
+    build:
+      context: .
+      dockerfile: Dockerfile.berealbot
+    networks:
+      - brbnet
+    depends_on:
+      - berealbotdb
+
+networks:
+  brbnet:
+    driver: bridge
+
+volumes:
+  mysql-data:
+    driver: local 

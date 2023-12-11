@@ -8,6 +8,10 @@ module.exports = {
         .setName('exportcsv')
         .setDescription('Saves data to a text file and uploads it to the chat'),
     async execute(interaction) {
+        const modRole = interaction.guild.roles.cache.find(role => role.name === 'bot mod');
+            
+        if (!(interaction.member.roles.cache.has(modRole.id))) return await interaction.reply({ content: 'Only **moderators** can use this command', ephemeral: true});
+        
         await interaction.deferReply();
 
         try {
