@@ -1,6 +1,7 @@
 const { SlashCommandBuilder, AttachmentBuilder } = require('discord.js');
-const { processAllChannels } = require('../utils/saveDB');
 const { Parser } = require('json2csv');
+const { processAllChannels } = require('../utils/saveDB');
+
 
 module.exports = {
     data: new SlashCommandBuilder()

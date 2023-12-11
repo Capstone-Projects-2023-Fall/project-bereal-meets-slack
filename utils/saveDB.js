@@ -14,8 +14,6 @@ async function fetchImageMessagesUntilPrompt(client, channelId) {
     }
     let lastId;
     const imageMessagesList = [];
-    let promptText = null;
-    let promptUserId = null;
     let guild_id = channel.guild.id;
 
     const options = { limit: 100 };
@@ -36,8 +34,6 @@ async function fetchImageMessagesUntilPrompt(client, channelId) {
                     // If the message does not have an embed with an image and contains "Prompt", stop scanning
                     if (!message.embeds.some(embed => embed.image) && message.content.includes("Prompt")) {
                         console.log("prompt message found sending list to saveDB()")
-                        //promptText = message.content;
-                        //promptUserId = message.author.id;
                         return {imageMessagesList, guild_id}; //dont return the prompttext from here for right now we can get that from the message now from the embed
                     }
                     // If the message has an embed with an image, add it to the list
@@ -54,7 +50,7 @@ async function fetchImageMessagesUntilPrompt(client, channelId) {
     }
 
     // If the loop exits without finding a message with "Prompt" that has no embedded image
-    return {imageMessagesList, promptText, promptUserId, guild_id};
+    return {imageMessagesList, guild_id};
 }
 
 //to clean prompt text to only provide the main prompt when adding to database
@@ -122,22 +118,25 @@ async function findTimeDifferenceToPrompt(client, channelId, referenceMessage) {
 
 async function saveDB(client, channelId) {
     try {
-
-        const {imageMessagesList, guild_id} = await fetchImageMessagesUntilPrompt(client, channelId);
-        console.log("This is the data")
-        console.log(imageMessagesList, guild_id); //what are we not getting from the data?
+        const { imageMessagesList, guild_id } = await fetchImageMessagesUntilPrompt(client, channelId);
+        console.log("This is the data");
+        console.log(imageMessagesList, guild_id);
         const messagesData = [];
 
         for (const message of imageMessagesList) {
             const numOfReactions = countReactions(message);
-            // Assuming the relevant data is in the first embed of the message
             const embed = message.embeds[0];
             if (!embed) continue;  // Skip if there's no embed in the message
+
             const imageLink = getImageLinkFromEmbed(embed);
             const timeToPost = await findTimeDifferenceToPrompt(client, channelId, message);
             const message_id = message.id;
             const promptText = extractPromptTextFromEmbed(embed);
             const promptUserId = extractPromptUserIdFromEmbed(embed);
+            const messageUrl = `https://discord.com/channels/${guild_id}/${channelId}/${message_id}`;
+
+            console.log("Message URL:", messageUrl); // Print the message URL
+
             const messageData = {
                 message_id: message_id,
                 num_reactions: numOfReactions,
@@ -147,10 +146,12 @@ async function saveDB(client, channelId) {
                 user_id: promptUserId,
                 guild_id: guild_id
             };
-            console.log("saving the message data")
+
+            console.log("saving the message data");
             console.log(messageData);
             messagesData.push(messageData);
         }
+
         // Insert each messageData into the database
         for (const messageData of messagesData) {
             await insertResponseData(messageData);
@@ -264,7 +265,7 @@ function extractPromptUserIdFromEmbed(embed) {
     return promptUserId;
 }
 
-
-//TODO: Make chages to all methods to read from embeds to get the data it needs, then make it so it will scan for all channels in the discord, then fix exportCSV
-
-module.exports = saveDB;
+module.exports = {
+    saveDB,
+    processAllChannels
+};
