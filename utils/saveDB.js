@@ -208,32 +208,30 @@ async function insertResponseData(messageData) {
     }
 }
 
-async function fetchAllTextChannelIds(client) {
-    if (!client.isReady()) {
-        console.error('Client is not ready');
+async function fetchTextChannelIdsFromGuild(interaction) {
+    if (!interaction.guild) {
+        console.error('This command can only be used in a guild.');
         return [];
     }
 
     const channelIds = [];
 
-    // Iterate over all guilds the client is a part of
-    client.guilds.cache.forEach(guild => {
-        // Iterate over all channels in the guild
-        guild.channels.cache.forEach(channel => {
-            // Check if the channel is a text channel
-            if (channel.type === ChannelType.GuildText) {
-                // Add the channel ID to the list
-                channelIds.push(channel.id);
-            }
-        });
+    // Iterate over all channels in the guild
+    interaction.guild.channels.cache.forEach(channel => {
+        // Check if the channel is a text channel
+        if (channel.type === ChannelType.GuildText) {
+            // Add the channel ID to the list
+            channelIds.push(channel.id);
+        }
     });
 
     return channelIds;
 }
 
-async function processAllChannels(client) {
+
+async function processAllChannels(client, interaction) {
     try {
-        const channelIds = await fetchAllTextChannelIds(client);
+        const channelIds = await fetchTextChannelIdsFromGuild(interaction);
         let allMessagesData = [];
 
         for (const channelId of channelIds) {

@@ -2,7 +2,6 @@ const { SlashCommandBuilder, AttachmentBuilder } = require('discord.js');
 const { Parser } = require('json2csv');
 const { processAllChannels } = require('../utils/saveDB');
 
-
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('exportcsv')
@@ -10,12 +9,15 @@ module.exports = {
     async execute(interaction) {
         const modRole = interaction.guild.roles.cache.find(role => role.name === 'bot mod');
             
-        if (!(interaction.member.roles.cache.has(modRole.id))) return await interaction.reply({ content: 'Only **moderators** can use this command', ephemeral: true});
+        if (!(interaction.member.roles.cache.has(modRole.id))) {
+            return await interaction.reply({ content: 'Only **moderators** can use this command', ephemeral: true});
+        }
         
         await interaction.deferReply();
 
         try {
-            const allChannelsData = await processAllChannels(interaction.client);
+            // Process channels from the guild where the command is executed
+            const allChannelsData = await processAllChannels(interaction.client, interaction);
             const parser = new Parser();
             const csvData = parser.parse(allChannelsData);
 
@@ -29,5 +31,3 @@ module.exports = {
         }
     },
 };
-//Note: test if the exportcsv command is working when they are done to see if the all channel reading data exporting is working and exporting the csv actually
-//KNOWN ISSUE: The database is not saving any of this data but that doesn't mean we shouldnt be able to export a csv of what we are reading.
