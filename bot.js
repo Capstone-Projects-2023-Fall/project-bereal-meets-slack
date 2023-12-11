@@ -138,7 +138,7 @@ client.on('ready', async () => {
         cron.schedule('59 23 * * *', async () => { //scheduled to run every day at 11:59 PM
             try {
                 console.log('Running daily saveDB task');
-                await saveDB(client, guild.id); //this is hard coded for the submissions channel
+                await saveDB(client, guild.id); 
                 console.log('Daily saveDB task completed');
             } catch (error) {
                 console.error('Error running daily saveDB task:', error);
@@ -180,8 +180,7 @@ async function schedulePost(activeHoursData, guildId){
         console.log(`Now prompt is scheduled for: ${targetTime.format('MM-DD-YYYY @ HH:mm A')}`);
 
         scheduledPromptTimeout = setTimeout(async () => {
-          await postPrompt(guildId);
-          schedulePost(activeHoursData, guildId); //reschedule to keep convo going 
+          await postPrompt(guildId); 
         }, timeDifference);
 }
 
@@ -279,10 +278,10 @@ client.on('messageCreate', async msg => {
             }
         }
     } 
-    else if(msg.content === "!demoTrigger"){ //&& msg.author.id === process.env.ADMIN_USER_ID
+    else if(msg.content === "!demoTrigger"){ 
         await postPrompt(msg.guildId);
     }
-    else if(msg.content === "Prompt me"){ //&& msg.author.id === process.env.ADMIN_USER_ID
+    else if(msg.content === "Prompt me"){ 
         await postPrompt(msg.guildId, msg.author);
     }
 });
