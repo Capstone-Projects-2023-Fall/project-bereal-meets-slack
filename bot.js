@@ -5,40 +5,19 @@ const moment = require('moment-timezone');
 const path = require('node:path');
 const fs = require('fs');
 const registrar = require('./utils/commandregistrar'); 
-const promptUtils = require('./utils/promptUtils');
-const outputUsers = require('./utils/getRandom');
 const activeHoursUtils = require('./utils/activeHoursUtils');
-const saveDB = require('./utils/saveDB');
+const saveDB = require('./utils/saveDB.js');
+const { Timer } = require('./utils/Timer.js');
 const { Prompt } = require('./utils/prompt.js');
 const PromptTimeout = require('./utils/promptTimeout');
 const activeEvents = require('./utils/activeEvents')
 const { setDefaultChannel } = require('./utils/setDefaultChannelUtils.js');
 const helpUtils = require('./utils/helpUtils.js');
+const { postPrompt } = require('./utils/postUtils.js');
 
 const TOKEN = process.env.DISCORD_TOKEN;
 
-class Timer {
-    constructor() {
-        this.startTime = null;
-        this.endTime = null;
-    }
-    start() {
-        this.startTime = Date.now();
-        this.endTime = null; // Reset the end time in case start is called again before stop
-    }
-    stop() {
-        if (this.startTime === null) {
-            throw new Error("Timer was stopped without being started.");
-        }
-        this.endTime = Date.now();
-        const elapsedSeconds = (this.endTime - this.startTime) / 1000;
-        this.startTime = null; // Reset the start time for the next use
-        return elapsedSeconds;
-    }
-    isRunning() {
-        return this.startTime !== null;
-    }
-}
+
 const timer = new Timer(); //create a timer object
 
 const client = new Client({ 
@@ -53,7 +32,8 @@ const client = new Client({
 
 client.toggles = new Collection();
 client.commands = new Collection(); // set up commands list
-const promptTimeout = new PromptTimeout(client);
+client.promptTimeout = new PromptTimeout(client);
+client.activePrompts = new Map();
 
 const commandsPath = path.join(__dirname, 'commands');
 const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
@@ -68,7 +48,6 @@ for (const file of commandFiles) {
 		console.log(`[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`);
 	}
 }
-
 
 //Handle Interaction Command.
 client.on(Events.InteractionCreate, async interaction => {  
@@ -110,8 +89,6 @@ client.on(Events.InteractionCreate, async interaction => {
         return;
     }
 });
-
-client.activePrompts = new Map();
 
 client.on('ready', async () => {
     console.log(`Logged in as ${client.user.tag}!`);
@@ -159,7 +136,7 @@ activeEvents.on('activeHoursUpdated', async (data) => {
 });
 
 activeEvents.on('activePromptExpired', async (data) => {
-    await postPrompt(data.guildId);
+    await postPrompt(data.guildId, client);
 });
 
 async function schedulePost(activeHoursData, guildId){
@@ -184,78 +161,10 @@ async function schedulePost(activeHoursData, guildId){
         console.log(`Now prompt is scheduled for: ${targetTime.format('MM-DD-YYYY @ HH:mm A')} in: ${clientGuild.name}`);
 
         scheduledPromptTimeout = setTimeout(async () => {
-          await postPrompt(guildId); 
+          await postPrompt(guildId, client); 
         }, timeDifference);
 }
 
-async function postPrompt(guildId, callingUser) {
-    var prompt = client.activePrompts.get(guildId);
-    const promptData = await promptUtils.getRandomPrompt(guildId);
-    
-    if (!promptData) {
-        console.error("No prompt found.");
-        return;
-    }
-
-    const { promptText, channelId } = promptData;
-    prompt.setPrompt(promptText);
-
-    // Fetch the target channel using the channel ID
-    const submissionChannel = await client.channels.fetch(channelId);
-    if (!submissionChannel) {
-        console.error(`Could not find channel with ID: ${channelId}`);
-        return;
-    }
-
-    prompt.setChannel(submissionChannel);
-
-    let messageContent;
-    let userToPrompt;
-
-    if (callingUser) {
-        userToPrompt = await client.users.fetch(callingUser.id);
-    } else {
-        const userRand = await outputUsers(submissionChannel.guild);
-        try {
-            userToPrompt = await client.users.fetch(userRand);
-        } catch (error) {
-            console.error("Error fetching random user:", error);
-            return;
-        }
-    }
-
-    const userID = userToPrompt.id;
-    if (!client.toggles.has(userID)) {
-        client.toggles.set(userID, true);
-    }
-    const instruction = client.toggles.get(userID) ? 'Use /submit to submit your post!' : 
-    `You opted for private prompting!, use /submit in ${submissionChannel} (Click that link!) to post!`;
-
-    messageContent = `${userToPrompt} ${instruction}\n**Prompt:**\n${promptText}`;
-
-    if (!userToPrompt || !messageContent) {
-        console.error("Error: User or message content is not defined.");
-        return;
-    }
-
-    let sentMessage;
-    let sentChannel;
-
-    if (client.toggles.get(userID)) {
-        // public
-        sentMessage = await client.sendMessageWithTimer(submissionChannel.id, messageContent);
-        sentChannel = submissionChannel.id;
-    } else {
-        // private
-        sentMessage = await userToPrompt.send(messageContent); 
-        sentChannel = sentMessage.channel.id;
-    }
-    // Send the message in the specified channel
-    prompt.setUserId(userToPrompt.id);
-    client.activePrompts.set(guildId, prompt);
-    promptTimeout.setupPrompt(sentChannel, sentMessage, userToPrompt, promptText);
-
-}
 
 
 client.sendMessageWithTimer = async (channelId, content) => {
@@ -283,10 +192,10 @@ client.on('messageCreate', async msg => {
         }
     } 
     else if(msg.content === "!demoTrigger"){ 
-        await postPrompt(msg.guildId);
+        await postPrompt(msg.guildId, client);
     }
     else if(msg.content === "Prompt me"){ 
-        await postPrompt(msg.guildId, msg.author);
+        await postPrompt(msg.guildId, client, msg.author.id);
     }
 });
 
