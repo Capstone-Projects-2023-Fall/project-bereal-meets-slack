@@ -207,6 +207,47 @@ async function insertResponseData(messageData) {
     }
 }
 
+async function fetchAllTextChannelIds(client) {
+    if (!client.isReady()) {
+        console.error('Client is not ready');
+        return [];
+    }
+
+    const channelIds = [];
+
+    // Iterate over all guilds the client is a part of
+    client.guilds.cache.forEach(guild => {
+        // Iterate over all channels in the guild
+        guild.channels.cache.forEach(channel => {
+            // Check if the channel is a text channel
+            if (channel.type === ChannelType.GuildText) {
+                // Add the channel ID to the list
+                channelIds.push(channel.id);
+            }
+        });
+    });
+
+    return channelIds;
+}
+
+async function processAllChannels(client) {
+    try {
+        const channelIds = await fetchAllTextChannelIds(client);
+        let allMessagesData = [];
+
+        for (const channelId of channelIds) {
+            const messagesData = await saveDB(client, channelId);
+            allMessagesData = allMessagesData.concat(messagesData);
+        }
+
+        console.log('All channel data has been processed and saved.');
+        return allMessagesData;
+    } catch (error) {
+        console.error('Error processing channels:', error);
+    }
+}
+
+
 function extractPromptUserIdFromEmbed(embed) {
     let promptUserId = null;
     
