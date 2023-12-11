@@ -5,7 +5,7 @@ const promptUtils = require('../utils/promptUtils.js');
 const { pool } = require('../utils/dbconn.js');
 
 
-describe(('prompt command'), () => {
+describe(('search prompt command'), () => {
     let interaction;
 
     beforeEach(() => {
