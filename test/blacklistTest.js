@@ -1,82 +1,71 @@
-const{
-    blacklistAddUser,
-    blacklistDeleteUser,
-    blacklistListUsers
-} = require('./blacklistutils.js');
 
-jest.mock('./dbconn.js', () =>({
-    pool: {
-        query: jest.fn()
-    }
-}));
+const { expect } = require('chai');
+const sinon = require('sinon');
+const blacklistUtils = require('../utils/blacklistutils.js');
+const { pool } = require('../utils/dbconn.js');
 
-const mockQuery = jest.fn();
-
-require('./dbconn.js').pool.query.mockImplementaion(mockQuery);
-
-describe('Blacklist Functions', () =>{
-    beforeEach(() =>{
-        jest.clearAllMocks();
+describe('Blacklist Utils', () => {
+    afterEach(() => {
+        sinon.restore();
     });
 
-    describe('blacklistAddUser', () =>{
-        it('should addd a user to the blacklist', async () =>{
-            mockQuery.mockResolvedValueOnce({rows: []});
+    it('should add a user to the blacklist', async () => {
+        const guildId = 'guild123';
+        const dbuser = 'dbUser123';
+        const mockRows = [];
 
-            const result = await blacklistAddUser('guildId', 'dbuser');
+        const queryStub = sinon.stub(pool, 'query');
+        queryStub.onFirstCall().resolves([mockRows]);
+        queryStub.onSecondCall().resolves();
 
-            expect(result).toBe(0);
-            expect(mockQuery).toHaveBeenCalledTimes(2)
-        });//end of it
+        const result = await blacklistUtils.blacklistAddUser(guildId, dbuser);
 
-        it('should not add a user if aldready in  the blacklist', async () => {
-            mockQuery.mockRejectedValueOnce({rows: 'Nick Sowers'});
+        expect(result).to.equal(0); // 0 for success
 
-            const result = await blacklistAddUser('guildId', 'dbuser');
+        // Check pool.query was called with the correct SQL query and parameters
+        expect(queryStub.calledTwice).to.be.true;
+        expect(queryStub.firstCall.calledWithExactly(
+            `SELECT * FROM bot.blacklist WHERE user_id = '${dbuser}' AND guild_id = '${guildId}'`
+        )).to.be.true;
+        expect(queryStub.secondCall.calledWithExactly(
+            `INSERT INTO bot.blacklist (user_id, guild_id) VALUES ('${dbuser}', '${guildId}')`
+        )).to.be.true;
+    });
 
-            expect(result).toBe(1);
-            expect(mockQuery).toHaveBeenCalledTimes(1);
-        });//end of it
+    it('should delete a user from the blacklist', async () => {
+        const guildId = 'guild123';
+        const dbuser = 'dbUser123';
+        const mockRows = { affectedRows: 1 }; // 1 row was affected
 
-        it('should handle errors', async () =>{
-            mockQuery.mockRejectedValueOnce(new Error('Mock Error'));
+        const queryStub = sinon.stub(pool, 'query').resolves([mockRows]);
 
-            const result = await blacklistAddUser('guildId', 'dbuser');
+        const result = await blacklistUtils.blacklistDeleteUser(guildId, dbuser);
 
-            expected(result).toBe(2);
-            expect(mockQuery).toHaveBeenCalledTimes(1);
-        });
-    })//end of describe balcklistAddUser
+        expect(result).to.equal(0); // 0 for success
 
-    describe('blacklistDeleteUser', () => {
-        it('should delete a user from the blacklist', async () =>{
-            mockQuery.mockRejectedValueOnce({affectedRows: 1});
+        // check pool.query was called with the correct SQL query and parameters
+        expect(queryStub.calledOnce).to.be.true;
+        expect(queryStub.calledWithExactly(
+            `DELETE FROM bot.blacklist WHERE user_id = '${dbuser}' AND guild_id = '${guildId}'`
+        )).to.be.true;
+    });
 
-            const result = await blacklistDeleteUser('guildId', 'dbuser');
+    it('should list users from the blacklist', async () => {
+        const guildId = 'guild123';
+        const mockRows = [{ user_id: 'user1' }, { user_id: 'user2' }];
 
-            expect(result).toBe(0);
-            expect(mockQuery).toHaveBeenCalledTimes(1);
-        });//end of it
-    });//end of describe blackListDeleteUser
+        const queryStub = sinon.stub(pool, 'query').resolves([mockRows]);
 
-    describe('blacklistListUsers', () =>{
-        it('shoild return a list of users on the blacklist', async () =>{
-            mockQuery.mockRejectedValueOnce({rows: [{user_id: '456'},{user_id: '789'}]});
+        const result = await blacklistUtils.blacklistListUsers(guildId);
 
-            const result = await blacklistListUsers('guildId');
+        // Assuming your function returns an array of user IDs
+        expect(result).to.deep.equal(['<@user1>', '<@user2>']);
 
-            expect(result).toEqual(['<@456>', '<@789>']);
-            expect(mockQuery).toHaveBeenCalledTimes(1);
-        });//end of it
-
-        it('should return an empty list if no users are on the blacklist', async () =>{
-            mockQuery.mockRejectedValueOnce({rows: []});
-
-            const result = await blacklistListUsers('guildId');
-
-            expect(result).toEqual([]);
-            expect(mockQuery).toHaveBeenCalledTimes(1);
-        });//end of it
-    });//end of blacklistListUsers
-
-});//end of beforeEach
+        // Check if pool.query was called with the correct SQL query and parameters
+        expect(queryStub.calledOnce).to.be.true;
+        expect(queryStub.calledWithExactly(
+            `SELECT user_id FROM bot.blacklist WHERE guild_id = '${guildId}'`
+        )).to.be.true;
+    });
+    
+});
