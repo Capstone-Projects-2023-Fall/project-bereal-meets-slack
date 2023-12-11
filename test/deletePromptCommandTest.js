@@ -14,8 +14,16 @@ describe(('delete prompt command'), () => {
             options: {
                 getSubcommand: sinon.stub(),
                 getString: sinon.stub(),
+                getChannel: sinon.stub(),
             },
-            guild: { id: 'guild123' },
+            guild: { 
+                id: 'guild123',
+                roles: {
+                    cache: [
+                        { name: 'bot mod' }
+                    ]
+                }
+            },
             deferReply: sinon.fake(),
             followUp: sinon.fake(),
         };

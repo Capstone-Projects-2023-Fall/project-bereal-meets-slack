@@ -13,7 +13,22 @@ describe(('list prompt command'), () => {
                 getSubcommand: sinon.stub(),
                 getString: sinon.stub(),
             },
-            guild: { id: 'guild123' },
+            client: {
+                channels: {
+                    cache: {
+                        get: sinon.stub(),
+                    }
+                }
+            },
+            guild: { 
+                id: 'guild123',
+                roles: {
+                    cache: [
+                        { name: 'bot mod' }
+                    ]
+                }
+            },
+            channel: { id: 'channel123' },
             deferReply: sinon.fake(),
             followUp: sinon.fake(),
         };
@@ -38,13 +53,12 @@ describe(('list prompt command'), () => {
     it('should list all the prompts for the user', async () => {
         interaction.options.getSubcommand.returns('list');
 
-        const listPromptsStub = sinon.stub(promptUtils, 'listPrompts').resolves('Current Prompts: \nPrompt1\nPrompt2\nPrompt3');
+        const listPromptsStub = sinon.stub(promptUtils, 'listPrompts').resolves('Current Prompts:\nPrompt: Prompt1 - Channel: channel123\nPrompt: Prompt2 - Channel: channel123\nPrompt: Prompt3 - Channel: channel123');
 
         await promptCommand.execute(interaction);
 
         expect(interaction.deferReply.calledOnce).to.be.true;
-        expect(listPromptsStub.calledOnceWithExactly('guild123')).to.be.true;
-        expect(interaction.followUp.calledOnceWithExactly('Current Prompts: \nPrompt1\nPrompt2\nPrompt3')).to.be.true;
+        expect(interaction.followUp.calledOnceWithExactly('Current Prompts:\nPrompt: Prompt1 - Channel: channel123\nPrompt: Prompt2 - Channel: channel123\nPrompt: Prompt3 - Channel: channel123')).to.be.true;
 
         listPromptsStub.restore();
     });

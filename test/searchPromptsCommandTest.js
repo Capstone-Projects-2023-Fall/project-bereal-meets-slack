@@ -15,7 +15,15 @@ describe(('search prompt command'), () => {
                 getSubcommand: sinon.stub(),
                 getString: sinon.stub(),
             },
-            guild: { id: 'guild123' },
+            guild: { 
+                id: 'guild123',
+                roles: {
+                    cache: [
+                        { name: 'bot mod' }
+                    ]
+                }
+            },
+            channel: { id: 'channel123' },            
             deferReply: sinon.fake(),
             followUp: sinon.fake(),
         };
@@ -46,7 +54,7 @@ describe(('search prompt command'), () => {
         await promptCommand.execute(interaction);
     
         expect(interaction.deferReply.calledOnce).to.be.true;
-        expect(searchPromptsStub.calledOnceWithExactly('guild123', 'SearchTerm')).to.be.true;
+        expect(searchPromptsStub.calledOnceWithExactly('guild123', 'SearchTerm', 'channel123')).to.be.true;
         expect(interaction.followUp.calledOnceWithExactly('Search results for "SearchTerm":\nSearchTerm1\nSearchTerm2')).to.be.true;
     
         searchPromptsStub.restore();
