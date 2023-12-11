@@ -1,10 +1,10 @@
 require('dotenv').config(); //initialize dotenv
-const { Client, Collection, Events, GatewayIntentBits, channelLink,  ChannelType } = require('discord.js');
+const { Client, Collection, Events, GatewayIntentBits} = require('discord.js');
+const cron = require('node-cron');
+const moment = require('moment-timezone');
 const path = require('node:path');
 const fs = require('fs');
 const registrar = require('./utils/commandregistrar'); 
-const cron = require('node-cron');
-const moment = require('moment-timezone');
 const promptUtils = require('./utils/promptUtils');
 const outputUsers = require('./utils/getRandom');
 const activeHoursUtils = require('./utils/activeHoursUtils');
@@ -70,7 +70,7 @@ for (const file of commandFiles) {
 }
 
 
-//check for ping command.
+//Handle Interaction Command.
 client.on(Events.InteractionCreate, async interaction => {  
     if(interaction.isAutocomplete()) {
         const command = interaction.client.commands.get(interaction.commandName);
@@ -122,18 +122,19 @@ client.on('ready', async () => {
         client.activePrompts.set(guild.id, new Prompt());
         //setup cron
         const activeHoursData = await activeHoursUtils.fetchActiveHoursFromDB(guild.id);
-        //await schedulePost(guild.id, activeHoursData); //schedule a post at first whenever the bot loads up.
+        await schedulePost(activeHoursData, guild.id); //schedule a post at first whenever the bot loads up.
         cron.schedule('30 36 16 * * *', async () => {
         //try to schedule post 
         try{
-            await schedulePost(guild.id, activeHoursData);
+            await schedulePost(activeHoursData, guild.id);
         } catch (error) {
             console.error('Error scheduling post', error);
         }
-    }, {
-        scheduled: true,
-        timezone: "America/New_York"
-    });
+        }, {
+            scheduled: true,
+            timezone: "America/New_York"
+        });
+
         console.log('scheduling data collector\n');
         cron.schedule('59 23 * * *', async () => { //scheduled to run every day at 11:59 PM
             try {
@@ -147,6 +148,7 @@ client.on('ready', async () => {
             scheduled: true,
             timezone: "America/New_York"
         });
+
     });
 });
 let scheduledPromptTimeout;
@@ -164,8 +166,10 @@ async function schedulePost(activeHoursData, guildId){
     if (scheduledPromptTimeout) {
         clearTimeout(scheduledPromptTimeout);
     }
+    client.guilds.fetch();
+    const clientGuild = await client.guilds.cache.find(guild => guild.id === guildId);
     //get random hour within active hours
-    const targetHour = activeHoursUtils.getRandomHourWithinActiveHours(activeHoursData);
+    const targetHour = await activeHoursUtils.getRandomHourWithinActiveHours(activeHoursData);
     const [hour, minute] = targetHour.split(':');
 
     const now = moment().tz("America/New_York");
@@ -177,7 +181,7 @@ async function schedulePost(activeHoursData, guildId){
         targetTime.add(1, 'day');
     }
         const timeDifference = targetTime.diff(now);
-        console.log(`Now prompt is scheduled for: ${targetTime.format('MM-DD-YYYY @ HH:mm A')}`);
+        console.log(`Now prompt is scheduled for: ${targetTime.format('MM-DD-YYYY @ HH:mm A')} in: ${clientGuild.name}`);
 
         scheduledPromptTimeout = setTimeout(async () => {
           await postPrompt(guildId); 
