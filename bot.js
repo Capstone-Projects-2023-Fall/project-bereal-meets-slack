@@ -99,7 +99,7 @@ client.on('ready', async () => {
         //setup cron
         const activeHoursData = await fetchActiveHoursFromDB(guild.id);
         await schedulePost(activeHoursData, guild.id, client); //schedule a post at first whenever the bot loads up.
-        cron.schedule('30 36 16 * * *', async () => {
+        cron.schedule('0 0 8 * * *', async () => {
         //try to schedule post 
         try{
             await schedulePost(activeHoursData, guild.id, client);
