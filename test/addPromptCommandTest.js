@@ -26,18 +26,18 @@ describe(('add prompt command'), () => {
 
 
     it('should call the addPrompt util upon /prompt add execution', async () => {
-        const listPromptsStub = sinon.stub(promptUtils, 'addPrompt');
+        const addPromptStub = sinon.stub(promptUtils, 'addPrompt');
         interaction.options.getSubcommand.returns('add');
         
         await promptCommand.execute(interaction);
 
         expect(interaction.deferReply.called).to.be.true;
         expect(promptUtils.addPrompt.called).to.be.true;
-        listPromptsStub.restore(); 
+        addPromptStub.restore(); 
     });
 
 
-    it('should add the user inputted prompt to the list', async () => {
+    it('should add prompt from the user to the list', async () => {
         const queryStub = sinon.stub(pool, 'query').resolves();
 
         await promptUtils.addPrompt('guild123', 'New Prompt');

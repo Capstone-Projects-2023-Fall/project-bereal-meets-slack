@@ -1,7 +1,7 @@
 const { expect } = require('chai');
 const sinon = require('sinon');
-const promptCommand = require('../commands/prompt-commands');
-const promptUtils = require('../utils/promptUtils');
+const promptCommand = require('../commands/prompt-commands.js');
+const promptUtils = require('../utils/promptUtils.js');
 const { pool } = require('../utils/dbconn.js');
 
 
@@ -46,7 +46,7 @@ describe(('prompt utils to get prompts and get a random prompt'), () => {
 
         const result = await promptUtils.getRandomPrompt('guild123');
         
-        // check getRandomPrompt matches a prompt from mocked rows
+        // check returns a prompt from mockedRows
         expect(result).to.equal(mockRows.prompt_text);
 
         // check that pool.query was called with the correct SQL query and parameters
