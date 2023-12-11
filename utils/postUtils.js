@@ -1,5 +1,7 @@
 const { getRandomPrompt } = require('./promptUtils.js');
 const outputUsers = require('./getRandom.js');
+const moment = require('moment-timezone');
+const { getRandomHourWithinActiveHours } = require('./activeHoursUtils');
 
 async function postPrompt(guildId, client, callingUser) {
     var prompt = client.activePrompts.get(guildId);
@@ -69,5 +71,33 @@ async function postPrompt(guildId, client, callingUser) {
     client.promptTimeout.setupPrompt(sentChannel, sentMessage, userToPrompt, promptText);
 }
 
+let scheduledPromptTimeout;
 
-module.exports = { postPrompt }
+async function schedulePost(activeHoursData, guildId, client){
+    if (scheduledPromptTimeout) {
+        clearTimeout(scheduledPromptTimeout);
+    }
+    client.guilds.fetch();
+    const clientGuild = await client.guilds.cache.find(guild => guild.id === guildId);
+    //get random hour within active hours
+    const targetHour = await getRandomHourWithinActiveHours(activeHoursData);
+    const [hour, minute] = targetHour.split(':');
+
+    const now = moment().tz("America/New_York");
+    const targetTime = now.clone().hour(hour).minute(minute).second(0);
+
+    if(now.isAfter(targetTime)){
+        //if current time is after target time, schedule for next day
+        console.log("Current time is past target posting time. Scheduling for next available slot.\n");
+        targetTime.add(1, 'day');
+    }
+        const timeDifference = targetTime.diff(now);
+        console.log(`Now prompt is scheduled for: ${targetTime.format('MM-DD-YYYY @ HH:mm A')} in: ${clientGuild.name}`);
+
+        scheduledPromptTimeout = setTimeout(async () => {
+          await postPrompt(guildId, client); 
+        }, timeDifference);
+}
+
+
+module.exports = { postPrompt, schedulePost }
