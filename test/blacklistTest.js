@@ -4,7 +4,7 @@ const sinon = require('sinon');
 const blacklistUtils = require('../utils/blacklistutils.js');
 const { pool } = require('../utils/dbconn.js');
 
-describe('Blacklist Utils', () => {
+describe('blacklist command', () => {
     afterEach(() => {
         sinon.restore();
     });

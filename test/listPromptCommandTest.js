@@ -53,12 +53,15 @@ describe(('list prompt command'), () => {
     it('should list all the prompts for the user', async () => {
         interaction.options.getSubcommand.returns('list');
 
-        const listPromptsStub = sinon.stub(promptUtils, 'listPrompts').resolves('Current Prompts:\nPrompt: Prompt1 - Channel: channel123\nPrompt: Prompt2 - Channel: channel123\nPrompt: Prompt3 - Channel: channel123');
+        const listPromptsStub = sinon.stub(promptUtils, 'listPrompts').
+        resolves('Current Prompts:\nPrompt: Prompt1 - Channel: channel123\nPrompt: Prompt2 - Channel: channel123\nPrompt: Prompt3 - Channel: channel123');
 
         await promptCommand.execute(interaction);
 
         expect(interaction.deferReply.calledOnce).to.be.true;
-        expect(interaction.followUp.calledOnceWithExactly('Current Prompts:\nPrompt: Prompt1 - Channel: channel123\nPrompt: Prompt2 - Channel: channel123\nPrompt: Prompt3 - Channel: channel123')).to.be.true;
+        expect(interaction.followUp.calledOnceWithExactly(
+            'Current Prompts:\nPrompt: Prompt1 - Channel: channel123\nPrompt: Prompt2 - Channel: channel123\nPrompt: Prompt3 - Channel: channel123')).
+            to.be.true;
 
         listPromptsStub.restore();
     });

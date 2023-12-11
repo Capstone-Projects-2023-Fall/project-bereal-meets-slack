@@ -33,7 +33,7 @@ describe(('delete prompt command'), () => {
         sinon.restore();
     });
 
-    it('should call the deletePrompt util upon /prompt delete executio', async () => {
+    it('should call the deletePrompt util upon /prompt delete execution', async () => {
         const deletePromptStub = sinon.stub(promptUtils, 'deletePrompt');
         interaction.options.getSubcommand.returns('delete');
         promptUtils.deletePrompt.resolves('Prompt was deleted');
@@ -65,7 +65,8 @@ describe(('delete prompt command'), () => {
         interaction.options.getSubcommand.returns('delete');
         interaction.options.getString.returns('PartialMatch');
 
-        const deletePromptStub = sinon.stub(promptUtils, 'deletePrompt').resolves('Did not find specified prompt, did you mean: PartialMatch1, PartialMatch2');
+        const deletePromptStub = sinon.stub(promptUtils, 'deletePrompt').
+        resolves('Did not find specified prompt, did you mean: PartialMatch1, PartialMatch2');
 
         await promptCommand.execute(interaction);
 

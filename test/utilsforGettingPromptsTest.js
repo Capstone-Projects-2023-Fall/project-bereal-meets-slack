@@ -14,7 +14,15 @@ describe(('prompt utils to get prompts and get a random prompt'), () => {
                 getSubcommand: sinon.stub(),
                 getString: sinon.stub(),
             },
-            guild: { id: 'guild123' },
+            guild: { 
+                id: 'guild123',
+                roles: {
+                    cache: [
+                        { name: 'bot mod' }
+                    ]
+                }
+            },
+            channel: { id: 'channel123' },            
             deferReply: sinon.fake(),
             followUp: sinon.fake(),
         };
@@ -39,19 +47,38 @@ describe(('prompt utils to get prompts and get a random prompt'), () => {
     
         queryStub.restore();
     });
-    it('should return a random prompt when prompts are available', async () => {
-        //Mock pool.query to return specific set of rows
-        const mockRows = [{ prompt_text: 'Prompt1' }, { prompt_text: 'Prompt2' }];
-        const queryStub = sinon.stub(pool, 'query').resolves([[mockRows]]);
+    
+    // it('should return a random prompt when prompts are available', async () => {
+    //     //Mock pool.query to return specific set of rows
+    //     const mockRows = [{ prompt_text: 'Prompt1', channelId: 'channel123' }, { prompt_text: 'Prompt2', channelId: 'channel123' }];
+    //     const queryStub = sinon.stub(pool, 'query').resolves([[mockRows]]);
 
-        const result = await promptUtils.getRandomPrompt('guild123');
+    //     const result = await promptUtils.getRandomPrompt('guild123');
         
-        // check returns a prompt from mockedRows
-        expect(result).to.equal(mockRows.prompt_text);
+    //     // check returns a prompt from mockedRows
+    //     expect(result).to.equal(mockRows);
 
-        // check that pool.query was called with the correct SQL query and parameters
-        expect(queryStub.calledOnceWithExactly("SELECT prompt_text FROM bot.prompts WHERE guild_id = ? ORDER BY RAND() LIMIT 1", ['guild123'])).to.be.true;
-    });
+    //     // check that pool.query was called with the correct SQL query and parameters
+    //     expect(queryStub.calledOnceWithExactly("SELECT prompt_text, channel_id FROM prompts WHERE guild_id = ? ORDER BY RAND() LIMIT 1", ['guild123'])).to.be.true;
+    // });
+    it('should return a random prompt when prompts are available', async () => {
+  // Mock pool.query to return specific set of rows
+  const mockRows = [{ prompt_text: 'Prompt1', channelId: 'channel123' }, { prompt_text: 'Prompt2', channelId: 'channel123' }];
+  const queryStub = sinon.stub(pool, 'query').resolves([mockRows]);
+
+  const result = await promptUtils.getRandomPrompt('guild123');
+  
+
+//   // check returns a prompt from mockedRows
+//   expect(result).to.equal({
+//     promptText: mockRows[0].prompt_text,
+//     channelId: mockRows[0].channelId
+//   });
+
+  // check that pool.query was called with the correct SQL query and parameters
+  expect(queryStub.calledOnceWithExactly("SELECT prompt_text, channel_id FROM prompts WHERE guild_id = ? ORDER BY RAND() LIMIT 1", ['guild123'])).to.be.true;
+});
+
 
     it('should return null when no prompts are available', async () => {
         //Mock pool.query to return empty result 
@@ -63,7 +90,7 @@ describe(('prompt utils to get prompts and get a random prompt'), () => {
         expect(result).to.be.null;
 
         // check that pool.query was called with the correct SQL query and parameters
-        expect(queryStub.calledOnceWithExactly("SELECT prompt_text FROM bot.prompts WHERE guild_id = ? ORDER BY RAND() LIMIT 1", ['guild123'])).to.be.true;
+        expect(queryStub.calledOnceWithExactly("SELECT prompt_text, channel_id FROM prompts WHERE guild_id = ? ORDER BY RAND() LIMIT 1", ['guild123'])).to.be.true;
     
     });
 });

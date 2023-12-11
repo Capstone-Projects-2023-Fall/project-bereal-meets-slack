@@ -52,7 +52,9 @@ describe(('add prompt command'), () => {
 
         await promptUtils.addPrompt('guild123', 'New Prompt', 'channel123');
 
-        expect(queryStub.calledOnceWithExactly("INSERT INTO bot.prompts (guild_id, prompt_text, channel_id) VALUES (?, ?, ?)", ['guild123', 'New Prompt', 'channel123'])).to.be.true;
+        expect(queryStub.calledOnceWithExactly(
+            "INSERT INTO bot.prompts (guild_id, prompt_text, channel_id) VALUES (?, ?, ?)", ['guild123', 'New Prompt', 'channel123'])
+            ).to.be.true;
     });
 
     it('should return the success message when adding a prompt from the user', async () => {
