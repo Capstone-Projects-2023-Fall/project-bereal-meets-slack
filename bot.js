@@ -308,10 +308,21 @@ client.on('messageCreate', async msg => {
 
 
 client.on('guildCreate', async guild => {
-    await setDefaultChannel(guild.systemChannel.id, guild.id);
 
-    const welcomeMessage = helpUtils.getHelpMessage();
-    await guild.systemChannel.send(welcomeMessage);
+    botChannel = guild.systemChannel;
+    
+
+    if(!botChannel){
+       await guild.channels.fetch();
+       textChannels = await guild.channels.cache.filter(channel => channel.isTextBased());
+       botChannel = textChannels.first();
+    }
+
+    console.log(botChannel);
+
+    await setDefaultChannel(botChannel.id, guild.id);
+    const welcomeMessage = helpUtils.getHelpMessageMod();
+    await botChannel.send(welcomeMessage);
     const modrole = await guild.roles.create({
         name:'bot mod', 
         color:'Random',
