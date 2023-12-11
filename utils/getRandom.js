@@ -28,10 +28,6 @@ async function getRandomUser(guild) {
             }
         });
 
-        console.log('Blacklisted Users:', blacklistedUsers);
-        console.log('Bot Users:', botUsers);
-        console.log('Non-Bot Users:', nonBotUsers);
-
         if (nonBotUsers.length === 0) {
             // Handles the case where no eligible non-bot users are found
             return null;

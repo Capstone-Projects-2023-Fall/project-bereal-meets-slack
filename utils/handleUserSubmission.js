@@ -1,6 +1,7 @@
 const { blacklistAddUser } = require('../utils/blacklistutils.js');
 const { ComponentType, EmbedBuilder } = require('discord.js');
 const { notifyMods } = require('./notifyMods.js');
+const activeEvents = require('../utils/activeEvents');
 
 let deniedUsers = new Map(); //keep track of user denial counts
 
@@ -120,6 +121,7 @@ async function handleUserSubmission(attachment, caption, interaction) {
                         if (denialCount >= 3) {
                             prompt.setUserId(client.user.id); //prompt has been exhausted, default the value to prevent extraneous post spam.
                             client.activePrompts.set(guild.id, prompt);
+                            activeEvents.emit('activePromptExpired', {guildId: guild.id})
                             //add user to blacklist
                             await blacklistAddUser(guild.id, submitter.id);
 
