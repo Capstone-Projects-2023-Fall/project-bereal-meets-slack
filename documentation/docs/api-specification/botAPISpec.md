@@ -391,7 +391,22 @@ Notifies moderators in a guild about a new submission and provides options to ap
 
 
 
+## postPrompt Methods
 
+
+### `postPrompt(guildId, client, callingUser)`
+
+#### `postPrompt(guildId, client, callingUser) → {void}`
+
+Posts a prompt in a specified channel for a user to submit content.
+
+##### Parameters:
+
+| Name           | Type          | Description                                       |
+|----------------|---------------|---------------------------------------------------|
+| `guildId`      | string        | The ID of the Discord guild.                       |
+| `client`       | Object        | The Discord client object.                         |
+| `callingUser`  | string (optional) | The ID of the user triggering the prompt.        |
 
 
 
@@ -415,8 +430,159 @@ Sets up a timed prompt in a specific channel for user interaction.
 | `user`             | Object | The Discord user object for whom the prompt is set up.         |
 | `originalPrompt`   | Object | The original prompt object or content for reference.           |
 
+### `schedulePost(activeHoursData, guildId, client)`
+
+#### `schedulePost(activeHoursData, guildId, client) → {void}`
+
+Schedules the posting of a prompt within active hours of a guild.
+
+##### Parameters:
+
+| Name               | Type    | Description                                           |
+|--------------------|---------|-------------------------------------------------------|
+| `activeHoursData`  | Object  | An object containing `start_time` and `end_time`.      |
+| `guildId`          | string  | The ID of the Discord guild.                           |
+| `client`           | Object  | The Discord client object.                             |
 
 
+
+## Prompt Class
+
+### `Prompt`
+
+#### Description:
+
+A class representing a prompt with associated user and channel information.
+
+##### Properties:
+
+- `prompt`: The content of the prompt.
+- `userId`: The ID of the user associated with the prompt.
+- `channel`: The channel associated with the prompt.
+
+#### Methods:
+
+##### `isUserIdMatch(userId)`
+
+Checks if the provided user ID matches the user ID associated with the prompt.
+
+###### Parameters:
+
+| Name      | Type   | Description                         |
+|-----------|--------|-------------------------------------|
+| `userId`  | string | The user ID to compare with.         |
+
+###### Returns:
+
+- `true` if the provided user ID matches the user ID associated with the prompt; otherwise, `false`.
+
+###### Type: `boolean`
+
+##### `setPrompt(msg)`
+
+Sets the content of the prompt.
+
+###### Parameters:
+
+| Name   | Type   | Description                     |
+|--------|--------|---------------------------------|
+| `msg`  | string | The content of the prompt.       |
+
+##### `setUserId(userId)`
+
+Sets the user ID associated with the prompt.
+
+###### Parameters:
+
+| Name      | Type   | Description                    |
+|-----------|--------|--------------------------------|
+| `userId`  | string | The ID of the associated user.  |
+
+##### `setChannel(channel)`
+
+Sets the channel associated with the prompt.
+
+###### Parameters:
+
+| Name       | Type   | Description                    |
+|------------|--------|--------------------------------|
+| `channel`  | string | The associated channel.         |
+
+##### `getPrompt()`
+
+Gets the content of the prompt.
+
+###### Returns:
+
+- The content of the prompt.
+
+###### Type: `string`
+
+##### `getUserId()`
+
+Gets the user ID associated with the prompt.
+
+###### Returns:
+
+- The ID of the associated user.
+
+###### Type: `string`
+
+##### `getChannel()`
+
+Gets the channel associated with the prompt.
+
+###### Returns:
+
+- The associated channel.
+
+###### Type: `string`
+
+
+
+## promptTimeout Class
+
+### `PromptTimeout`
+
+A utility class managing timeouts for prompts and reprompts.
+
+### `constructor(client)`
+
+#### Description:
+Constructs a new instance of the class.
+
+##### Parameters:
+| Name       | Type   | Description                           |
+|------------|--------|---------------------------------------|
+| `client`   | Object | The Discord.js client instance.       |
+
+---
+
+## Methods
+
+
+### `setupPrompt(channelId, message, user, originalPrompt)`
+
+#### `setupPrompt(channelId, message, user, originalPrompt) → {void}`
+
+#### Description:
+This method sets up the timeout and message for a prompt.
+
+##### Parameters:
+| Name             | Type   | Description                                   |
+|------------------|--------|-----------------------------------------------|
+| `channelId`      | string | The ID of the Discord channel.                |
+| `message`        | string | The message content for the prompt.           |
+| `user`           | Object | The Discord user associated with the prompt.  |
+| `originalPrompt` | string | The original prompt content.                  |
+
+##### Parameters:
+| Name             | Type   | Description                                   |
+|------------------|--------|-----------------------------------------------|
+| `channelId`      | string | The ID of the Discord channel.                |
+| `message`        | string | The message content for the prompt.           |
+| `user`           | Object | The Discord user associated with the prompt.  |
+| `originalPrompt` | string | The original prompt content.                  |
 
 
 
@@ -755,4 +921,27 @@ Inserts response data into the database, avoiding duplicates based on the messag
 |---------------|--------|------------------------------------|
 | `messageData` | Object | Data object for the response.       |
 
-_____
+
+
+## setDefaultChannel Methods
+
+## Function
+
+### `setDefaultChannel(channelId, guildId)`
+
+#### Description:
+Sets the default channel for submissions in the database. If the channel and guild combination already exists, it updates the submission channel.
+
+##### Parameters:
+| Name       | Type   | Description                        |
+|------------|--------|------------------------------------|
+| `channelId` | string | The ID of the Discord channel.      |
+| `guildId`   | string | The ID of the Discord guild.        |
+
+##### Returns:
+- A promise that resolves to `0` on success.
+- A promise that resolves to `1` on failure.
+
+  **Type:** `Promise.<number>`
+
+
