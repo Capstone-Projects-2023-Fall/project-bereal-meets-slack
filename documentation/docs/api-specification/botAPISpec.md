@@ -11,7 +11,7 @@ This outlines the API specification for the Bot. It provides details on the meth
 
 ### `activeEvents`
 
-#### Type:
+**Type:** 
 
 - An instance of the Node.js built-in 'EventEmitter' class.
 
@@ -89,6 +89,11 @@ Generates a random hour within the active operating hours for a guild.
 
 
 
+
+
+
+
+
 ## blacklistUtils Methods
 
 ### `blacklistAddUser(guildId, dbuser)`
@@ -129,37 +134,15 @@ Deletes a user from the blacklist for a guild.
 
 ##### Returns:
 
-- A Promise that resolves to `0` if the user is successfully deleted.
-- Resolves to `1` if no user is deleted.
+- A Promise resolving to:
+  - `0` if the user is successfully deleted.
+  - `1` if no user is deleted
+
 
   **Type:** `Promise.<number>`
 
 
 
-
-
-
-### `blacklistAddUser(guildId, dbuser)`
-
-#### `blacklistAddUser(guildId, dbuser) → {Promise<number>}`
-
-Adds a user to the blacklist for a guild.
-
-##### Parameters:
-
-| Name      | Type   | Description                             |
-|-----------|--------|-----------------------------------------|
-| `guildId` | string | The ID of the Discord guild.             |
-| `dbuser`  | string | The user ID to be blacklisted.           |
-
-##### Returns:
-
-- A Promise resolving to:
-  - `0` if the user was successfully added to the blacklist.
-  - `1` if the user is already blacklisted.
-  - `2` if an error occurred during the operation.
-
-  **Type:** `Promise<number>`
 
 
 
@@ -239,6 +222,10 @@ Creates a connection pool for local database calls during testing.
 - MySQL connection pool object.
 
   **Type:** `Object`
+
+
+
+
 
 ### `createConnectionPoolCloud()`
 
@@ -476,7 +463,11 @@ Checks if the provided user ID matches the user ID associated with the prompt.
 
 - `true` if the provided user ID matches the user ID associated with the prompt; otherwise, `false`.
 
-###### Type: `boolean`
+##**Type:**  `boolean`
+
+
+
+
 
 ##### `setPrompt(msg)`
 
@@ -516,7 +507,7 @@ Gets the content of the prompt.
 
 - The content of the prompt.
 
-###### Type: `string`
+##**Type:**  `string`
 
 ##### `getUserId()`
 
@@ -526,7 +517,9 @@ Gets the user ID associated with the prompt.
 
 - The ID of the associated user.
 
-###### Type: `string`
+##**Type:**  `string`
+
+
 
 ##### `getChannel()`
 
@@ -536,7 +529,7 @@ Gets the channel associated with the prompt.
 
 - The associated channel.
 
-###### Type: `string`
+##**Type:**  `string`
 
 
 
@@ -647,7 +640,6 @@ Retrieves a list of prompts for a specified guild from the database.
 
   **Type:** `Promise<Array.<string>>`
 
----
 
 ### `addPrompt(guildId, prompt)`
 
@@ -668,7 +660,6 @@ Adds a new prompt to the database for a specified guild.
 
   **Type:** `Promise<string>`
 
----
 
 ### `deletePrompt(guildId, promptToDelete)`
 
@@ -689,7 +680,8 @@ Deletes a prompt from the database for a specified guild.
 
   **Type:** `Promise<string>`
 
----
+
+
 
 ### `listPrompts(guildId)`
 
@@ -709,7 +701,8 @@ Retrieves and lists all prompts for a specified guild.
 
   **Type:** `Promise<string>`
 
----
+
+
 
 ### `searchPrompts(guildId, query)`
 
@@ -730,7 +723,7 @@ Searches for prompts that match a specified query for a specified guild.
 
   **Type:** `Promise<string>`
 
----
+
 
 ### `getRandomPrompt(guildId)`
 
@@ -943,5 +936,48 @@ Sets the default channel for submissions in the database. If the channel and gui
 - A promise that resolves to `1` on failure.
 
   **Type:** `Promise.<number>`
+
+
+## `Timer`
+
+### Constructor
+
+#### `constructor()`
+
+##### Description:
+Constructs a new instance of the Timer class.
+
+##### Properties:
+- `startTime` (null|number): The timestamp when the timer started.
+- `endTime` (null|number): The timestamp when the timer stopped.
+
+---
+
+### Methods
+
+#### `start()`
+
+##### Description:
+Starts the timer by setting the `startTime` to the current timestamp.
+
+#### `stop()`
+
+##### Description:
+Stops the timer by setting the `endTime` to the current timestamp. Calculates and returns the elapsed time in seconds.
+
+##### Returns:
+- `number`: Elapsed time in seconds.
+
+##### Throws:
+- Error: If the timer was stopped without being started.
+
+
+#### `isRunning()`
+
+##### Description:
+Checks if the timer is currently running.
+
+##### Returns:
+- `boolean`: `true` if the timer is running; `false` otherwise.
 
 
