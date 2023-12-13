@@ -9,29 +9,11 @@ Bot Api Spec
 This outlines the API specification for the Bot. It provides details on the methods available, their parameters, return values, and the usage.
 
 
+### `activeEvents`
 
-## getRandom Methods
-### `getRandomUser(guild)`
+#### Type:
 
-#### `getRandomUser(guild) → {string | null}`
-
-Generates a random non-blacklisted, non-bot user ID from a guild's members.
-
-##### Parameters:
-
-| Name    | Type   | Description                           |
-|---------|--------|---------------------------------------|
-| `guild` | Object | The Discord guild object.             |
-
-##### Returns:
-
-- A string representing the user ID of a randomly selected non-blacklisted, non-bot user.
-- Returns `null` if no eligible non-bot users are found.
-
-  **Type:** `string | null`
-
-
-
+- An instance of the Node.js built-in 'EventEmitter' class.
 
 
 
@@ -58,11 +40,7 @@ Fetches active operating hours for a guild from the database.
   **Type:** `Promise.<{start_time: string, end_time: string}>`
 
 
-
-
-
-
-### `storeOperatingHours(guildId, startTime, endTime)`
+  ### `storeOperatingHours(guildId, startTime, endTime)`
 
 #### `(async) storeOperatingHours(guildId, startTime, endTime) → {Promise.<void>}`
 
@@ -110,6 +88,144 @@ Generates a random hour within the active operating hours for a guild.
 
 
 
+
+## blacklistUtils Methods
+
+### `blacklistAddUser(guildId, dbuser)`
+
+#### `blacklistAddUser(guildId, dbuser) → {Promise<number>}`
+
+Adds a user to the blacklist for a guild.
+
+##### Parameters:
+
+| Name      | Type   | Description                             |
+|-----------|--------|-----------------------------------------|
+| `guildId` | string | The ID of the Discord guild.             |
+| `dbuser`  | string | The user ID to be blacklisted.           |
+
+##### Returns:
+
+- A Promise resolving to:
+  - `0` if the user was successfully added to the blacklist.
+  - `1` if the user is already blacklisted.
+  - `2` if an error occurred during the operation.
+
+  **Type:** `Promise<number>`
+
+
+### `blacklistDeleteUser(guildId, dbuser)`
+
+#### `blacklistDeleteUser(guildId, dbuser) → {Promise.<number>}`
+
+Deletes a user from the blacklist for a guild.
+
+##### Parameters:
+
+| Name      | Type   | Description                            |
+|-----------|--------|----------------------------------------|
+| `guildId` | string | The ID of the Discord guild.           |
+| `dbuser`  | string | The user ID to be removed from the blacklist. |
+
+##### Returns:
+
+- A Promise that resolves to `0` if the user is successfully deleted.
+- Resolves to `1` if no user is deleted.
+
+  **Type:** `Promise.<number>`
+
+
+
+
+
+
+### `blacklistAddUser(guildId, dbuser)`
+
+#### `blacklistAddUser(guildId, dbuser) → {Promise<number>}`
+
+Adds a user to the blacklist for a guild.
+
+##### Parameters:
+
+| Name      | Type   | Description                             |
+|-----------|--------|-----------------------------------------|
+| `guildId` | string | The ID of the Discord guild.             |
+| `dbuser`  | string | The user ID to be blacklisted.           |
+
+##### Returns:
+
+- A Promise resolving to:
+  - `0` if the user was successfully added to the blacklist.
+  - `1` if the user is already blacklisted.
+  - `2` if an error occurred during the operation.
+
+  **Type:** `Promise<number>`
+
+
+
+### `blacklistListUsers(guildId)`
+
+#### `blacklistListUsers(guildId) → {Promise.<Array.<string>>}`
+
+Fetches and returns a list of blacklisted users in a guild.
+
+##### Parameters:
+
+| Name      | Type   | Description                                   |
+|-----------|--------|-----------------------------------------------|
+| `guildId` | string | The ID of the Discord guild.                   |
+
+##### Returns:
+
+- A promise that resolves to an array of formatted user mentions (`<@user_id>`).
+
+  **Type:** `Promise.<Array.<string>>`
+
+
+
+
+## dataGraph Methods
+
+### `fetchDataForGraph(guildId)`
+
+#### `fetchDataForGraph(guildId) → {Promise.<Array<Object>>}`
+
+Fetches data for generating a graph based on reactions in a guild.
+
+##### Parameters:
+
+| Name      | Type   | Description                              |
+|-----------|--------|------------------------------------------|
+| `guildId` | string | The ID of the Discord guild.              |
+
+##### Returns:
+
+- A promise that resolves to an array of objects containing `prompt_text` and `num_reactions`.
+
+  **Type:** `Promise.<Array<Object>>`
+
+
+### `generateGraph(data)`
+
+#### `generateGraph(data) → {Promise.<Buffer>}`
+
+Generates a bar chart graph using Chart.js based on the provided data.
+
+##### Parameters:
+
+| Name  | Type   | Description                                |
+|-------|--------|--------------------------------------------|
+| `data`| Array  | An array of objects with `prompt_text` and `num_reactions`. |
+
+##### Returns:
+
+- A Promise that resolves to a Buffer containing the rendered graph image.
+
+  **Type:** `Promise.<Buffer>`
+
+
+
+
 ## dbConn Methods
 
 ### `createConnectionPoolLocal()`
@@ -138,6 +254,10 @@ Creates a connection pool for cloud database calls.
 
 
 
+
+
+
+
 ### `createPromiseConnectionPool()`
 
 #### `createPromiseConnectionPool() → {Object}`
@@ -149,6 +269,131 @@ Creates a promise-based connection pool based on the specified environment flag.
 - A Promise-based MySQL connection pool.
 
   **Type:** `Object`
+
+
+
+
+
+
+## getRandom Methods
+### `getRandomUser(guild)`
+
+#### `getRandomUser(guild) → {string | null}`
+
+Generates a random non-blacklisted, non-bot user ID from a guild's members.
+
+##### Parameters:
+
+| Name    | Type   | Description                           |
+|---------|--------|---------------------------------------|
+| `guild` | Object | The Discord guild object.             |
+
+##### Returns:
+
+- A string representing the user ID of a randomly selected non-blacklisted, non-bot user.
+- Returns `null` if no eligible non-bot users are found.
+
+  **Type:** `string | null`
+
+
+
+
+
+## handleUserSubmission Methods
+
+
+### `handleUserSubmission(attachment, caption, interaction)`
+
+Handles user submissions for Discord bot prompts.
+
+#### Parameters:
+
+| Name           | Type        | Description                                                                                   |
+|----------------|-------------|-----------------------------------------------------------------------------------------------|
+| `attachment`   | Discord.Attachment | The file attached to the submission.                                                        |
+| `caption`      | string      | The optional caption provided by the user.                                                  |
+| `interaction`  | Discord.CommandInteraction | The interaction object representing the user's command interaction.                          |
+
+#### Execution:
+
+- Verifies if the user is prompted and if the prompt matches the user ID.
+- Defers and then edits the user's reply to indicate the submission has been received.
+- Checks if the attachment is an image.
+- Notifies moderators about the submission and waits for their responses.
+
+#### Deny Flow:
+
+- If a moderator denies the submission, prompts the moderator for a reason and notifies the submitter.
+- Tracks denial counts for users and issues warnings.
+- If a user reaches a strike limit, adds them to the blacklist and notifies moderators.
+
+#### Approval Flow:
+
+- If a moderator approves the submission, edits messages accordingly and notifies moderators.
+- Sends an embedded message to the specified channel containing the submission details.
+
+
+
+ ## helpUtils Methods
+
+ ### `getHelpMessageMod()`
+
+#### `getHelpMessageMod() → {string}`
+
+Returns a help message that explains how to use the Bot for Bot moderators.
+
+##### Returns:
+
+- A string containing the help message for moderators.
+
+  **Type:** `string`
+
+
+
+### `getHelpMessageUser()`
+
+#### `getHelpMessageUser() → {string}`
+
+Returns a help message that explains how to use the Bot for Bot users.
+
+##### Returns:
+
+- A string containing the help message for regular users.
+
+  **Type:** `string`
+
+
+## notifyMods Methods
+
+### `notifyMods(guild, content, caption, author, attachments)`
+
+#### `notifyMods(guild, content, caption, author, attachments) → {Object}`
+
+Notifies moderators in a guild about a new submission and provides options to approve or deny.
+
+##### Parameters:
+
+| Name          | Type      | Description                                      |
+|---------------|-----------|--------------------------------------------------|
+| `guild`       | Object    | The Discord guild object.                        |
+| `content`     | string    | The content or prompt associated with the submission. |
+| `caption`     | string    | The caption provided for the submission. (Optional) |
+| `author`      | Object    | The author of the submission.                     |
+| `attachments` | Collection or Array | Attachments associated with the submission. |
+
+##### Returns:
+
+- An object with the following properties:
+  - `responses`: An array of responses from moderators.
+  - `moderators`: A collection of moderators who were notified.
+
+
+
+
+
+
+
+
 
 
 
@@ -510,3 +755,4 @@ Inserts response data into the database, avoiding duplicates based on the messag
 |---------------|--------|------------------------------------|
 | `messageData` | Object | Data object for the response.       |
 
+_____
