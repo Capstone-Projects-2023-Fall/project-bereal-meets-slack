@@ -1,36 +1,36 @@
 ---
 sidebar_position: 1
 ---
-# BeReal Bot Design Document
+# WhatchaDoin Bot Design Document
 
 ## Components
 
 ### Chat Application
 
-The chat application acts as both the user portal for the bot and as the running environment for the bot. The chat application facilitates user interaction with the bot and allows for it to act like a psuedo user that can post and interact with messages. There will be a level of UI/UX design for the bot in Discord using both its API & libraries for command and interaction formatting as well as block kit for formatting of modals, popups, and responses. The application will also act as the display for all data visualization that moderators ask for.
+The chat application acts as both the bot's user portal and the bot's running environment. The chat application facilitates user interaction with the bot and allows it to act like a pseudo-user that can post and interact with messages. There will be a level of UI/UX design for the bot in Discord using both its API & libraries for command and interaction formatting as well as a block kit for formatting of modals, popups, and responses. The application will also act as the display for all data visualization that moderators ask for.
 
-### BeReal Bot 
+### WhatchaDoin Bot 
 
-The bot itself is a chatbot that is hosted on Google Cloud via cloud run, as mentioned previous it will act as a pseudo user posting messages and accepting/reacting to user responses with triggers. It interfaces with the Discord API to send messages, and interfaces with the database to both store and pull user reaction data. When dealing with moderation the bot will opt to DM moderators and generate either popups, modals, or interfaceable actions for approvals, data requests, or moderation features. When logging data the bot will leverage the server to send data to firebase for storage.
+The bot itself is a chatbot that is hosted on Google Cloud via cloud run, as previously mentioned it will act as a pseudo-user posting messages and accepting and reacting to user responses with triggers. It interfaces with the Discord API to send messages and with the database to store and pull user reaction data. When dealing with moderation the bot will opt to DM moderators and generate either popups, modals, or interactive actions for approvals, data requests, or moderation features. When logging data the bot will leverage the server to send data to Firebase for storage.
 
-### Google Cloud Webserver
+### Google Cloud Web Server
 
-The Google Cloud webserver provides a hosting point for the bot using the cloud run service. The server allows for two things, bot uptime and bot access to the database, through the server the bot can make calls to the firebase database both for logging and for acces of data. The webserver will also provide containers that host the firebase database for reaction data. The webserver will also be responsible for handling the formatting of data into visualizations when requested by the bot via a user.
+The Google Cloud web server provides a hosting point for the bot using the cloud run service. The server allows for two things, bot uptime and bot access to the database, through the server, the bot can make calls to the Firebase database both for logging and for access to data. The web server will also provide containers that host the Firebase database for reaction data. The web server also will be responsible for formatting data into visualizations when requested by the bot via a user.
 
 ### Google Firebase Database
 
-The Firebase database is contained in the cloud webserver and acts as a means of storing and logging all reaction data. The database will contain data pertaining to prompts, approved submitted images, time to post, emoji reactions, threaded replies, and number of comments. All of this data will be exportable as a CSV or in a visualization done by the host webserver.
+The Firebase database is contained in the cloud web server and acts as a means of storing and logging all reaction data. The database will contain data about prompts, approved submitted images, time to post, emoji reactions, threaded replies, and several comments. All of this data will be exportable as a CSV or in a visualization done by the host web server.
 
 ## Class Diagram
 ```mermaid
 classDiagram
-webServer --> BeRealBot
+webServer --> WhatchaDoinBot
 webServer --> database
 class webServer{
   + generateCSV(int startTime, int endTime)
   + generateDataVis(int startTime, int endTime)
 }
-class BeRealBot{
+class WhatchaDoinBot{
   + String botName
   + token botToken
   - int startHour
@@ -86,7 +86,7 @@ class database{
 
 }
 ```
-## BeReal Bot
+## WhatchaDoin Bot
 This class will contain methods that allow the bot to interact with the users and moderator
 
 **Fields**
@@ -192,22 +192,22 @@ Prompts ||--|{ Responses : ""
 ```
 ## Sequence Diagrams
 
-**Use Case #1**: Owner of the Discord Server Configures the BeReal bot
+**Use Case #1**: Owner of the Discord Server Configures the WhatchaDoin bot
 <details>
 <summary>
 Use Case 1 Discription
 </summary>
-
-1. Owner signs in to Discord.
-2. Owner opens the server "Preferences". 
-3. Owner selects "Apps and Integrations" and installs the BeReal bot.
-4. Owner assigns roles and privileges to users in the community.
-5. Owner defines moderation and content guidelines.
-6. Owner defines type of prompts for BeReal bot to send properly suit the culture and vibe of their community.  
-7. Owner configures the schedule for BeReal bot, defining the hours when the it will send prompts.
-8. Owner sets the duration for prompt responses to remain in the chat.
-9. Owner sets the amount of time users have to respond to prompt notification.
-10. Owner saves the configuration settings.
+  
+  <p>1. Owner signs in to Discord.</p>
+  <p>2. Owner opens the server "Preferences".</p>
+  <p>3. Owner selects "Apps and Integrations" and installs the WhatchaDoin bot.</p>
+  <p>4. Owner assigns roles and privileges to users in the community.</p>
+  <p>5. Owner defines moderation and content guidelines.</p>
+  <p>6. Owner defines type of prompts for WhatchaDoin bot to send properly suit the culture and vibe of their community.</p>
+  <p>7. Owner configures the schedule for WhatchaDoin bot, defining the hours when the it will send prompts.</p>
+  <p>8. Owner sets the duration for prompt responses to remain in the chat.</p>
+  <p>9. Owner sets the amount of time users have to respond to prompt notification.</p>
+  <p>10. Owner saves the configuration settings.</p>
       
 </details>
 
@@ -216,32 +216,32 @@ Use Case 1 Discription
 sequenceDiagram
     participant Owner as Owner
     participant Discord as Discord Server
-    participant BeRealBot as BeReal Bot
+    participant WhatchaDoinBot as WhatchaDoin Bot
     participant Database as Configuration Database
 
     Owner ->> Discord: Open server "Preferences"
     activate Discord
     Owner ->> Discord: Select "Apps and Integrations"
-    Discord ->> BeRealBot: Install BeReal bot
+    Discord ->> WhatchaDoinBot: Install WhatchaDoin bot
     deactivate Discord
-    activate BeRealBot
-    Owner ->> BeRealBot: Assign roles and privileges
-    Owner ->> BeRealBot: Define moderation and content guidelines
-    Owner ->> BeRealBot: Define prompts culture and vibe
-    Owner ->> BeRealBot: Configure schedule for prompts
-    Owner ->> BeRealBot: Set duration for prompt responses
-    Owner ->> BeRealBot: Set response time limit
-    BeRealBot ->> Database: Save configuration settings
-    deactivate BeRealBot
-    Database -->> BeRealBot: Confirmation
+    activate WhatchaDoinBot
+    Owner ->> WhatchaDoinBot: Assign roles and privileges
+    Owner ->> WhatchaDoinBot: Define moderation and content guidelines
+    Owner ->> WhatchaDoinBot: Define prompts culture and vibe
+    Owner ->> WhatchaDoinBot: Configure schedule for prompts
+    Owner ->> WhatchaDoinBot: Set duration for prompt responses
+    Owner ->> WhatchaDoinBot: Set response time limit
+    WhatchaDoinBot ->> Database: Save configuration settings
+    deactivate WhatchaDoinBot
+    Database -->> WhatchaDoinBot: Confirmation
     activate Database
-    BeRealBot -->> Owner: Configuration settings saved
+    WhatchaDoinBot -->> Owner: Configuration settings saved
     deactivate Database
 
 ```
 <br/><br/>
 
-**Use Case #2**: User Responds to a BeReal bot Prompt
+**Use Case #2**: User Responds to a WhatchaDoin bot Prompt
 <details>
 <summary>
 Use Case 2 Discription
@@ -259,25 +259,25 @@ Use Case 2 Discription
 
 sequenceDiagram
     participant User as Discord User
-    participant BeRealBot as BeReal Bot
-    participant Moderator as Moderator
+    participant WhatchaDoinBot as WhatchaDoin Bot
+    actor Moderator as Moderator
     participant Database as Response Database
 
-    User ->> BeRealBot: Receive BeReal bot prompt notification
+    User ->> WhatchaDoinBot: Receive WhatchaDoin bot prompt notification
     activate User
-    User ->> BeRealBot: Respond to prompt by taking a picture
-    User ->> BeRealBot: Reply to the BeReal bot with the image
-    BeRealBot ->> Moderator: Send user's response to moderator
+    User ->> WhatchaDoinBot: Respond to prompt by taking a picture
+    User ->> WhatchaDoinBot: Reply to the WhatchaDoin bot with the image
+    WhatchaDoinBot ->> Moderator: Send user's response to moderator
     Moderator ->> Database: Review user's response
     Database -->> Moderator: Response approval status
-    Moderator -->> BeRealBot: Send approval status
-    BeRealBot -->> User: Display approval status
+    Moderator -->> WhatchaDoinBot: Send approval status
+    WhatchaDoinBot -->> User: Display approval status
     deactivate User
 
 ```
 <br/><br/>
 
-**Use Case #3**: User Does Not Respond to a BeReal bot Prompt
+**Use Case #3**: User Does Not Respond to a WhatchaDoin bot Prompt
 <details>
 <summary>
 Use Case 3 Discription
@@ -291,18 +291,18 @@ Use Case 3 Discription
 ```mermaid
 
 sequenceDiagram
-    participant BeRealBot as BeReal Bot
+    participant WhatchaDoinBot as WhatchaDoin Bot
     participant User as Discord User
 
-    activate BeRealBot
-    BeRealBot ->> BeRealBot: Wait until timeout
-    BeRealBot ->> User: Send a notification
+    activate WhatchaDoinBot
+    WhatchaDoinBot ->> WhatchaDoinBot: Wait until timeout
+    WhatchaDoinBot ->> User: Send a notification
     activate User
     User ->> User: Receive notification
-    User -->> BeRealBot: Acknowledge notification
+    User -->> WhatchaDoinBot: Acknowledge notification
     deactivate User
-    BeRealBot ->> BeRealBot: Recognize user's failure to respond
-    BeRealBot ->> User: Send a reminder notification
+    WhatchaDoinBot ->> WhatchaDoinBot: Recognize user's failure to respond
+    WhatchaDoinBot ->> User: Send a reminder notification
 
 ```
 <br/><br/>
@@ -312,7 +312,7 @@ sequenceDiagram
 <summary>
 Use Case 4 Discription
 </summary>
-  
+
 1. BeReal bot receives the approval decision
 2. BeReal bot posts the image with the caption and notifies the user
 3. BeReal bot logs emoji reactions, threaded replies, and comments from the community
@@ -323,20 +323,20 @@ Use Case 4 Discription
 ```mermaid
 
 sequenceDiagram
-    participant BeRealBot as BeReal Bot
+    participant WhatchaDoinBot as WhatchaDoin Bot
     participant Moderators as Moderators
     participant User as Discord User
     participant Server as Discord Server
 
-    Moderators -->> BeRealBot: Approval decision
-    BeRealBot ->> BeRealBot: Process approval decision
-    BeRealBot ->> BeRealBot: Retrieve image and caption
-    BeRealBot ->> BeRealBot: Notify user
-    BeRealBot ->> User: Post image with caption
+    Moderators -->> WhatchaDoinBot: Approval decision
+    WhatchaDoinBot ->> WhatchaDoinBot: Process approval decision
+    WhatchaDoinBot ->> WhatchaDoinBot: Retrieve image and caption
+    WhatchaDoinBot ->> WhatchaDoinBot: Notify user
+    WhatchaDoinBot ->> User: Post image with caption
     User ->> Server: Post image with caption
     User ->> User: React with emoji, thread replies, and comment
-    BeRealBot ->> BeRealBot: Log emoji reactions, threaded replies, and comments
-    BeRealBot ->> Server: Send logs
+    WhatchaDoinBot ->> WhatchaDoinBot: Log emoji reactions, threaded replies, and comments
+    WhatchaDoinBot ->> Server: Send logs
 
 ```
 <br/><br/>
@@ -357,16 +357,16 @@ Use Case 5 Discription
 
 sequenceDiagram
     participant User as Discord User
-    participant BeRealBot as BeReal Bot
+    participant WhatchaDoinBot as WhatchaDoin Bot
     participant Moderator as Moderator
 
-    User ->> BeRealBot: Receives a notification that the post was not approved
-    BeRealBot -->> User: Notifies the user to resubmit the image with feedback
+    User ->> WhatchaDoinBot: Receives a notification that the post was not approved
+    WhatchaDoinBot -->> User: Notifies the user to resubmit the image with feedback
     User ->> User: Resubmits the image with necessary changes
-    BeRealBot ->> Moderator: Notifies the moderator about the resubmission
-    Moderator -->> BeRealBot: Reviews the resubmitted image
-    Moderator -->> BeRealBot: Approves the resubmitted image
-    BeRealBot -->> User: Notifies the user that the post was approved and posted
+    WhatchaDoinBot ->> Moderator: Notifies the moderator about the resubmission
+    Moderator -->> WhatchaDoinBot: Reviews the resubmitted image
+    Moderator -->> WhatchaDoinBot: Approves the resubmitted image
+    WhatchaDoinBot -->> User: Notifies the user that the post was approved and posted
 
 ```
 <br/><br/>
@@ -376,7 +376,7 @@ sequenceDiagram
 <summary>
 Use Case 6 Discription
 </summary>
-  
+
 1. A user in the Discord community is notified by the BeReal bot that another user has posted a response to a prompt.
 2. User opens Discord to view the response in the Discord community channel
 3. User interacts with the post by leaving a comment or a reaction(likes, emojis, etc)
@@ -387,17 +387,17 @@ Use Case 6 Discription
 
 sequenceDiagram
     participant User as Discord User
-    participant BeRealBot as BeReal Bot
+    participant WhatchaDoinBot as WhatchaDoin Bot
     participant Community as Discord Community
 
     activate User
-    User ->> BeRealBot: Receives a new post notification
+    User ->> WhatchaDoinBot: Receives a new post notification
     User ->> Discord: Opens Discord to view the response
-    BeRealBot -->> User: Displays the new post in the Discord channel
-    User ->> BeRealBot: Interacts with the post (e.g., leaves a comment or reacts with emojis)
-    BeRealBot ->> Community: Updates the post with user interactions
-    Community -->> BeRealBot: Views reactions and comments on the post
-    BeRealBot ->> BeRealBot: Collects data on reactions and comments
+    WhatchaDoinBot -->> User: Displays the new post in the Discord channel
+    User ->> WhatchaDoinBot: Interacts with the post (e.g., leaves a comment or reacts with emojis)
+    WhatchaDoinBot ->> Community: Updates the post with user interactions
+    Community -->> WhatchaDoinBot: Views reactions and comments on the post
+    WhatchaDoinBot ->> WhatchaDoinBot: Collects data on reactions and comments
     deactivate User
 
 ```
@@ -413,7 +413,6 @@ Use Case 7 Discription
 2. User chooses an option to turn off new post notifications.
 3. The user is no longer sent another post notification.
 
-
 </details>
 
 ```mermaid
@@ -421,15 +420,15 @@ Use Case 7 Discription
 sequenceDiagram
     participant User as Discord User
     participant DiscordInterface as Discord Interface
-    participant BeRealBot as BeReal Bot
+    participant WhatchaDoinBot as WhatchaDoin Bot
     participant NotificationSettings as Notification Settings
 
-    User ->> DiscordInterface: Opens BeReal Bot settings
+    User ->> DiscordInterface: Opens WhatchaDoin Bot settings
     DiscordInterface -->> User: Notification viewed
     User ->> DiscordInterface: Accesses Settings
     DiscordInterface ->> NotificationSettings: Turn Off Notification settings
-    NotificationSettings -->> BeRealBot: Sends updated notification settings
-    BeRealBot -->> DiscordInterface: Forwards the updated settings (OFF)
+    NotificationSettings -->> WhatchaDoinBot: Sends updated notification settings
+    WhatchaDoinBot -->> DiscordInterface: Forwards the updated settings (OFF)
     DiscordInterface -->> User: Sent the new notification settings
     Note over DiscordInterface: User views notifications
 
@@ -454,19 +453,19 @@ Normal Flow:
 sequenceDiagram
     participant Moderator as Moderator
     participant Discord as Discord Server
-    participant BeRealBot as BeReal Bot
+    participant WhatchaDoinBot as WhatchaDoin Bot
     participant Database as Configuration Database
 
     Moderator ->> Discord: Log into Discord
     activate Discord
     Moderator ->> Discord: Run command to request reaction data in CSV format
-    Discord ->> BeRealBot: Send data view command
-    BeRealBot ->> Database: Retrieve reaction data
-    activate BeRealBot
-    Database -->> BeRealBot: Reaction data
-    BeRealBot -->> Discord: Provide reaction data
+    Discord ->> WhatchaDoinBot: Send data view command
+    WhatchaDoinBot ->> Database: Retrieve reaction data
+    activate WhatchaDoinBot
+    Database -->> WhatchaDoinBot: Reaction data
+    WhatchaDoinBot -->> Discord: Provide reaction data
     Discord -->> Moderator: Display reaction data
-    deactivate BeRealBot
+    deactivate WhatchaDoinBot
     Moderator ->> Moderator: Exports reaction data for further analysis (if needed)
     deactivate Discord
 
@@ -489,19 +488,19 @@ Alternate Flow:
 sequenceDiagram
     participant Moderator as Moderator
     participant Discord as Discord Server
-    participant BeRealBot as BeReal Bot
+    participant WhatchaDoinBot as WhatchaDoin Bot
     participant Database as Configuration Database
 
     Moderator ->> Discord: Log into Discord
     activate Discord
     Moderator ->> Discord: Run command to request reaction data in CSV format
-    Discord ->> BeRealBot: Send data view command
-    BeRealBot ->> Database: Retrieve reaction data
-    activate BeRealBot
-    Database -->> BeRealBot: Reaction data in CSV format
-    BeRealBot -->> Discord: Provide reaction data in CSV format
+    Discord ->> WhatchaDoinBot: Send data view command
+    WhatchaDoinBot ->> Database: Retrieve reaction data
+    activate WhatchaDoinBot
+    Database -->> WhatchaDoinBot: Reaction data in CSV format
+    WhatchaDoinBot -->> Discord: Provide reaction data in CSV format
     Discord -->> Moderator: Display reaction data CSV
-    deactivate BeRealBot
+    deactivate WhatchaDoinBot
     Moderator ->> Moderator: Exports reaction data for further analysis (if needed)
     deactivate Discord
 
