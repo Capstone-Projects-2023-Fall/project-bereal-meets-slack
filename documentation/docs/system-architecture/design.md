@@ -260,7 +260,7 @@ Use Case 2 Discription
 sequenceDiagram
     participant User as Discord User
     participant WhatchaDoinBot as WhatchaDoin Bot
-    participant Moderator as Moderator
+    actor Moderator as Moderator
     participant Database as Response Database
 
     User ->> WhatchaDoinBot: Receive WhatchaDoin bot prompt notification
