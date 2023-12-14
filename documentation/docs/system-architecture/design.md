@@ -197,24 +197,24 @@ Prompts ||--|{ Responses : ""
 <summary>
 Use Case 1 Discription
 </summary>
-  
-  <p>1. Owner signs in to Discord.</p>
-  <p>2. Owner opens the server "Preferences".</p>
-  <p>3. Owner selects "Apps and Integrations" and installs the WhatchaDoin bot.</p>
-  <p>4. Owner assigns roles and privileges to users in the community.</p>
-  <p>5. Owner defines moderation and content guidelines.</p>
-  <p>6. Owner defines type of prompts for WhatchaDoin bot to send properly suit the culture and vibe of their community.</p>
-  <p>7. Owner configures the schedule for WhatchaDoin bot, defining the hours when the it will send prompts.</p>
-  <p>8. Owner sets the duration for prompt responses to remain in the chat.</p>
-  <p>9. Owner sets the amount of time users have to respond to prompt notification.</p>
-  <p>10. Owner saves the configuration settings.</p>
+
+1. Owner signs in to Discord.</p>
+2. Owner opens the server "Preferences".</p>
+3. Owner selects "Apps and Integrations" and installs the WhatchaDoin bot.</p>
+4. Owner assigns roles and privileges to users in the community.</p>
+5. Owner defines moderation and content guidelines.</p>
+6. Owner defines type of prompts for WhatchaDoin bot to send properly suit the culture and vibe of their community.</p>
+7. Owner configures the schedule for WhatchaDoin bot, defining the hours when the it will send prompts.</p>
+8. Owner sets the duration for prompt responses to remain in the chat.</p>
+9. Owner sets the amount of time users have to respond to prompt notification.</p>
+10. Owner saves the configuration settings.</p>
       
 </details>
 
 ```mermaid
 
 sequenceDiagram
-    participant Owner as Owner
+    actor Owner as Owner
     participant Discord as Discord Server
     participant WhatchaDoinBot as WhatchaDoin Bot
     participant Database as Configuration Database
@@ -233,8 +233,8 @@ sequenceDiagram
     Owner ->> WhatchaDoinBot: Set response time limit
     WhatchaDoinBot ->> Database: Save configuration settings
     deactivate WhatchaDoinBot
-    Database -->> WhatchaDoinBot: Confirmation
     activate Database
+    Database -->> WhatchaDoinBot: Confirmation
     WhatchaDoinBot -->> Owner: Configuration settings saved
     deactivate Database
 
@@ -247,29 +247,30 @@ sequenceDiagram
 Use Case 2 Discription
 </summary>
   
-1. User in the Discord community receives a notification at a random time of day that they have received a prompt from the BeReal bot
-2. User opens Discord.
-3. User responds to the random prompt by taking a picture and uploading it.
-4. User replies to the BeReal bot with their response to the prompt, which is sent to the moderator.
-5. User waits for approval status from the BeReal bot.
+1. User in the Discord community receives a notification at a random time of day that they have received a prompt from the BeReal bot</p>
+2. User opens Discord.</p>
+3. User responds to the random prompt by taking a picture and uploading it.</p>
+4. User replies to the BeReal bot with their response to the prompt, which is sent to the moderator.</p>
+5. User waits for approval status from the BeReal bot.</p>
     
 </details>
 
 ```mermaid
 
 sequenceDiagram
-    participant User as Discord User
+    actor User as Discord User
+    participant Discord as Discord
     participant WhatchaDoinBot as WhatchaDoin Bot
-    actor Moderator as Moderator
-    participant Database as Response Database
+    participant Moderator as Moderator
 
-    User ->> WhatchaDoinBot: Receive WhatchaDoin bot prompt notification
+    WhatchaDoinBot ->> WhatchaDoinBot: 
+    WhatchaDoinBot ->> User: Receive WhatchaDoin bot prompt notification
     activate User
-    User ->> WhatchaDoinBot: Respond to prompt by taking a picture
+    User -->> WhatchaDoinBot: Respond to prompt by taking a picture
+    activate WhatchaDoinBot
     User ->> WhatchaDoinBot: Reply to the WhatchaDoin bot with the image
     WhatchaDoinBot ->> Moderator: Send user's response to moderator
-    Moderator ->> Database: Review user's response
-    Database -->> Moderator: Response approval status
+    deactivate WhatchaDoinBot
     Moderator -->> WhatchaDoinBot: Send approval status
     WhatchaDoinBot -->> User: Display approval status
     deactivate User
@@ -282,10 +283,10 @@ sequenceDiagram
 <summary>
 Use Case 3 Discription
 </summary>
-  
-1. The BeReal bot waits until timeout The BeReal bot sends a notification to the Discord user
-2. BeReal bot recognizes the user’s failure to respond, and sends a reminder notification to the users about the missed prompt.
-      
+
+1. The BeReal bot waits until timeout The BeReal bot sends a notification to the Discord user</p>
+2. BeReal bot recognizes the user’s failure to respond, and sends a reminder notification to the users about the missed prompt.</p>
+    
 </details>
 
 ```mermaid
@@ -313,10 +314,10 @@ sequenceDiagram
 Use Case 4 Discription
 </summary>
 
-1. BeReal bot receives the approval decision
-2. BeReal bot posts the image with the caption and notifies the user
-3. BeReal bot logs emoji reactions, threaded replies, and comments from the community
-4. BeReal bot sends logs to the server
+1. BeReal bot receives the approval decision</p>
+2. BeReal bot posts the image with the caption and notifies the user</p>
+3. BeReal bot logs emoji reactions, threaded replies, and comments from the community</p>
+4. BeReal bot sends logs to the server</p>
     
 </details>
 
@@ -347,9 +348,9 @@ sequenceDiagram
 Use Case 5 Discription
 </summary>
   
-1. User receives a notification that the post was not approved and is asked to resubmit with feedback
-2. User resubmits the image
-3. User receives a notification that the post was approved and it was posted
+1. User receives a notification that the post was not approved and is asked to resubmit with feedback</p>
+2. User resubmits the image</p>
+3. User receives a notification that the post was approved and it was posted</p>
     
 </details>
 
@@ -377,9 +378,9 @@ sequenceDiagram
 Use Case 6 Discription
 </summary>
 
-1. A user in the Discord community is notified by the BeReal bot that another user has posted a response to a prompt.
-2. User opens Discord to view the response in the Discord community channel
-3. User interacts with the post by leaving a comment or a reaction(likes, emojis, etc)
+1. A user in the Discord community is notified by the BeReal bot that another user has posted a response to a prompt.</p>
+2. User opens Discord to view the response in the Discord community channel</p>
+3. User interacts with the post by leaving a comment or a reaction(likes, emojis, etc)</p>
 
 </details>
 
@@ -409,9 +410,9 @@ sequenceDiagram
 Use Case 7 Discription
 </summary>
   
-1. A user in the Discord community goes to the settings of the BeReal bot
-2. User chooses an option to turn off new post notifications.
-3. The user is no longer sent another post notification.
+1. A user in the Discord community goes to the settings of the BeReal bot</p>
+2. User chooses an option to turn off new post notifications.</p>
+3. The user is no longer sent another post notification.</p>
 
 </details>
 
@@ -442,9 +443,9 @@ Use Case 8 Discription
 </summary>
 Normal Flow:
 
-1. Moderator logs into Discord
-2. Moderator runs a command to request reaction data in csv format
-3. Moderator exports reaction data for further analysis, if needed
+1. Moderator logs into Discord</p>
+2. Moderator runs a command to request reaction data in csv format</p>
+3. Moderator exports reaction data for further analysis, if needed</p>
 
 </details>
 
@@ -477,9 +478,9 @@ Use Case 8 Alternate Discription
   
 Alternate Flow:
 
-1. Moderator logs into Discord
-2. Moderator runs a command to see reaction data
-3. Moderator receives data visualizations from bot
+1. Moderator logs into Discord</p>
+2. Moderator runs a command to see reaction data</p>
+3. Moderator receives data visualizations from bot</p>
 
 </details>
 
