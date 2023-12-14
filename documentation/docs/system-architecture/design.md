@@ -198,16 +198,16 @@ Prompts ||--|{ Responses : ""
 Use Case 1 Discription
 </summary>
   
-  1. Owner signs in to Discord.
-  2. Owner opens the server "Preferences". 
-  3. Owner selects "Apps and Integrations" and installs the WhatchaDoin bot.
-  4. Owner assigns roles and privileges to users in the community.
-  5. Owner defines moderation and content guidelines.
-  6. Owner defines type of prompts for WhatchaDoin bot to send properly suit the culture and vibe of their community.  
-  7. Owner configures the schedule for WhatchaDoin bot, defining the hours when the it will send prompts.
-  8. Owner sets the duration for prompt responses to remain in the chat.
-  9. Owner sets the amount of time users have to respond to prompt notification.
-  10. Owner saves the configuration settings.
+  <p>1. Owner signs in to Discord.</p>
+  <p>2. Owner opens the server "Preferences".</p>
+  <p>3. Owner selects "Apps and Integrations" and installs the WhatchaDoin bot.</p>
+  <p>4. Owner assigns roles and privileges to users in the community.</p>
+  <p>5. Owner defines moderation and content guidelines.</p>
+  <p>6. Owner defines type of prompts for WhatchaDoin bot to send properly suit the culture and vibe of their community.</p>
+  <p>7. Owner configures the schedule for WhatchaDoin bot, defining the hours when the it will send prompts.</p>
+  <p>8. Owner sets the duration for prompt responses to remain in the chat.</p>
+  <p>9. Owner sets the amount of time users have to respond to prompt notification.</p>
+  <p>10. Owner saves the configuration settings.</p>
       
 </details>
 
