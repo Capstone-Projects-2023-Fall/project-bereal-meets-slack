@@ -197,17 +197,17 @@ Prompts ||--|{ Responses : ""
 <summary>
 Use Case 1 Discription
 </summary>
-  
-  1. Owner signs in to Discord.
-  2. Owner opens the server "Preferences". 
-  3. Owner selects "Apps and Integrations" and installs the BeReal bot.
-  4. Owner assigns roles and privileges to users in the community.
-  5. Owner defines moderation and content guidelines.
-  6. Owner defines type of prompts for BeReal bot to send properly suit the culture and vibe of their community.  
-  7. Owner configures the schedule for BeReal bot, defining the hours when the it will send prompts.
-  8. Owner sets the duration for prompt responses to remain in the chat.
-  9. Owner sets the amount of time users have to respond to prompt notification.
-  10. Owner saves the configuration settings.
+
+1. Owner signs in to Discord.
+2. Owner opens the server "Preferences". 
+3. Owner selects "Apps and Integrations" and installs the BeReal bot.
+4. Owner assigns roles and privileges to users in the community.
+5. Owner defines moderation and content guidelines.
+6. Owner defines type of prompts for BeReal bot to send properly suit the culture and vibe of their community.  
+7. Owner configures the schedule for BeReal bot, defining the hours when the it will send prompts.
+8. Owner sets the duration for prompt responses to remain in the chat.
+9. Owner sets the amount of time users have to respond to prompt notification.
+10. Owner saves the configuration settings.
       
 </details>
 
@@ -247,12 +247,12 @@ sequenceDiagram
 Use Case 2 Discription
 </summary>
   
-  1. User in the Discord community receives a notification at a random time of day that they have received a prompt from the BeReal bot
-  2. User opens Discord.
-  3. User responds to the random prompt by taking a picture and uploading it.
-  4. User replies to the BeReal bot with their response to the prompt, which is sent to the moderator.
-  5. User waits for approval status from the BeReal bot.
-      
+1. User in the Discord community receives a notification at a random time of day that they have received a prompt from the BeReal bot
+2. User opens Discord.
+3. User responds to the random prompt by taking a picture and uploading it.
+4. User replies to the BeReal bot with their response to the prompt, which is sent to the moderator.
+5. User waits for approval status from the BeReal bot.
+    
 </details>
 
 ```mermaid
@@ -283,8 +283,8 @@ sequenceDiagram
 Use Case 3 Discription
 </summary>
   
-  1. The BeReal bot waits until timeout The BeReal bot sends a notification to the Discord user
-  2. BeReal bot recognizes the user’s failure to respond, and sends a reminder notification to the users about the missed prompt.
+1. The BeReal bot waits until timeout The BeReal bot sends a notification to the Discord user
+2. BeReal bot recognizes the user’s failure to respond, and sends a reminder notification to the users about the missed prompt.
       
 </details>
 
@@ -313,11 +313,11 @@ sequenceDiagram
 Use Case 4 Discription
 </summary>
   
-  1. BeReal bot receives the approval decision
-  2. BeReal bot posts the image with the caption and notifies the user
-  3. BeReal bot logs emoji reactions, threaded replies, and comments from the community
-  4. BeReal bot sends logs to the server
-      
+1. BeReal bot receives the approval decision
+2. BeReal bot posts the image with the caption and notifies the user
+3. BeReal bot logs emoji reactions, threaded replies, and comments from the community
+4. BeReal bot sends logs to the server
+    
 </details>
 
 ```mermaid
@@ -347,10 +347,10 @@ sequenceDiagram
 Use Case 5 Discription
 </summary>
   
-  1. User receives a notification that the post was not approved and is asked to resubmit with feedback
-  2. User resubmits the image
-  3. User receives a notification that the post was approved and it was posted
-      
+1. User receives a notification that the post was not approved and is asked to resubmit with feedback
+2. User resubmits the image
+3. User receives a notification that the post was approved and it was posted
+    
 </details>
 
 ```mermaid
@@ -377,9 +377,9 @@ sequenceDiagram
 Use Case 6 Discription
 </summary>
   
-  1. A user in the Discord community is notified by the BeReal bot that another user has posted a response to a prompt.
-  2. User opens Discord to view the response in the Discord community channel
-  3. User interacts with the post by leaving a comment or a reaction(likes, emojis, etc)
+1. A user in the Discord community is notified by the BeReal bot that another user has posted a response to a prompt.
+2. User opens Discord to view the response in the Discord community channel
+3. User interacts with the post by leaving a comment or a reaction(likes, emojis, etc)
 
 </details>
 
@@ -409,9 +409,9 @@ sequenceDiagram
 Use Case 7 Discription
 </summary>
   
-  1. A user in the Discord community goes to the settings of the BeReal bot
-  2. User chooses an option to turn off new post notifications.
-  3. The user is no longer sent another post notification.
+1. A user in the Discord community goes to the settings of the BeReal bot
+2. User chooses an option to turn off new post notifications.
+3. The user is no longer sent another post notification.
 
 
 </details>
@@ -443,9 +443,9 @@ Use Case 8 Discription
 </summary>
 Normal Flow:
 
-  1. Moderator logs into Discord
-  2. Moderator runs a command to request reaction data in csv format
-  3. Moderator exports reaction data for further analysis, if needed
+1. Moderator logs into Discord
+2. Moderator runs a command to request reaction data in csv format
+3. Moderator exports reaction data for further analysis, if needed
 
 </details>
 
@@ -478,9 +478,9 @@ Use Case 8 Alternate Discription
   
 Alternate Flow:
 
-  1. Moderator logs into Discord
-  2. Moderator runs a command to see reaction data
-  3. Moderator receives data visualizations from bot
+1. Moderator logs into Discord
+2. Moderator runs a command to see reaction data
+3. Moderator receives data visualizations from bot
 
 </details>
 
