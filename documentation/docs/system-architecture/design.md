@@ -24,12 +24,6 @@ The Firebase database is contained in the cloud web server and acts as a means o
 ## Class Diagram
 ```mermaid
 classDiagram
-webServer --> WhatchaDoinBot
-webServer --> database
-class webServer{
-  + generateCSV(int startTime, int endTime)
-  + generateDataVis(int startTime, int endTime)
-}
 class WhatchaDoinBot{
   + String botName
   + token botToken
@@ -37,54 +31,56 @@ class WhatchaDoinBot{
   - int endHour
   - String [] promptList
   - String [] blackList
-  - getCSV()
-  - getDatavis()
-  - getOperatingHours()
-  - sendPrompt()
-  - getResponseDelay()
-  - getResponse()
-  - setOperatingHours(int newStart, int newEnd)
-  - generateRandomPromptTime()
-  - generateRandomPrompt()
-  - getPromptList()
-  - setPromptList()
-  - getResponsePostComment()
-  - setReponsePostComment()
-  - getBlackList()
-  - addUserToBlackList()
-  - removeUserFromBlackList()
-  - selectRandomUserToPrompt()
-  - getApprovalStatus()
-  - setApprovalStatus()
-  - sendToReponseToMod()
-  - postReponseToChannel()
-  - deleteOriginalPromptFromChannel()
-  - setaUsersAlreadyPromptedList()
+  - activeEvents()
+  - activeHourUtils()
+  - blacklistutils()
+  - commandregistrar()
+  - dataGraph()
+  - dbconn()
+  - getRandom()
+  - handleUserSubmissions()
+  - helpUtils()
+  - notifyMods()
+  - postUtils()
+  - promptUtils()
+  - saveDB()
+  - setDefualtChannelUtils()
 }
-class database{
-  + String Prompt
-  + String imageLink
-  + int numReactions
-  + int numReplies
-  + int timeToPost 
-  + setUserRoles()
-  + setBotSettings()
-  + getBotSettings()
-  + updateTotalAverageTimeToPost()
-  + getReactionTS()
-  + getResponseTS()
-  + setPromptPostTS()
-  + updateUserTimeToPost()
-  + getUserTimeToPost()
-  + updateReactionsUsage()
-  + getReactionsUsage()
-  + updateUsersList()
-  + updateUserInfo()
-  + getUserInfo()
-  + createUser()
-  + getUser()
 
+class Timer {
+  - startTime: number
+  - endTime: number
+  + constructor()
+  + start(): void
+  + stop(): number
+  + isRunning(): boolean
 }
+
+class PromptTimeout {
+  - client
+  - activePrompts: Map
+  - repromptTimeouts: Map
+  + setupPrompt(channelId, message, user, originalPrompt)
+  + setPromptTimeout(promptId, duration, message, user, originalPrompt, channelId)
+  + handleReprompt(user, originalPrompt, channelId, originalMessage)
+}
+
+class Prompt {
+  - prompt: string
+  - userId: string
+  - channel: string
+  + isUserIdMatch(userId: string): boolean
+  + setPrompt(msg: string): void
+  + setUserId(userId: string): void
+  + setChannel(channel: string): void
+  + getPrompt(): string
+  + getUserId(): string
+  + getChannel(): string
+}
+
+WhatchaDoinBot "1" --> "*" Timer
+WhatchaDoinBot "1" --> "*" PromptTimeout
+WhatchaDoinBot "1" --> "*" Prompt
 ```
 ## WhatchaDoin Bot
 This class will contain methods that allow the bot to interact with the users and moderator
