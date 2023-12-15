@@ -216,7 +216,7 @@ Use Case 1 Discription
 ```mermaid
 
 sequenceDiagram
-    participant Owner as Owner
+    actor Owner as Owner
     participant Discord as Discord Server
     participant WhatchaDoinBot as WhatchaDoin Bot
     participant Database as Configuration Database
@@ -249,29 +249,30 @@ sequenceDiagram
 Use Case 2 Discription
 </summary>
   
-1. User in the Discord community receives a notification at a random time of day that they have received a prompt from the BeReal bot
-2. User opens Discord.
-3. User responds to the random prompt by taking a picture and uploading it.
-4. User replies to the BeReal bot with their response to the prompt, which is sent to the moderator.
-5. User waits for approval status from the BeReal bot.
+1. User in the Discord community receives a notification at a random time of day that they have received a prompt from the BeReal bot</p>
+2. User opens Discord.</p>
+3. User responds to the random prompt by taking a picture and uploading it.</p>
+4. User replies to the BeReal bot with their response to the prompt, which is sent to the moderator.</p>
+5. User waits for approval status from the BeReal bot.</p>
     
 </details>
 
 ```mermaid
 
 sequenceDiagram
-    participant User as Discord User
+    actor User as Discord User
+    participant Discord as Discord
     participant WhatchaDoinBot as WhatchaDoin Bot
-    actor Moderator as Moderator
-    participant Database as Response Database
+    participant Moderator as Moderator
 
-    User ->> WhatchaDoinBot: Receive WhatchaDoin bot prompt notification
+    WhatchaDoinBot ->> WhatchaDoinBot: 
+    WhatchaDoinBot ->> User: Receive WhatchaDoin bot prompt notification
     activate User
-    User ->> WhatchaDoinBot: Respond to prompt by taking a picture
+    User -->> WhatchaDoinBot: Respond to prompt by taking a picture
+    activate WhatchaDoinBot
     User ->> WhatchaDoinBot: Reply to the WhatchaDoin bot with the image
     WhatchaDoinBot ->> Moderator: Send user's response to moderator
-    Moderator ->> Database: Review user's response
-    Database -->> Moderator: Response approval status
+    deactivate WhatchaDoinBot
     Moderator -->> WhatchaDoinBot: Send approval status
     WhatchaDoinBot -->> User: Display approval status
     deactivate User
