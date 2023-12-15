@@ -159,36 +159,42 @@ This class will contain methods that allow the bot to interact with the users an
 
 ```mermaid
 erDiagram
-Prompts {
-  Int prompt_id PK
-  String text
-  Int guild_id
-}
+    PROMPTS ||--|{ RESPONSES : "includes"
 
-Responses {
-  Int response_id PK
-  String response_image
-  Int numReactions
-  Int numReplies
-  Int timetoRespond
-  Int prompt_id FK
-}
+    PROMPTS {
+        int prompt_id PK "Unique identifier for the prompt"
+        varchar prompt_text "Text of the prompt"
+        bigint guild_id FK "References the guild"
+        bigint channel_id FK "References the channel"
+    }
 
-Blacklist{
-  Int blacklist_id PK
-  Int user_id
-  Int guild_id
-}
+    RESPONSES {
+        int response_id PK "Unique identifier for the response"
+        varchar response_image "URL of the response image"
+        int num_reactions "Number of reactions to the response"
+        int time_to_respond "Time taken to respond"
+        bigint message_id FK "References the message"
+        bigint prompt_id FK "References the prompt"
+        bigint user_id FK "References the user"
+        bigint guild_id FK "References the guild"
+    }
 
-Hours{
-  Int hour_id PK
-  Int start_time
-  Int end_time
-  Int guild_id
-}
+    OPERATING_HOURS {
+        bigint guild_id PK "Unique identifier for the guild"
+        time start_time "Start time for bot activity"
+        time end_time "End time for bot activity"
+    }
 
-Prompts ||--|{ Responses : ""
+    BLACKLIST {
+        int blacklist_id PK "Unique identifier for the blacklist entry"
+        bigint user_id "References the user"
+        bigint guild_id "References the guild"
+    }
 
+    SETTINGS {
+        bigint submission_channel_id PK "Unique identifier for the submission channel"
+        bigint guild_id PK "Unique identifier for the guild"
+    }
 ```
 ## Sequence Diagrams
 
