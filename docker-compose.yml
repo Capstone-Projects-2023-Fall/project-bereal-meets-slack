@@ -13,6 +13,8 @@ services:
     volumes:
      - 'mysql-data:/var/lib/mysql'
      - './init.sql:/docker-entrypoint-initdb.d/init.sql'  # Mount custom scripts
+    restart: on-failure
+
   berealbot:
     image: berealbot:latest
     build:
@@ -22,6 +24,7 @@ services:
       - brbnet
     depends_on:
       - berealbotdb
+    restart: on-failure
 
 networks:
   brbnet:
