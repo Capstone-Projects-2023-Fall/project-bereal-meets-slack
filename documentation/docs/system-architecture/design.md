@@ -249,11 +249,11 @@ sequenceDiagram
 Use Case 2 Discription
 </summary>
   
-</p>1. User in the Discord community receives a notification at a random time of day that they have received a prompt from the BeReal bot</p>
-</p>2. User opens Discord.</p>
-</p>3. User responds to the random prompt by taking a picture and uploading it.</p>
-</p>4. User replies to the BeReal bot with their response to the prompt, which is sent to the moderator.</p>
-</p>5. User waits for approval status from the BeReal bot.</p>
+1. User in the Discord community receives a notification at a random time of day that they have received a prompt from the BeReal bot
+2. User opens Discord.
+3. User responds to the random prompt by taking a picture and uploading it.
+4. User replies to the BeReal bot with their response to the prompt, which is sent to the moderator.
+5. User waits for approval status from the BeReal bot.
     
 </details>
 
