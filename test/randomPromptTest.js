@@ -3,7 +3,7 @@ const sinon = require('sinon');
 const promptUtils = require('../utils/promptUtils');
 const { getRandomPrompt, getPrompts } = require('../utils/promptUtils');
 
-describe('getRandomPrompt function', () => {
+describe('get random prompt', () => {
     beforeEach(() => {
         const guildId = process.env.DISCORD_GUILD_ID;
         sinon.stub(promptUtils, 'getRandomPrompt').resolves(guildId);

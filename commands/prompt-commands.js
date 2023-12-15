@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require('discord.js');
-const {addPrompt, listPrompts, deletePrompt, getPrompts} = require('../utils/promptUtils.js')
+const promptUtils = require('../utils/promptUtils.js');
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -55,8 +55,8 @@ module.exports = {
 
   async execute(interaction) {
     const modRole = interaction.guild.roles.cache.find(role => role.name === 'bot mod');
-            
-    if (!(interaction.member.roles.cache.has(modRole.id))) return await interaction.reply({ content: 'Only **moderators** can use this command', ephemeral: true});
+  
+    if (interaction.member && !(interaction.member.roles.cache.has(modRole.id))) return await interaction.reply({ content: 'Only **moderators** can use this command', ephemeral: true});
     
     const guildId = interaction.guild.id; //Get guild ID
     const subcommand = interaction.options.getSubcommand();
@@ -67,12 +67,12 @@ module.exports = {
       const promptText = interaction.options.getString('prompt');
       const channel = interaction.options.getChannel('channel');
       const channelId = channel ? channel.id : null; // Get the channel ID or null
-      reply = await addPrompt(guildId, promptText, channelId); // Pass channelId to addPrompt
+      reply = await promptUtils.addPrompt(guildId, promptText, channelId); // Pass channelId to addPrompt
   } else if (subcommand === 'delete') {
       const promptText = interaction.options.getString('prompt');
-      reply = await deletePrompt(guildId, promptText);
+      reply = await promptUtils.deletePrompt(guildId, promptText);
   } else if (subcommand === 'list') {
-      reply = await listPrompts(guildId, interaction.client);
+      reply = await promptUtils.listPrompts(guildId, interaction.client);
   }
 
       await interaction.followUp(reply);

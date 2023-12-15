@@ -17,7 +17,15 @@ describe('activeHours command', () => {
                 getSubcommand: sinon.stub(),
                 getString: sinon.stub(),
             },
-            guild: { id: 'guild123' },
+            guild: { 
+                id: 'guild123',
+                roles: {
+                    cache: [
+                        { name: 'bot mod' }
+                    ]
+                }
+            },
+            channel: { id: 'channel123' },
             deferReply: sinon.fake(),
             followUp: sinon.fake(),
         };
