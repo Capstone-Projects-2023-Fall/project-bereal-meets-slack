@@ -251,11 +251,11 @@ sequenceDiagram
 Use Case 2 Discription
 </summary>
   
-1. User in the Discord community receives a notification at a random time of day that they have received a prompt from the WhatchaDoinBot bot.
-2. User opens Discord.
-3. User responds to the random prompt by taking a picture and uploading it.
-4. User replies to the WhatchaDoinBot bot with their response to the prompt, which is sent to the moderator.
-5. User waits for approval status from the WhatchaDoinBot bot.
+1. User in the Discord community receives a notification at a random time of day that they have received a prompt from the WhatchaDoinBot bot.</p>
+2. User opens Discord.</p>
+3. User responds to the random prompt by taking a picture and uploading it.</p>
+4. User replies to the WhatchaDoinBot bot with their response to the prompt, which is sent to the moderator.</p>
+5. User waits for approval status from the WhatchaDoinBot bot.</p>
     
 </details>
 
