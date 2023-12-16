@@ -415,8 +415,8 @@ sequenceDiagram
     participant WhatchaDoinBot as WhatchaDoin Bot
     participant Community as Discord Community
 
-    activate User
     WhatchaDoinBot ->> User: Receives a new post notification
+    activate User
     activate WhatchaDoinBot
     WhatchaDoinBot ->> User: Displays the new post in the Discord channel
     deactivate WhatchaDoinBot
@@ -437,27 +437,35 @@ sequenceDiagram
 Use Case 7 Discription
 </summary>
   
-1. A user in the Discord community goes to the settings of the WhatchaDoinBot bot
-2. User chooses an option to turn off new post notifications.
-3. The user is no longer sent another post notification.
+<p>1. A user in the Discord community goes to the settings of the WhatchaDoinBot bot.</p>
+<p>2. User chooses an option to turn off new post notifications.</p>
+<p>3. The user is no longer sent another post notification.</p>
 
 </details>
 
 ```mermaid
 
 sequenceDiagram
-    participant User as Discord User
+    actor User as Discord User
     participant DiscordInterface as Discord Interface
     participant WhatchaDoinBot as WhatchaDoin Bot
     participant NotificationSettings as Notification Settings
 
     User ->> DiscordInterface: Opens WhatchaDoin Bot settings
+    activate User
+    activate DiscordInterface
     DiscordInterface -->> User: Notification viewed
+    deactivate DiscordInterface
     User ->> DiscordInterface: Accesses Settings
+    activate DiscordInterface
     DiscordInterface ->> NotificationSettings: Turn Off Notification settings
+    activate NotificationSettings
     NotificationSettings -->> WhatchaDoinBot: Sends updated notification settings
+    deactivate NotificationSettings
     WhatchaDoinBot -->> DiscordInterface: Forwards the updated settings (OFF)
     DiscordInterface -->> User: Sent the new notification settings
+    deactivate DiscordInterface
+    deactivate User
     Note over DiscordInterface: User views notifications
 
 ```
