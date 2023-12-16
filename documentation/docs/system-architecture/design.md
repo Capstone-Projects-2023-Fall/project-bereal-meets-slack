@@ -461,8 +461,10 @@ sequenceDiagram
     DiscordInterface ->> NotificationSettings: Turn Off Notification settings
     activate NotificationSettings
     NotificationSettings -->> WhatchaDoinBot: Sends updated notification settings
+    activate WhatchaDoinBot
     deactivate NotificationSettings
     WhatchaDoinBot -->> DiscordInterface: Forwards the updated settings (OFF)
+    deactivate WhatchaDoinBot
     DiscordInterface -->> User: Sent the new notification settings
     deactivate DiscordInterface
     deactivate User
