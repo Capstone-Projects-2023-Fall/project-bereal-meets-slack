@@ -389,7 +389,7 @@ sequenceDiagram
     Moderator -->> WhatchaDoinBot: Reviews the resubmitted image
     Moderator -->> WhatchaDoinBot: Approves the resubmitted image
     deactivate Moderator
-    WhatchaDoinBot -->> User: Notifies the user that the post was approved and posted
+    WhatchaDoinBot ->> User: Notifies the user that the post was approved and posted
     deactivate WhatchaDoinBot
     deactivate User
 
@@ -402,26 +402,29 @@ sequenceDiagram
 Use Case 6 Discription
 </summary>
 
-1. A user in the Discord community is notified by the WhatchaDoinBot bot that another user has posted a response to a prompt.
-2. User opens Discord to view the response in the Discord community channel
-3. User interacts with the post by leaving a comment or a reaction(likes, emojis, etc)
+<p>1. A user in the Discord community is notified by the WhatchaDoinBot bot that another user has posted a response to a prompt.</p>
+<p>2. User opens Discord to view the response in the Discord community channel.</p>
+<p>3. User interacts with the post by leaving a comment or a reaction(likes, emojis, etc).</p>
 
 </details>
 
 ```mermaid
 
 sequenceDiagram
-    participant User as Discord User
+    actor User as Discord User
     participant WhatchaDoinBot as WhatchaDoin Bot
     participant Community as Discord Community
 
     activate User
-    User ->> WhatchaDoinBot: Receives a new post notification
+    WhatchaDoinBot ->> User: Receives a new post notification
+    activate WhatchaDoinBot
+    WhatchaDoinBot ->> User: Displays the new post in the Discord channel
+    deactivate WhatchaDoinBot
     User ->> Discord: Opens Discord to view the response
-    WhatchaDoinBot -->> User: Displays the new post in the Discord channel
-    User ->> WhatchaDoinBot: Interacts with the post (e.g., leaves a comment or reacts with emojis)
-    WhatchaDoinBot ->> Community: Updates the post with user interactions
-    Community -->> WhatchaDoinBot: Views reactions and comments on the post
+    User -->> Community: Interacts with the post (e.g., leaves a comment or reacts with emojis)
+    activate Community
+    Community ->> WhatchaDoinBot: Views reactions and comments on the post
+    deactivate Community
     WhatchaDoinBot ->> WhatchaDoinBot: Collects data on reactions and comments
     deactivate User
 
