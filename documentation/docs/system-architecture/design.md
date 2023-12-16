@@ -286,16 +286,17 @@ sequenceDiagram
 Use Case 3 Discription
 </summary>
   
-1. The WhatchaDoinBot bot waits until timeout The WhatchaDoinBot bot sends a notification to the Discord user
-2. WhatchaDoinBot bot recognizes the user’s failure to respond, and sends a reminder notification to the users about the missed prompt.
+1. The WhatchaDoinBot bot waits until timeout.
+2. The WhatchaDoinBot bot sends a notification to the Discord user.
+3. WhatchaDoinBot bot recognizes the user’s failure to respond, and sends a reminder notification to the users about the missed prompt.
       
 </details>
 
 ```mermaid
 
 sequenceDiagram
+    actor User as Discord User
     participant WhatchaDoinBot as WhatchaDoin Bot
-    participant User as Discord User
 
     activate WhatchaDoinBot
     WhatchaDoinBot ->> WhatchaDoinBot: Wait until timeout
