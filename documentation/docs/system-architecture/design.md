@@ -480,32 +480,36 @@ Use Case 8 Discription
 </summary>
 Normal Flow:
 
-1. Moderator logs into Discord
-2. Moderator runs a command to request reaction data in csv format
-3. Moderator exports reaction data for further analysis, if needed
+1. Moderator logs into Discord.
+2. Moderator runs a command to request reaction data in csv format.
+3. Moderator exports reaction data for further analysis, if needed.
 
 </details>
 
 ```mermaid
 
 sequenceDiagram
-    participant Moderator as Moderator
+    actor Moderator as Moderator
     participant Discord as Discord Server
     participant WhatchaDoinBot as WhatchaDoin Bot
     participant Database as Configuration Database
 
     Moderator ->> Discord: Log into Discord
+    activate Moderator
     activate Discord
     Moderator ->> Discord: Run command to request reaction data in CSV format
     Discord ->> WhatchaDoinBot: Send data view command
-    WhatchaDoinBot ->> Database: Retrieve reaction data
     activate WhatchaDoinBot
+    WhatchaDoinBot ->> Database: Retrieve reaction data
+    activate Database
     Database -->> WhatchaDoinBot: Reaction data
+    deactivate Database
     WhatchaDoinBot -->> Discord: Provide reaction data
-    Discord -->> Moderator: Display reaction data
     deactivate WhatchaDoinBot
-    Moderator ->> Moderator: Exports reaction data for further analysis (if needed)
+    Discord -->> Moderator: Display reaction data
     deactivate Discord
+    Moderator ->> Moderator: Exports reaction data for further analysis (if needed)
+    deactivate Moderator
 
 ```
 <details>
@@ -515,32 +519,36 @@ Use Case 8 Alternate Discription
   
 Alternate Flow:
 
-1. Moderator logs into Discord
-2. Moderator runs a command to see reaction data
-3. Moderator receives data visualizations from bot
+1. Moderator logs into Discord.
+2. Moderator runs a command to see reaction data.
+3. Moderator receives data visualizations from bot.
 
 </details>
 
 ```mermaid
 
 sequenceDiagram
-    participant Moderator as Moderator
+    actor Moderator as Moderator
     participant Discord as Discord Server
     participant WhatchaDoinBot as WhatchaDoin Bot
     participant Database as Configuration Database
 
     Moderator ->> Discord: Log into Discord
+    activate Moderator
     activate Discord
-    Moderator ->> Discord: Run command to request reaction data in CSV format
+    Moderator ->> Discord: Run command to request reaction data in Graph format
     Discord ->> WhatchaDoinBot: Send data view command
-    WhatchaDoinBot ->> Database: Retrieve reaction data
     activate WhatchaDoinBot
+    WhatchaDoinBot ->> Database: Retrieve reaction data
+    activate Database
     Database -->> WhatchaDoinBot: Reaction data in CSV format
+    deactivate Database
     WhatchaDoinBot -->> Discord: Provide reaction data in CSV format
-    Discord -->> Moderator: Display reaction data CSV
     deactivate WhatchaDoinBot
-    Moderator ->> Moderator: Exports reaction data for further analysis (if needed)
+    Discord -->> Moderator: Translate reaction data into graph form
     deactivate Discord
+    Moderator ->> Moderator: Exports more reaction data for further analysis (if needed)
+    deactivate Moderator
 
 ```
 <br/><br/>
