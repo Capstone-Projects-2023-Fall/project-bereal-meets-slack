@@ -235,8 +235,8 @@ sequenceDiagram
     Owner ->> WhatchaDoinBot: Set response time limit
     WhatchaDoinBot ->> Database: Save configuration settings
     deactivate WhatchaDoinBot
-    Database -->> WhatchaDoinBot: Confirmation
     activate Database
+    Database -->> WhatchaDoinBot: Confirmation
     WhatchaDoinBot -->> Owner: Configuration settings saved
     deactivate Database
 
@@ -249,11 +249,11 @@ sequenceDiagram
 Use Case 2 Discription
 </summary>
   
-1. User in the Discord community receives a notification at a random time of day that they have received a prompt from the BeReal bot
+1. User in the Discord community receives a notification at a random time of day that they have received a prompt from the WhatchaDoinBot bot.
 2. User opens Discord.
 3. User responds to the random prompt by taking a picture and uploading it.
-4. User replies to the BeReal bot with their response to the prompt, which is sent to the moderator.
-5. User waits for approval status from the BeReal bot.
+4. User replies to the WhatchaDoinBot bot with their response to the prompt, which is sent to the moderator.
+5. User waits for approval status from the WhatchaDoinBot bot.
     
 </details>
 
@@ -286,8 +286,8 @@ sequenceDiagram
 Use Case 3 Discription
 </summary>
   
-1. The BeReal bot waits until timeout The BeReal bot sends a notification to the Discord user
-2. BeReal bot recognizes the user’s failure to respond, and sends a reminder notification to the users about the missed prompt.
+1. The WhatchaDoinBot bot waits until timeout The WhatchaDoinBot bot sends a notification to the Discord user
+2. WhatchaDoinBot bot recognizes the user’s failure to respond, and sends a reminder notification to the users about the missed prompt.
       
 </details>
 
@@ -316,10 +316,10 @@ sequenceDiagram
 Use Case 4 Discription
 </summary>
 
-1. BeReal bot receives the approval decision
-2. BeReal bot posts the image with the caption and notifies the user
-3. BeReal bot logs emoji reactions, threaded replies, and comments from the community
-4. BeReal bot sends logs to the server
+1. WhatchaDoinBot bot receives the approval decision
+2. WhatchaDoinBot bot posts the image with the caption and notifies the user
+3. WhatchaDoinBot bot logs emoji reactions, threaded replies, and comments from the community
+4. WhatchaDoinBot bot sends logs to the server
     
 </details>
 
@@ -380,7 +380,7 @@ sequenceDiagram
 Use Case 6 Discription
 </summary>
 
-1. A user in the Discord community is notified by the BeReal bot that another user has posted a response to a prompt.
+1. A user in the Discord community is notified by the WhatchaDoinBot bot that another user has posted a response to a prompt.
 2. User opens Discord to view the response in the Discord community channel
 3. User interacts with the post by leaving a comment or a reaction(likes, emojis, etc)
 
@@ -412,7 +412,7 @@ sequenceDiagram
 Use Case 7 Discription
 </summary>
   
-1. A user in the Discord community goes to the settings of the BeReal bot
+1. A user in the Discord community goes to the settings of the WhatchaDoinBot bot
 2. User chooses an option to turn off new post notifications.
 3. The user is no longer sent another post notification.
 
