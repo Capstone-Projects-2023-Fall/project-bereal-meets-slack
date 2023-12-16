@@ -222,6 +222,7 @@ sequenceDiagram
     participant Database as Configuration Database
 
     Owner ->> Discord: Open server "Preferences"
+    activate Owner
     activate Discord
     Owner ->> Discord: Select "Apps and Integrations"
     Discord ->> WhatchaDoinBot: Install WhatchaDoin bot
@@ -237,8 +238,9 @@ sequenceDiagram
     deactivate WhatchaDoinBot
     activate Database
     Database -->> WhatchaDoinBot: Confirmation
-    WhatchaDoinBot -->> Owner: Configuration settings saved
     deactivate Database
+    WhatchaDoinBot -->> Owner: Configuration settings saved
+    deactivate Owner
 
 ```
 <br/><br/>
@@ -267,14 +269,18 @@ sequenceDiagram
 
     WhatchaDoinBot ->> WhatchaDoinBot: 
     WhatchaDoinBot ->> User: Receive WhatchaDoin bot prompt notification
+    activate WhatchaDoinBot
     activate User
     User -->> WhatchaDoinBot: Respond to prompt by taking a picture
-    activate WhatchaDoinBot
-    User ->> WhatchaDoinBot: Reply to the WhatchaDoin bot with the image
-    WhatchaDoinBot ->> Moderator: Send user's response to moderator
     deactivate WhatchaDoinBot
+    User ->> WhatchaDoinBot: Reply to the WhatchaDoin bot with the image
+    activate WhatchaDoinBot
+    WhatchaDoinBot ->> Moderator: Send user's response to moderator
+    activate Moderator
     Moderator -->> WhatchaDoinBot: Send approval status
+    deactivate Moderator
     WhatchaDoinBot -->> User: Display approval status
+    deactivate WhatchaDoinBot
     deactivate User
 
 ```
@@ -302,11 +308,14 @@ sequenceDiagram
     WhatchaDoinBot ->> WhatchaDoinBot: Wait until timeout
     WhatchaDoinBot ->> User: Send a notification
     activate User
+    activate WhatchaDoinBot
     User ->> User: Receive notification
     User -->> WhatchaDoinBot: Acknowledge notification
-    deactivate User
     WhatchaDoinBot ->> WhatchaDoinBot: Recognize user's failure to respond
     WhatchaDoinBot ->> User: Send a reminder notification
+    deactivate WhatchaDoinBot
+    deactivate User
+
 
 ```
 <br/><br/>
@@ -327,18 +336,22 @@ Use Case 4 Discription
 ```mermaid
 
 sequenceDiagram
-    participant WhatchaDoinBot as WhatchaDoin Bot
+    actor User as Discord User
     participant Moderators as Moderators
-    participant User as Discord User
+    participant WhatchaDoinBot as WhatchaDoin Bot
     participant Server as Discord Server
 
     Moderators -->> WhatchaDoinBot: Approval decision
+    activate User
+    activate WhatchaDoinBot
     WhatchaDoinBot ->> WhatchaDoinBot: Process approval decision
     WhatchaDoinBot ->> WhatchaDoinBot: Retrieve image and caption
-    WhatchaDoinBot ->> WhatchaDoinBot: Notify user
-    WhatchaDoinBot ->> User: Post image with caption
-    User ->> Server: Post image with caption
-    User ->> User: React with emoji, thread replies, and comment
+    WhatchaDoinBot ->> User: Post approved
+    activate User
+    WhatchaDoinBot ->> Server: Post image with caption
+    deactivate WhatchaDoinBot
+    User ->> Server: React with emoji, thread replies, and comment
+    deactivate User
     WhatchaDoinBot ->> WhatchaDoinBot: Log emoji reactions, threaded replies, and comments
     WhatchaDoinBot ->> Server: Send logs
 
