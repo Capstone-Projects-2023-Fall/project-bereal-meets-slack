@@ -273,13 +273,13 @@ sequenceDiagram
     activate User
     User -->> WhatchaDoinBot: Respond to prompt by taking a picture
     deactivate WhatchaDoinBot
-    User ->> WhatchaDoinBot: Reply to the WhatchaDoin bot with the image
+    User -->> WhatchaDoinBot: Reply to the WhatchaDoin bot with the image
     activate WhatchaDoinBot
     WhatchaDoinBot ->> Moderator: Send user's response to moderator
     activate Moderator
     Moderator -->> WhatchaDoinBot: Send approval status
     deactivate Moderator
-    WhatchaDoinBot -->> User: Display approval status
+    WhatchaDoinBot ->> User: Display approval status
     deactivate WhatchaDoinBot
     deactivate User
 
@@ -292,9 +292,9 @@ sequenceDiagram
 Use Case 3 Discription
 </summary>
   
-1. The WhatchaDoinBot bot waits until timeout.
-2. The WhatchaDoinBot bot sends a notification to the Discord user.
-3. WhatchaDoinBot bot recognizes the user’s failure to respond, and sends a reminder notification to the users about the missed prompt.
+<p>1. The WhatchaDoinBot bot waits until timeout.</p>
+<p>2. The WhatchaDoinBot bot sends a notification to the Discord user.</p>
+<p>3. WhatchaDoinBot bot recognizes the user’s failure to respond, and sends a reminder notification to the users about the missed prompt.</p>
       
 </details>
 
@@ -326,10 +326,10 @@ sequenceDiagram
 Use Case 4 Discription
 </summary>
 
-1. WhatchaDoinBot bot receives the approval decision
-2. WhatchaDoinBot bot posts the image with the caption and notifies the user
-3. WhatchaDoinBot bot logs emoji reactions, threaded replies, and comments from the community
-4. WhatchaDoinBot bot sends logs to the server
+1. WhatchaDoinBot bot receives the approval decision.
+2. WhatchaDoinBot bot posts the image with the caption and notifies the user.
+3. WhatchaDoinBot bot logs emoji reactions, threaded replies, and comments from the community.
+4. WhatchaDoinBot bot sends logs to the server.
     
 </details>
 
@@ -350,7 +350,7 @@ sequenceDiagram
     activate User
     WhatchaDoinBot ->> Server: Post image with caption
     deactivate WhatchaDoinBot
-    User ->> Server: React with emoji, thread replies, and comment
+    User -->> Server: React with emoji, thread replies, and comment
     deactivate User
     WhatchaDoinBot ->> WhatchaDoinBot: Log emoji reactions, threaded replies, and comments
     WhatchaDoinBot ->> Server: Send logs
@@ -364,26 +364,34 @@ sequenceDiagram
 Use Case 5 Discription
 </summary>
   
-1. User receives a notification that the post was not approved and is asked to resubmit with feedback
-2. User resubmits the image
-3. User receives a notification that the post was approved and it was posted
+<p>1. User receives a notification that the post was not approved and is asked to resubmit with feedback.</p>
+<p>2. User resubmits the image.</p>
+<p>3. User receives a notification that the post was approved and it was posted.</p>
     
 </details>
 
 ```mermaid
 
 sequenceDiagram
-    participant User as Discord User
+    actor User as Discord User
     participant WhatchaDoinBot as WhatchaDoin Bot
     participant Moderator as Moderator
 
-    User ->> WhatchaDoinBot: Receives a notification that the post was not approved
-    WhatchaDoinBot -->> User: Notifies the user to resubmit the image with feedback
-    User ->> User: Resubmits the image with necessary changes
+    WhatchaDoinBot ->> User: Receives a notification that the post was not approved
+    activate User
+    activate WhatchaDoinBot
+    WhatchaDoinBot ->> User: Notifies the user to resubmit the image with feedback
+    User -->> WhatchaDoinBot: Resubmits the image with necessary changes
+    deactivate WhatchaDoinBot
     WhatchaDoinBot ->> Moderator: Notifies the moderator about the resubmission
+    activate WhatchaDoinBot
+    activate Moderator
     Moderator -->> WhatchaDoinBot: Reviews the resubmitted image
     Moderator -->> WhatchaDoinBot: Approves the resubmitted image
+    deactivate Moderator
     WhatchaDoinBot -->> User: Notifies the user that the post was approved and posted
+    deactivate WhatchaDoinBot
+    deactivate User
 
 ```
 <br/><br/>
