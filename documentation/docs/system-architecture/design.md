@@ -598,8 +598,53 @@ sequenceDiagram
 ```
 <br/><br/>
 
+**Use Case #10**: WhatchaDoin Bot bans user from prompting after mupltiple denails
+<details>
+<summary>
+Use Case 10 Discription
+</summary>
+  
+<p>1. WhatchaDoinBot counts DENIALS (strikes) recieved by users within the Discord community.</p>
+<p>2. WhatchaDoinBot bot sends a warning notification to the user about strikes.</p>
+<p>3. WhatchaDoinBot bot notifies moderator about the DENIALS and how close they are from the blacklist.</p>
+<p>4. If the user continues to recieve DENIALS, WhatchaDoinBot adds the user to the blacklist.</p>
+<p>5. WhatchaDoinBot bot logs the action to blacklist log.</p>
 
-![Sequence Diagram 10](https://cdn.discordapp.com/attachments/1158176482569494568/1158245639008817212/Screen_Shot_2023-10-01_at_11.34.34_PM.png?ex=651b8bcf&is=651a3a4f&hm=5b059721fd6e6a0fd52f4dc157ebf12eac0d255e54b4798ee34e8ac07f38d616&)
+</details>
+
+```mermaid
+
+sequenceDiagram
+    actor Moderator as Moderator
+    participant WhatchaDoinBot as WhatchaDoin Bot
+    participant User as User
+    participant Discord as Discord Server
+    participant Database as Database
+
+    Moderator -->> WhatchaDoinBot: Sends commands to report blackList
+    activate Moderator
+    activate WhatchaDoinBot
+    WhatchaDoinBot ->> Database: Fetches user denail count
+    deactivate WhatchaDoinBot
+    activate Database
+    Database ->> Discord: Fetches user denails count
+    deactivate Database
+    activate Discord
+    Discord ->> WhatchaDoinBot: Sends user denail count for specific server
+    activate WhatchaDoinBot
+    deactivate Discord
+    WhatchaDoinBot ->> User: Sends user warning notification about strikes
+    WhatchaDoinBot ->> Moderator: Sends warning notification about user strikes
+    deactivate WhatchaDoinBot
+    Moderator -->> User: Denies post another time
+    deactivate Moderator
+    WhatchaDoinBot ->> WhatchaDoinBot: Logs another denial for specific user
+    WhatchaDoinBot ->> User: Notify about blacklist addition
+    WhatchaDoinBot -->> Database: Adds user to the blacklist
+
+```
+<br/><br/>
+
 
 ![Sequence Diagram 11](https://cdn.discordapp.com/attachments/1158176482569494568/1158245675163734056/Screen_Shot_2023-10-01_at_11.34.45_PM.png?ex=651b8bd8&is=651a3a58&hm=7a1811a5cce04fe5100a891d4a4a89bca843f9cebf120e10a66cb7b74b3e298a&)
 
