@@ -621,7 +621,7 @@ sequenceDiagram
     participant Discord as Discord Server
     participant Database as Database
 
-    Moderator -->> WhatchaDoinBot: Sends commands to report blackList
+    Moderator -->> WhatchaDoinBot: Sends commands to report blacklist
     activate Moderator
     activate WhatchaDoinBot
     WhatchaDoinBot ->> Database: Fetches user denail count
@@ -638,14 +638,106 @@ sequenceDiagram
     deactivate WhatchaDoinBot
     Moderator -->> User: Denies post another time
     deactivate Moderator
+    activate WhatchaDoinBot
     WhatchaDoinBot ->> WhatchaDoinBot: Logs another denial for specific user
-    WhatchaDoinBot ->> User: Notify about blacklist addition
     WhatchaDoinBot -->> Database: Adds user to the blacklist
+    WhatchaDoinBot ->> User: Notify about blacklist addition
+    deactivate WhatchaDoinBot
 
 ```
 <br/><br/>
 
+**Use Case #11**:  Moderator manages blacklist
+<details>
+<summary>
+Use Case 11 Discription
+</summary>
+Normal Flow:
 
-![Sequence Diagram 11](https://cdn.discordapp.com/attachments/1158176482569494568/1158245675163734056/Screen_Shot_2023-10-01_at_11.34.45_PM.png?ex=651b8bd8&is=651a3a58&hm=7a1811a5cce04fe5100a891d4a4a89bca843f9cebf120e10a66cb7b74b3e298a&)
+<p>1. Moderator chooses to add user to blacklist.</p>
+<p>2. Moderator runs a command to view the blacklist and sees added user.</p>
 
-![Sequence Diagram 11 Alt](https://cdn.discordapp.com/attachments/1158176482569494568/1158245708969811978/Screen_Shot_2023-10-01_at_11.34.53_PM.png?ex=651b8be0&is=651a3a60&hm=ea1ae6eebd6fdb5bce2dec8cd0e381bfd76e20541e8c73b85a343c59da5cd075&)
+</details>
+
+```mermaid
+
+sequenceDiagram
+    actor Moderator as Moderator
+    participant Discord as Discord Server
+    participant WhatchaDoinBot as WhatchaDoin Bot
+    participant Database as Database
+
+    Moderator ->> Database: Add specific user to Blacklist
+    activate Moderator
+    Moderator -->> Discord: Run command to view Blacklist
+    activate Discord
+    Discord ->> WhatchaDoinBot: Fetch specific server Blacklist
+    activate WhatchaDoinBot
+    WhatchaDoinBot ->> Database: Query Blacklist
+    activate Database
+    Database -->> WhatchaDoinBot: Send server specific Blacklist
+    deactivate Database
+    WhatchaDoinBot -->> Discord: Send Blacklist
+    deactivate WhatchaDoinBot
+    Discord -->> Moderator: Display Blacklist
+    deactivate Discord
+    deactivate Moderator
+
+
+```
+<details>
+<summary>
+Use Case 11 Alternate Discription
+</summary>
+  
+Alternate Flow:
+
+<p>1. Moderator chooses not to add user to blacklist.</p>
+<p>2. Moderator views the blacklist and sees another user they want to remove.</p>
+<p>3. Moderator runs a command to remove the user from the blacklist.</p>
+<p>4. Moderator views the blacklist and no longer sees removed user.</p>
+
+</details>
+
+```mermaid
+
+sequenceDiagram
+    actor Moderator as Moderator
+    participant Discord as Discord Server
+    participant WhatchaDoinBot as WhatchaDoin Bot
+    participant Database as Database
+
+    Moderator ->> Database: Does not add specific user to Blacklist
+    activate Moderator
+    Moderator -->> Discord: Run command to view Blacklist
+    activate Discord
+    Discord ->> WhatchaDoinBot: Fetch specific server Blacklist
+    activate WhatchaDoinBot
+    WhatchaDoinBot ->> Database: Query Blacklist
+    activate Database
+    Database -->> WhatchaDoinBot: Send server specific Blacklist
+    deactivate Database
+    WhatchaDoinBot -->> Discord: Send Blacklist
+    deactivate WhatchaDoinBot
+    Discord -->> Moderator: Display Blacklist
+    deactivate Discord
+    deactivate Moderator
+
+    Moderator -->> Discord: Run command to remove a user from Blacklist
+    activate Moderator
+    activate Discord
+    Discord ->> WhatchaDoinBot: Send command to remove specific user
+    activate WhatchaDoinBot
+    WhatchaDoinBot ->> Database: Remove user from Blacklist
+    activate Database
+    Database -->> WhatchaDoinBot: confirm removal of user
+    deactivate Database
+    WhatchaDoinBot -->> Discord: Send confirmation of removal of user
+    deactivate WhatchaDoinBot
+    Discord -->> Moderator: Display new Blacklist
+    deactivate Discord
+    deactivate Moderator
+
+
+```
+<br/><br/>
