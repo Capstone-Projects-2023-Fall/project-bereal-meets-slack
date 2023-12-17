@@ -553,7 +553,51 @@ sequenceDiagram
 ```
 <br/><br/>
 
-![Sequence Diagram 9](https://cdn.discordapp.com/attachments/1158176482569494568/1158246744417640588/image.png?ex=651b8cd7&is=651a3b57&hm=82005351873047d440493d7523197f984992051a6aee5cebcfba722b27dddc51&)
+**Use Case #9**: Moderator makes approval status decision
+<details>
+<summary>
+Use Case 9 Discription
+</summary>
+  
+  <p>1. Moderator receives notification about a user submission.</p>
+  <p>2. Moderator opens Discord.</p>
+  <p>3. Moderator reviews submission using predefined criteria from community guidelines.</p>
+  <p>4. Based on guidelines, moderators approves or rejects submissions.</p>
+  <p>5. Moderator marks submissions as “Approved” or “Denied” to bot.</p>
+
+</details>
+
+```mermaid
+
+sequenceDiagram
+    actor Moderator as Moderator
+    participant Discord as Discord Server
+    participant WhatchaDoinBot as WhatchaDoin Bot
+
+    WhatchaDoinBot -->> Discord: Sends user submission notification
+    Discord -->> Moderator: Sends user submission notification
+    Moderator ->> Discord: Log into Discord
+    activate Moderator
+    activate Discord
+    Discord -->> Moderator: Shows users submission
+    deactivate Discord
+    Moderator ->> Discord: Fetches community guidelines to based submission review
+    activate Discord
+    Discord -->> Moderator: Provides predefined criteria
+    deactivate Discord
+    Moderator ->> Discord: Marks submission with appproed decision
+    activate Discord
+    Discord ->> WhatchaDoinBot: Sends approeved decision to post
+    activate WhatchaDoinBot
+    WhatchaDoinBot -->> Discord: Posting approved post to server
+    deactivate WhatchaDoinBot
+    Discord -->> Moderator: Notifying Moderator about posting
+    deactivate Discord
+    deactivate Moderator
+
+```
+<br/><br/>
+
 
 ![Sequence Diagram 10](https://cdn.discordapp.com/attachments/1158176482569494568/1158245639008817212/Screen_Shot_2023-10-01_at_11.34.34_PM.png?ex=651b8bcf&is=651a3a4f&hm=5b059721fd6e6a0fd52f4dc157ebf12eac0d255e54b4798ee34e8ac07f38d616&)
 
