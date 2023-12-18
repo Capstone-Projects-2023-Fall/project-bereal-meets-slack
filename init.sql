@@ -31,6 +31,7 @@ num_reactions INT,
 time_to_respond INT,
 message_id VARCHAR(255),
 user_id VARCHAR(45),
+guild_id VARCHAR(45),
 prompt_text VARCHAR(400)
 );
 

@@ -183,8 +183,6 @@ client.on('guildCreate', async guild => {
        botChannel = textChannels.first();
     }
 
-    console.log(botChannel);
-
     await setDefaultChannel(botChannel.id, guild.id);
     const welcomeMessage = helpUtils.getHelpMessageMod();
     await botChannel.send(welcomeMessage);
