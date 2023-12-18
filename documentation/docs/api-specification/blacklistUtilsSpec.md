@@ -1,7 +1,3 @@
----
-sidebar_position: 2
-description: Blasklist Utility Module Specification Document
----
 
 Blacklist Utility Module Spec
 =============================
