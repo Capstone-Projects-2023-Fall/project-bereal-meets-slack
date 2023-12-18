@@ -49,7 +49,7 @@ module.exports = {
       );
     }catch(error){
       console.log("Timeout; Unknown Interaction");
-      await interaction.respond([{name: "Fetching ERROR: You can still enter aprompt to delete", value: "N/A"}]);
+      await interaction.respond([{name: "Error: You can still enter a prompt to delete, discord will input this value, use arrow keys to exit the box before hitting enter.", value: "N/A"}]);
     }
   },
 
