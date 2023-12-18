@@ -1,7 +1,4 @@
----
-sidebar_position: 13
-description: Timer Class Specification Document
----
+
 Timer Class Spec
 =============================
 
