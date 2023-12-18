@@ -1,87 +1,104 @@
 ---
 sidebar_position: 1
 ---
-Command Modules Spec
-=============================
 
-**Introduction**
-This outlines the API specification for the Bot slash command modules.
+# Command Modules Spec
+
+This document outlines the API specification for the Bot slash command modules.
 
 ## `/submit`
 
-#### Description:
+### Description
 
 A Discord slash command for users to submit posts.
 
-##### Options:
+#### Options:
 
 - `file` (Required): Attach a file to the submission.
 - `caption`: Provide a caption for the submission.
 
-
 ## `/activehours`
 
-#### Description:
+### Description
 
 View and manage active hours for prompts.
 
-### Subcommands:
+#### Subcommands:
 
-### `/set`
+#### `/set`
 
 Set the bot's active hours.
 
-#### Options:
+##### Options:
 
 - `start-time` (Required): Enter the start time in HH:MM format.
 - `end-time` (Required): Enter the end time in HH:MM format.
 
-### `/list`
+#### `/list`
 
 List the active hours.
 
-##  /blacklist
+## `/blacklist`
+
+### Description
+
 A Discord slash command for moderators to manage the blacklist of users.
 
-### Subcommands:
-###  `/add`
+#### Subcommands:
+
+#### `/add`
+
 Add a user to the blacklist.
 
-#### Options:
-- `user` (Required): The user you want to remove from the blacklist.
+##### Options:
 
-###  `/remove`
+- `user` (Required): The user you want to add to the blacklist.
+
+#### `/remove`
+
 Remove a user from the blacklist.
 
-#### Options:
+##### Options:
+
 - `user` (Required): The user you want to remove from the blacklist.
 
-### `/list`
-List users in the blacklist.
+#### `/list`
 
+List users in the blacklist.
 
 ## `/exportcsv`
 
-#### Description
+### Description
+
 Discord slash command to export and save data to a CSV file, and then uploading it to the chat.
 
 #### Permissions
+
 - **Required Role**: `bot mod` (Only moderators can use this command)
 
 ## `/graphdata`
+
+### Description
+
 Displays a graph based on the provided data.
+
+#### Permissions
+
 - **Required Role**: `bot mod` (Only moderators can use this command)
 
-
 ## `/help`
-#### Description
+
+### Description
+
 A Discord slash command to display help information.
 
 ## `/post`
 
+### Description
+
 A Discord slash command to send a prompted post.
 
-### Subcommands:
+#### Subcommands:
 
 #### `/random`
 
@@ -96,21 +113,26 @@ Prompt a specified user.
 - `user` (Required): Prompt a specific user.
 
 #### Permissions
+
 - **Required Role**: `bot mod` (Only moderators can use this command)
 
-##  `/toggle_private`
-
-A Discord slash command to toggle between public and private responses.
+## `/toggle_private`
 
 ### Description
 
+A Discord slash command to toggle between public and private responses.
+
+#### Description
+
 Toggles the bot to send direct messages (DMs) to the user instead of public replies.
 
-##  `/prompts`
+## `/prompts`
 
-Manage prompts.
+### Description
 
-### Subcommands:
+A Discord slash command to manage prompts.
+
+#### Subcommands:
 
 #### `/add`
 
@@ -133,32 +155,30 @@ Delete a prompt from the list.
 
 List all prompts.
 
-### Autocomplete Function
+#### Permissions
+
+- **Required Role**: `bot mod` (Only moderators can use this command)
+
+#### Autocomplete Function
 
 The command includes an autocomplete function that provides suggestions based on user input.
 
+## `/setsubmissionchannel`
 
-
-##  `/setsubmissionchannel`
+### Description
 
 A Discord slash command to set the submission channel for the guild.
 
-### Options:
+#### Options:
 
 - `channel` (Required): The channel for submissions.
 
 #### Permissions
+
 - **Required Role**: `bot mod` (Only moderators can use this command)
 
+## `/notifications`
 
-##  `/notifications`
+### Description
 
 A Discord slash command to toggle bot notifications on and off.
-
-
-
-
-
-
-
-
