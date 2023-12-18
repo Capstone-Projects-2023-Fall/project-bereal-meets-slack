@@ -14,26 +14,17 @@
 
 This photo sharing is similar to the BeReal app which prompts users to post photos once a day to share with people they have added as friends. Our project differs in the fact that it will be used in communities of people who may not already be friends. BeReal users can only see the photos of people they have added.
 
-Required Resources
-
-Virtual Private Server or Cloud
-
 DiscordAPI
 
-Backend Framework (Laravel PHP, or NodeJS)
 
-SQL or NoSQL Database for logging
+# [Invite the bot!](https://discord.com/api/oauth2/authorize?client_id=1159133118830215170&permissions=8&scope=bot)
 
-
-
-
-# Installation Instructions
-* Make Sure you have nodeJs installed (any ver 18+ works)
-* Clone the repo and open in vs code
-* install the env file in the main folder and rename it to .env
-* in the same terminal run npm install
-* to run use npm run startdev
-* to test use node test
+# Dev Installation Instructions
+* Make Sure you have nodeJs installed (any ver 20+ works)
+* Make sure docker is installed
+* Clone the repo 
+* Create a file named .env and provide it with a discord token, DB connection info. 
+* Run docker compose up or alternative to run the bot.
 
 # WhatchaDoin' Bot Slash Commands
 
