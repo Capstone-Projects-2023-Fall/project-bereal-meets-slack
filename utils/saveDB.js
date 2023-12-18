@@ -147,8 +147,8 @@ async function saveDB(client, channelId) {
                 guild_id: guild_id
             };
 
-            console.log("saving the message data");
-            console.log(messageData);
+            //console.log("saving the message data");
+            //console.log(messageData);
             messagesData.push(messageData);
         }
 
