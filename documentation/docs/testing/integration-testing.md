@@ -35,23 +35,23 @@ Tests to demonstrate each use-case based on the use-case descriptions and the se
   <tr>
     <td>2</td>
     <td> 
-         Test if BeReal bot successfully prompted user <br/><br/>
+         Test if WhatchaDoin bot successfully prompted user <br/><br/>
          Test If user responded, If bot got user response and if it is sent to the moderator <br/><br/>
-         Test If user can get approval status from BeReal bot
+         Test If user can get approval status from WhatchaDoin bot
     </td>
     <td>      
       <ol>
         <li>Stimulate of notification sent and user receiving notification</li>
         <li>User opens Discord</li>
         <li>User responds to random prompt by taking a photo and uploading it</li>
-        <li>User sends text response to BeReal bot</li>
+        <li>User sends text response to WhatchaDoin bot</li>
         <li>Moderator is sent the user’s response via the bot, for review</li>
         <li>Discord user waits for approval status from bot, to see whether response was approved or not (test waits for reasonable time and checks for arrival of this status)</li>
       </ol>
     </td>
     <td>
       Assert that moderator receive user’s response for review <br/><br/>
-      Discord user receives approval status or feedback from BeReal bot within reasonable time 
+      Discord user receives approval status or feedback from WhatchaDoin bot within reasonable time 
     </td>
   </tr>
   <tr>
@@ -123,7 +123,7 @@ Tests to demonstrate each use-case based on the use-case descriptions and the se
     </td>
     <td>
       <ol>
-        <li>A user in the Discord community is notified by the BeReal bot that another user has posted a response to a prompt. </li>
+        <li>A user in the Discord community is notified by the WhatchaDoin bot that another user has posted a response to a prompt. </li>
         <li>User opens Discord to view the response in the Discord community channel</li>
         <li>User interacts with the post by leaving a comment or a reaction(likes, emojis, etc)</li>
       </ol>
@@ -199,9 +199,9 @@ Tests to demonstrate each use-case based on the use-case descriptions and the se
     <td>
       <ol>
         <li>Bot is repeatedly ignored to a set limit</li>
-        <li>BeReal bot sends a warning notification about the bad behavior.</li>
-        <li>BeReal bot notifies moderators about the bad behavior and asks if they want to add the user to the blacklist.</li>
-        <li>BeReal bot logs the action.</li>
+        <li>WhatchaDoin bot sends a warning notification about the bad behavior.</li>
+        <li>WhatchaDoin bot notifies moderators about the bad behavior and asks if they want to add the user to the blacklist.</li>
+        <li>WhatchaDoin bot logs the action.</li>
       </ol>
     </td>
     <td>
