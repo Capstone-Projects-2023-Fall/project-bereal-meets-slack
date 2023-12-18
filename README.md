@@ -48,12 +48,12 @@ SQL or NoSQL Database for logging
 
 
 # Installation Instructions
-Make Sure you have nodeJs installed (any ver 18+ works)
-Clone the repo and open in vs code
-install the env file in the main folder and rename it to .env
-in the same terminal run npm install
-to run use npm run startdev
-to test use node test
+* Make Sure you have nodeJs installed (any ver 18+ works)
+* Clone the repo and open in vs code
+* install the env file in the main folder and rename it to .env
+* in the same terminal run npm install
+* to run use npm run startdev
+* to test use node test
 
 # WhatchaDoin' Bot Slash Commands
 
