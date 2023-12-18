@@ -33,7 +33,7 @@ Set the bot's active hours.
 - `start-time` (Required): Enter the start time in HH:MM format.
 - `end-time` (Required): Enter the end time in HH:MM format.
 
-### '/list'
+### `/list`
 
 List the active hours.
 
