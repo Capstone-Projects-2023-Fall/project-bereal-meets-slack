@@ -11,19 +11,221 @@ This outlines the API specification for the Bot. It provides details on the meth
 <<<<<<< HEAD
 =======
 
-## activeHoursUtils.js Methods
 
-#### (async) fetchActiveHoursFromDB(guildId) → {Promise.<{start\_time: string, end\_time: string}>}
+## getRandom Methods
+### `getRandomUser(guild)`
+
+#### `getRandomUser(guild) → {string | null}`
+
+Generates a random non-blacklisted, non-bot user ID from a guild's members.
+
+##### Parameters:
+
+| Name    | Type   | Description                           |
+|---------|--------|---------------------------------------|
+| `guild` | Object | The Discord guild object.             |
+
+##### Returns:
+
+- A string representing the user ID of a randomly selected non-blacklisted, non-bot user.
+- Returns `null` if no eligible non-bot users are found.
+
+  **Type:** `string | null`
+
+
+
+
+
+
+
+
+## activeHours Methods
+
+### `fetchActiveHoursFromDB(guildId)`
+
+#### `(async) fetchActiveHoursFromDB(guildId) → {Promise.<{start_time: string, end_time: string}>}`
 
 Fetches active operating hours for a guild from the database.
 
 ##### Parameters:
 
+| Name      | Type   | Description                                   |
+|-----------|--------|-----------------------------------------------|
+| `guildId` | string | The ID of the Discord guild.                   |
+
+##### Returns:
+
+- A promise that resolves to an object containing `start_time` and `end_time` representing the active operating hours for the guild.
+
+  **Type:** `Promise.<{start_time: string, end_time: string}>`
+
+
+
+
+
+
+### `storeOperatingHours(guildId, startTime, endTime)`
+
+#### `(async) storeOperatingHours(guildId, startTime, endTime) → {Promise.<void>}`
+
+Stores or updates operating hours for a guild in the database.
+
+##### Parameters:
+
+| Name       | Type   | Description                              |
+|------------|--------|------------------------------------------|
+| `guildId`  | string | The ID of the Discord guild.              |
+| `startTime`| string | The start time of the operating hours.    |
+| `endTime`  | string | The end time of the operating hours.      |
+
+##### Returns:
+
+- A Promise that resolves when the operating hours are successfully stored or updated.
+
+  **Type:** `Promise<void>`
+
+
+
+
+
+
+
+
+
+### `getRandomHourWithinActiveHours(activeHoursData)`
+
+#### `getRandomHourWithinActiveHours(activeHoursData) → {string}`
+
+Generates a random hour within the active operating hours for a guild.
+
+##### Parameters:
+
+| Name               | Type   | Description                                           |
+|--------------------|--------|-------------------------------------------------------|
+| `activeHoursData`  | Object | An object containing `start_time` and `end_time`.      |
+
+##### Returns:
+
+- A formatted string representing a random hour within the active hours.
+
+  **Type:** `string`
+
+
+
+## dbConn Methods
+
+### `createConnectionPoolLocal()`
+
+#### `createConnectionPoolLocal() → {Object}`
+
+Creates a connection pool for local database calls during testing.
+
+##### Returns:
+
+- MySQL connection pool object.
+
+  **Type:** `Object`
+
+### `createConnectionPoolCloud()`
+
+#### `createConnectionPoolCloud() → {Object}`
+
+Creates a connection pool for cloud database calls.
+
+##### Returns:
+
+- An object representing a MySQL connection pool.
+
+  **Type:** `Object`
+
+
+
+### `createPromiseConnectionPool()`
+
+#### `createPromiseConnectionPool() → {Object}`
+
+Creates a promise-based connection pool based on the specified environment flag.
+
+##### Returns:
+
+- A Promise-based MySQL connection pool.
+
+  **Type:** `Object`
+
+
+
+## promptTimeout Methods
+
+
+### `setupPrompt(channelId, message, user, originalPrompt)`
+
+#### `setupPrompt(channelId, message, user, originalPrompt) → {void}`
+
+Sets up a timed prompt in a specific channel for user interaction.
+
+##### Parameters:
+
+| Name               | Type   | Description                                                   |
+|--------------------|--------|---------------------------------------------------------------|
+| `channelId`        | string | The ID of the Discord channel where the prompt is set up.      |
+| `message`          | string | The message content for the prompt.                            |
+| `user`             | Object | The Discord user object for whom the prompt is set up.         |
+| `originalPrompt`   | Object | The original prompt object or content for reference.           |
+
+##### Returns:
+
+- This function does not return a value.
+
+
+
+
+
+
+### `setPromptTimeout(promptId, duration, message, expiredContent, user, originalPrompt, channelId)`
+
+#### `setPromptTimeout(promptId, duration, message, expiredContent, user, originalPrompt, channelId) → {void}`
+
+Sets a timeout for a prompt identified by `promptId`.
+
+##### Parameters:
+
+| Name               | Type      | Description                                           |
+|--------------------|-----------|-------------------------------------------------------|
+| `promptId`         | any       | Identifier for the prompt.                             |
+| `duration`         | number    | Duration of the timeout in milliseconds.               |
+| `message`          | Object    | Discord message object associated with the prompt.    |
+| `expiredContent`   | string    | Content to display when the prompt expires.            |
+| `user`             | Object    | Discord user object associated with the prompt.       |
+| `originalPrompt`   | any       | Original prompt content.                               |
+| `channelId`        | string    | ID of the Discord channel where the prompt is active. |
+
+##### Returns:
+
+- Void??
+- This function does not return a value.
+
+
+
+
+
+
+
+
+
+===========================================================
+
+
+**Bot Methods**
+
 ### `fetchActiveHoursFromDB(guildId)`
+
+#### (async) fetchActiveHoursFromDB(guildId) → {Promise.<{start_time: string, end_time: string}>}
 
 Fetches active operating hours for a guild from the database.
 
-#### Parameters:
+##### Parameters:
+
+#### `fetchActiveHoursFromDB(guildId)`
 
 | Name      | Type   | Description                           |
 |-----------|--------|---------------------------------------|
@@ -34,22 +236,34 @@ Fetches active operating hours for a guild from the database.
 A Promise that resolves to an object with `start_time` and `end_time` properties.
 
 
-## `getRandomHourWithinActiveHours(activeHoursData) → {string}`
+
+
+
+
+
+
+
+
+
+### `getRandomHourWithinActiveHours(activeHoursData)`
+
+#### `getRandomHourWithinActiveHours(activeHoursData) → {string}`
 
 Generates a random hour within the active operating hours for a guild.
 
-### Parameters:
+##### Parameters:
 
 | Name             | Type   | Description                               |
 |------------------|--------|-------------------------------------------|
 | `activeHoursData`| Object | An object containing `start_time` and `end_time`. |
 
-### Returns:
+##### Returns:
 
 - A formatted string representing a random hour within the active hours.
 
-**Type:** `string`
+  **Type:** `string`
 
+<<<<<<< HEAD
 ## `storeOperatingHours(guildId, startTime, endTime) → {Promise.<void>}`
 
 Stores or updates operating hours for a guild in the database.
@@ -128,6 +342,8 @@ Creates a promise-based connection pool based on the specified environment flag.
 
 **Bot Methods**
 >>>>>>> ebfa7b8 (active hours methods documented)
+=======
+>>>>>>> 4b724cc (util api spec update)
 
 ## activeHours Module
 ##### Methods
