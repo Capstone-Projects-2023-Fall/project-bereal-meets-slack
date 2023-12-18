@@ -222,6 +222,7 @@ sequenceDiagram
     participant Database as Configuration Database
 
     Owner ->> Discord: Open server "Preferences"
+    activate Owner
     activate Discord
     Owner ->> Discord: Select "Apps and Integrations"
     Discord ->> WhatchaDoinBot: Install WhatchaDoin bot
@@ -235,10 +236,11 @@ sequenceDiagram
     Owner ->> WhatchaDoinBot: Set response time limit
     WhatchaDoinBot ->> Database: Save configuration settings
     deactivate WhatchaDoinBot
-    Database -->> WhatchaDoinBot: Confirmation
     activate Database
-    WhatchaDoinBot -->> Owner: Configuration settings saved
+    Database -->> WhatchaDoinBot: Confirmation
     deactivate Database
+    WhatchaDoinBot -->> Owner: Configuration settings saved
+    deactivate Owner
 
 ```
 <br/><br/>
@@ -249,11 +251,11 @@ sequenceDiagram
 Use Case 2 Discription
 </summary>
   
-1. User in the Discord community receives a notification at a random time of day that they have received a prompt from the BeReal bot
-2. User opens Discord.
-3. User responds to the random prompt by taking a picture and uploading it.
-4. User replies to the BeReal bot with their response to the prompt, which is sent to the moderator.
-5. User waits for approval status from the BeReal bot.
+<p>1. User in the Discord community receives a notification at a random time of day that they have received a prompt from the WhatchaDoinBot bot.</p>
+<p>2. User opens Discord.</p>
+<p>3. User responds to the random prompt by taking a picture and uploading it.</p>
+<p>4. User replies to the WhatchaDoinBot bot with their response to the prompt, which is sent to the moderator.</p>
+<p>5. User waits for approval status from the WhatchaDoinBot bot.</p>
     
 </details>
 
@@ -267,14 +269,18 @@ sequenceDiagram
 
     WhatchaDoinBot ->> WhatchaDoinBot: 
     WhatchaDoinBot ->> User: Receive WhatchaDoin bot prompt notification
+    activate WhatchaDoinBot
     activate User
     User -->> WhatchaDoinBot: Respond to prompt by taking a picture
-    activate WhatchaDoinBot
-    User ->> WhatchaDoinBot: Reply to the WhatchaDoin bot with the image
-    WhatchaDoinBot ->> Moderator: Send user's response to moderator
     deactivate WhatchaDoinBot
+    User -->> WhatchaDoinBot: Reply to the WhatchaDoin bot with the image
+    activate WhatchaDoinBot
+    WhatchaDoinBot ->> Moderator: Send user's response to moderator
+    activate Moderator
     Moderator -->> WhatchaDoinBot: Send approval status
-    WhatchaDoinBot -->> User: Display approval status
+    deactivate Moderator
+    WhatchaDoinBot ->> User: Display approval status
+    deactivate WhatchaDoinBot
     deactivate User
 
 ```
@@ -286,26 +292,30 @@ sequenceDiagram
 Use Case 3 Discription
 </summary>
   
-1. The BeReal bot waits until timeout The BeReal bot sends a notification to the Discord user
-2. BeReal bot recognizes the user’s failure to respond, and sends a reminder notification to the users about the missed prompt.
+<p>1. The WhatchaDoinBot bot waits until timeout.</p>
+<p>2. The WhatchaDoinBot bot sends a notification to the Discord user.</p>
+<p>3. WhatchaDoinBot bot recognizes the user’s failure to respond, and sends a reminder notification to the users about the missed prompt.</p>
       
 </details>
 
 ```mermaid
 
 sequenceDiagram
+    actor User as Discord User
     participant WhatchaDoinBot as WhatchaDoin Bot
-    participant User as Discord User
 
     activate WhatchaDoinBot
     WhatchaDoinBot ->> WhatchaDoinBot: Wait until timeout
     WhatchaDoinBot ->> User: Send a notification
     activate User
+    activate WhatchaDoinBot
     User ->> User: Receive notification
     User -->> WhatchaDoinBot: Acknowledge notification
-    deactivate User
     WhatchaDoinBot ->> WhatchaDoinBot: Recognize user's failure to respond
     WhatchaDoinBot ->> User: Send a reminder notification
+    deactivate WhatchaDoinBot
+    deactivate User
+
 
 ```
 <br/><br/>
@@ -316,28 +326,32 @@ sequenceDiagram
 Use Case 4 Discription
 </summary>
 
-1. BeReal bot receives the approval decision
-2. BeReal bot posts the image with the caption and notifies the user
-3. BeReal bot logs emoji reactions, threaded replies, and comments from the community
-4. BeReal bot sends logs to the server
+1. WhatchaDoinBot bot receives the approval decision.
+2. WhatchaDoinBot bot posts the image with the caption and notifies the user.
+3. WhatchaDoinBot bot logs emoji reactions, threaded replies, and comments from the community.
+4. WhatchaDoinBot bot sends logs to the server.
     
 </details>
 
 ```mermaid
 
 sequenceDiagram
-    participant WhatchaDoinBot as WhatchaDoin Bot
+    actor User as Discord User
     participant Moderators as Moderators
-    participant User as Discord User
+    participant WhatchaDoinBot as WhatchaDoin Bot
     participant Server as Discord Server
 
     Moderators -->> WhatchaDoinBot: Approval decision
+    activate User
+    activate WhatchaDoinBot
     WhatchaDoinBot ->> WhatchaDoinBot: Process approval decision
     WhatchaDoinBot ->> WhatchaDoinBot: Retrieve image and caption
-    WhatchaDoinBot ->> WhatchaDoinBot: Notify user
-    WhatchaDoinBot ->> User: Post image with caption
-    User ->> Server: Post image with caption
-    User ->> User: React with emoji, thread replies, and comment
+    WhatchaDoinBot ->> User: Post approved
+    activate User
+    WhatchaDoinBot ->> Server: Post image with caption
+    deactivate WhatchaDoinBot
+    User -->> Server: React with emoji, thread replies, and comment
+    deactivate User
     WhatchaDoinBot ->> WhatchaDoinBot: Log emoji reactions, threaded replies, and comments
     WhatchaDoinBot ->> Server: Send logs
 
@@ -350,26 +364,34 @@ sequenceDiagram
 Use Case 5 Discription
 </summary>
   
-1. User receives a notification that the post was not approved and is asked to resubmit with feedback
-2. User resubmits the image
-3. User receives a notification that the post was approved and it was posted
+<p>1. User receives a notification that the post was not approved and is asked to resubmit with feedback.</p>
+<p>2. User resubmits the image.</p>
+<p>3. User receives a notification that the post was approved and it was posted.</p>
     
 </details>
 
 ```mermaid
 
 sequenceDiagram
-    participant User as Discord User
+    actor User as Discord User
     participant WhatchaDoinBot as WhatchaDoin Bot
     participant Moderator as Moderator
 
-    User ->> WhatchaDoinBot: Receives a notification that the post was not approved
-    WhatchaDoinBot -->> User: Notifies the user to resubmit the image with feedback
-    User ->> User: Resubmits the image with necessary changes
+    WhatchaDoinBot ->> User: Receives a notification that the post was not approved
+    activate User
+    activate WhatchaDoinBot
+    WhatchaDoinBot ->> User: Notifies the user to resubmit the image with feedback
+    User -->> WhatchaDoinBot: Resubmits the image with necessary changes
+    deactivate WhatchaDoinBot
     WhatchaDoinBot ->> Moderator: Notifies the moderator about the resubmission
+    activate WhatchaDoinBot
+    activate Moderator
     Moderator -->> WhatchaDoinBot: Reviews the resubmitted image
     Moderator -->> WhatchaDoinBot: Approves the resubmitted image
-    WhatchaDoinBot -->> User: Notifies the user that the post was approved and posted
+    deactivate Moderator
+    WhatchaDoinBot ->> User: Notifies the user that the post was approved and posted
+    deactivate WhatchaDoinBot
+    deactivate User
 
 ```
 <br/><br/>
@@ -380,26 +402,29 @@ sequenceDiagram
 Use Case 6 Discription
 </summary>
 
-1. A user in the Discord community is notified by the BeReal bot that another user has posted a response to a prompt.
-2. User opens Discord to view the response in the Discord community channel
-3. User interacts with the post by leaving a comment or a reaction(likes, emojis, etc)
+<p>1. A user in the Discord community is notified by the WhatchaDoinBot bot that another user has posted a response to a prompt.</p>
+<p>2. User opens Discord to view the response in the Discord community channel.</p>
+<p>3. User interacts with the post by leaving a comment or a reaction(likes, emojis, etc).</p>
 
 </details>
 
 ```mermaid
 
 sequenceDiagram
-    participant User as Discord User
+    actor User as Discord User
     participant WhatchaDoinBot as WhatchaDoin Bot
     participant Community as Discord Community
 
+    WhatchaDoinBot ->> User: Receives a new post notification
     activate User
-    User ->> WhatchaDoinBot: Receives a new post notification
+    activate WhatchaDoinBot
+    WhatchaDoinBot ->> User: Displays the new post in the Discord channel
+    deactivate WhatchaDoinBot
     User ->> Discord: Opens Discord to view the response
-    WhatchaDoinBot -->> User: Displays the new post in the Discord channel
-    User ->> WhatchaDoinBot: Interacts with the post (e.g., leaves a comment or reacts with emojis)
-    WhatchaDoinBot ->> Community: Updates the post with user interactions
-    Community -->> WhatchaDoinBot: Views reactions and comments on the post
+    User -->> Community: Interacts with the post (e.g., leaves a comment or reacts with emojis)
+    activate Community
+    Community ->> WhatchaDoinBot: Views reactions and comments on the post
+    deactivate Community
     WhatchaDoinBot ->> WhatchaDoinBot: Collects data on reactions and comments
     deactivate User
 
@@ -412,27 +437,37 @@ sequenceDiagram
 Use Case 7 Discription
 </summary>
   
-1. A user in the Discord community goes to the settings of the BeReal bot
-2. User chooses an option to turn off new post notifications.
-3. The user is no longer sent another post notification.
+<p>1. A user in the Discord community goes to the settings of the WhatchaDoinBot bot.</p>
+<p>2. User chooses an option to turn off new post notifications.</p>
+<p>3. The user is no longer sent another post notification.</p>
 
 </details>
 
 ```mermaid
 
 sequenceDiagram
-    participant User as Discord User
+    actor User as Discord User
     participant DiscordInterface as Discord Interface
     participant WhatchaDoinBot as WhatchaDoin Bot
     participant NotificationSettings as Notification Settings
 
     User ->> DiscordInterface: Opens WhatchaDoin Bot settings
+    activate User
+    activate DiscordInterface
     DiscordInterface -->> User: Notification viewed
+    deactivate DiscordInterface
     User ->> DiscordInterface: Accesses Settings
+    activate DiscordInterface
     DiscordInterface ->> NotificationSettings: Turn Off Notification settings
+    activate NotificationSettings
     NotificationSettings -->> WhatchaDoinBot: Sends updated notification settings
+    activate WhatchaDoinBot
+    deactivate NotificationSettings
     WhatchaDoinBot -->> DiscordInterface: Forwards the updated settings (OFF)
+    deactivate WhatchaDoinBot
     DiscordInterface -->> User: Sent the new notification settings
+    deactivate DiscordInterface
+    deactivate User
     Note over DiscordInterface: User views notifications
 
 ```
@@ -445,32 +480,36 @@ Use Case 8 Discription
 </summary>
 Normal Flow:
 
-1. Moderator logs into Discord
-2. Moderator runs a command to request reaction data in csv format
-3. Moderator exports reaction data for further analysis, if needed
+1. Moderator logs into Discord.
+2. Moderator runs a command to request reaction data in csv format.
+3. Moderator exports reaction data for further analysis, if needed.
 
 </details>
 
 ```mermaid
 
 sequenceDiagram
-    participant Moderator as Moderator
+    actor Moderator as Moderator
     participant Discord as Discord Server
     participant WhatchaDoinBot as WhatchaDoin Bot
     participant Database as Configuration Database
 
     Moderator ->> Discord: Log into Discord
+    activate Moderator
     activate Discord
     Moderator ->> Discord: Run command to request reaction data in CSV format
     Discord ->> WhatchaDoinBot: Send data view command
-    WhatchaDoinBot ->> Database: Retrieve reaction data
     activate WhatchaDoinBot
+    WhatchaDoinBot ->> Database: Retrieve reaction data
+    activate Database
     Database -->> WhatchaDoinBot: Reaction data
+    deactivate Database
     WhatchaDoinBot -->> Discord: Provide reaction data
-    Discord -->> Moderator: Display reaction data
     deactivate WhatchaDoinBot
-    Moderator ->> Moderator: Exports reaction data for further analysis (if needed)
+    Discord -->> Moderator: Display reaction data
     deactivate Discord
+    Moderator ->> Moderator: Exports reaction data for further analysis (if needed)
+    deactivate Moderator
 
 ```
 <details>
@@ -480,40 +519,225 @@ Use Case 8 Alternate Discription
   
 Alternate Flow:
 
-1. Moderator logs into Discord
-2. Moderator runs a command to see reaction data
-3. Moderator receives data visualizations from bot
+1. Moderator logs into Discord.
+2. Moderator runs a command to see reaction data.
+3. Moderator receives data visualizations from bot.
 
 </details>
 
 ```mermaid
 
 sequenceDiagram
-    participant Moderator as Moderator
+    actor Moderator as Moderator
     participant Discord as Discord Server
     participant WhatchaDoinBot as WhatchaDoin Bot
     participant Database as Configuration Database
 
     Moderator ->> Discord: Log into Discord
+    activate Moderator
     activate Discord
-    Moderator ->> Discord: Run command to request reaction data in CSV format
+    Moderator ->> Discord: Run command to request reaction data in Graph format
     Discord ->> WhatchaDoinBot: Send data view command
-    WhatchaDoinBot ->> Database: Retrieve reaction data
     activate WhatchaDoinBot
+    WhatchaDoinBot ->> Database: Retrieve reaction data
+    activate Database
     Database -->> WhatchaDoinBot: Reaction data in CSV format
+    deactivate Database
     WhatchaDoinBot -->> Discord: Provide reaction data in CSV format
-    Discord -->> Moderator: Display reaction data CSV
     deactivate WhatchaDoinBot
-    Moderator ->> Moderator: Exports reaction data for further analysis (if needed)
+    Discord -->> Moderator: Translate reaction data into graph form
     deactivate Discord
+    Moderator ->> Moderator: Exports more reaction data for further analysis (if needed)
+    deactivate Moderator
 
 ```
 <br/><br/>
 
-![Sequence Diagram 9](https://cdn.discordapp.com/attachments/1158176482569494568/1158246744417640588/image.png?ex=651b8cd7&is=651a3b57&hm=82005351873047d440493d7523197f984992051a6aee5cebcfba722b27dddc51&)
+**Use Case #9**: Moderator makes approval status decision
+<details>
+<summary>
+Use Case 9 Discription
+</summary>
+  
+  <p>1. Moderator receives notification about a user submission.</p>
+  <p>2. Moderator opens Discord.</p>
+  <p>3. Moderator reviews submission using predefined criteria from community guidelines.</p>
+  <p>4. Based on guidelines, moderators approves or rejects submissions.</p>
+  <p>5. Moderator marks submissions as “Approved” or “Denied” to bot.</p>
 
-![Sequence Diagram 10](https://cdn.discordapp.com/attachments/1158176482569494568/1158245639008817212/Screen_Shot_2023-10-01_at_11.34.34_PM.png?ex=651b8bcf&is=651a3a4f&hm=5b059721fd6e6a0fd52f4dc157ebf12eac0d255e54b4798ee34e8ac07f38d616&)
+</details>
 
-![Sequence Diagram 11](https://cdn.discordapp.com/attachments/1158176482569494568/1158245675163734056/Screen_Shot_2023-10-01_at_11.34.45_PM.png?ex=651b8bd8&is=651a3a58&hm=7a1811a5cce04fe5100a891d4a4a89bca843f9cebf120e10a66cb7b74b3e298a&)
+```mermaid
 
-![Sequence Diagram 11 Alt](https://cdn.discordapp.com/attachments/1158176482569494568/1158245708969811978/Screen_Shot_2023-10-01_at_11.34.53_PM.png?ex=651b8be0&is=651a3a60&hm=ea1ae6eebd6fdb5bce2dec8cd0e381bfd76e20541e8c73b85a343c59da5cd075&)
+sequenceDiagram
+    actor Moderator as Moderator
+    participant Discord as Discord Server
+    participant WhatchaDoinBot as WhatchaDoin Bot
+
+    WhatchaDoinBot -->> Discord: Sends user submission notification
+    Discord -->> Moderator: Sends user submission notification
+    Moderator ->> Discord: Log into Discord
+    activate Moderator
+    activate Discord
+    Discord -->> Moderator: Shows users submission
+    deactivate Discord
+    Moderator ->> Discord: Fetches community guidelines to based submission review
+    activate Discord
+    Discord -->> Moderator: Provides predefined criteria
+    deactivate Discord
+    Moderator ->> Discord: Marks submission with appproed decision
+    activate Discord
+    Discord ->> WhatchaDoinBot: Sends approeved decision to post
+    activate WhatchaDoinBot
+    WhatchaDoinBot -->> Discord: Posting approved post to server
+    deactivate WhatchaDoinBot
+    Discord -->> Moderator: Notifying Moderator about posting
+    deactivate Discord
+    deactivate Moderator
+
+```
+<br/><br/>
+
+**Use Case #10**: WhatchaDoin Bot bans user from prompting after mupltiple denails
+<details>
+<summary>
+Use Case 10 Discription
+</summary>
+  
+<p>1. WhatchaDoinBot counts DENIALS (strikes) recieved by users within the Discord community.</p>
+<p>2. WhatchaDoinBot bot sends a warning notification to the user about strikes.</p>
+<p>3. WhatchaDoinBot bot notifies moderator about the DENIALS and how close they are from the blacklist.</p>
+<p>4. If the user continues to recieve DENIALS, WhatchaDoinBot adds the user to the blacklist.</p>
+<p>5. WhatchaDoinBot bot logs the action to blacklist log.</p>
+
+</details>
+
+```mermaid
+
+sequenceDiagram
+    actor Moderator as Moderator
+    participant WhatchaDoinBot as WhatchaDoin Bot
+    participant User as User
+    participant Discord as Discord Server
+    participant Database as Database
+
+    Moderator -->> WhatchaDoinBot: Sends commands to report blacklist
+    activate Moderator
+    activate WhatchaDoinBot
+    WhatchaDoinBot ->> Database: Fetches user denail count
+    deactivate WhatchaDoinBot
+    activate Database
+    Database ->> Discord: Fetches user denails count
+    deactivate Database
+    activate Discord
+    Discord ->> WhatchaDoinBot: Sends user denail count for specific server
+    activate WhatchaDoinBot
+    deactivate Discord
+    WhatchaDoinBot ->> User: Sends user warning notification about strikes
+    WhatchaDoinBot ->> Moderator: Sends warning notification about user strikes
+    deactivate WhatchaDoinBot
+    Moderator -->> User: Denies post another time
+    deactivate Moderator
+    activate WhatchaDoinBot
+    WhatchaDoinBot ->> WhatchaDoinBot: Logs another denial for specific user
+    WhatchaDoinBot -->> Database: Adds user to the blacklist
+    WhatchaDoinBot ->> User: Notify about blacklist addition
+    deactivate WhatchaDoinBot
+
+```
+<br/><br/>
+
+**Use Case #11**:  Moderator manages blacklist
+<details>
+<summary>
+Use Case 11 Discription
+</summary>
+Normal Flow:
+
+<p>1. Moderator chooses to add user to blacklist.</p>
+<p>2. Moderator runs a command to view the blacklist and sees added user.</p>
+
+</details>
+
+```mermaid
+
+sequenceDiagram
+    actor Moderator as Moderator
+    participant Discord as Discord Server
+    participant WhatchaDoinBot as WhatchaDoin Bot
+    participant Database as Database
+
+    Moderator ->> Database: Add specific user to Blacklist
+    activate Moderator
+    Moderator -->> Discord: Run command to view Blacklist
+    activate Discord
+    Discord ->> WhatchaDoinBot: Fetch specific server Blacklist
+    activate WhatchaDoinBot
+    WhatchaDoinBot ->> Database: Query Blacklist
+    activate Database
+    Database -->> WhatchaDoinBot: Send server specific Blacklist
+    deactivate Database
+    WhatchaDoinBot -->> Discord: Send Blacklist
+    deactivate WhatchaDoinBot
+    Discord -->> Moderator: Display Blacklist
+    deactivate Discord
+    deactivate Moderator
+
+
+```
+<details>
+<summary>
+Use Case 11 Alternate Discription
+</summary>
+  
+Alternate Flow:
+
+<p>1. Moderator chooses not to add user to blacklist.</p>
+<p>2. Moderator views the blacklist and sees another user they want to remove.</p>
+<p>3. Moderator runs a command to remove the user from the blacklist.</p>
+<p>4. Moderator views the blacklist and no longer sees removed user.</p>
+
+</details>
+
+```mermaid
+
+sequenceDiagram
+    actor Moderator as Moderator
+    participant Discord as Discord Server
+    participant WhatchaDoinBot as WhatchaDoin Bot
+    participant Database as Database
+
+    Moderator ->> Database: Does not add specific user to Blacklist
+    activate Moderator
+    Moderator -->> Discord: Run command to view Blacklist
+    activate Discord
+    Discord ->> WhatchaDoinBot: Fetch specific server Blacklist
+    activate WhatchaDoinBot
+    WhatchaDoinBot ->> Database: Query Blacklist
+    activate Database
+    Database -->> WhatchaDoinBot: Send server specific Blacklist
+    deactivate Database
+    WhatchaDoinBot -->> Discord: Send Blacklist
+    deactivate WhatchaDoinBot
+    Discord -->> Moderator: Display Blacklist
+    deactivate Discord
+    deactivate Moderator
+
+    Moderator -->> Discord: Run command to remove a user from Blacklist
+    activate Moderator
+    activate Discord
+    Discord ->> WhatchaDoinBot: Send command to remove specific user
+    activate WhatchaDoinBot
+    WhatchaDoinBot ->> Database: Remove user from Blacklist
+    activate Database
+    Database -->> WhatchaDoinBot: confirm removal of user
+    deactivate Database
+    WhatchaDoinBot -->> Discord: Send confirmation of removal of user
+    deactivate WhatchaDoinBot
+    Discord -->> Moderator: Display new Blacklist
+    deactivate Discord
+    deactivate Moderator
+
+
+```
+<br/><br/>
