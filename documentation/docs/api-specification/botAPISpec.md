@@ -9,17 +9,9 @@ Bot Api Spec
 This outlines the API specification for the Bot. It provides details on the methods available, their parameters, return values, and the usage.
 
 
-### `activeEvents`
+## activeHours Module
+##### Methods
 
-**Type:** 
-
-- An instance of the Node.js built-in 'EventEmitter' class.
-
-
-
-
-
-## activeHours Methods
 
 ### `fetchActiveHoursFromDB(guildId)`
 
