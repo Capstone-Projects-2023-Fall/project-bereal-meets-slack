@@ -1,7 +1,3 @@
----
-sidebar_position: 1
-description: Active Hours Utility Module Specification Document
----
 
 Active Hours Utility Module Spec
 =============================
