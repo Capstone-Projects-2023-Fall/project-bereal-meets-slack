@@ -42,13 +42,15 @@ module.exports = {
   async autocomplete(interaction) {
     try{
       const focusedValue = interaction.options.getFocused();
-      const choices = await getPrompts(interaction.guild.id);
+      const choices = await promptUtils.getPrompts(interaction.guild.id);
+      console.log(choices);
       const filtered = choices.filter(choice => choice.startsWith(focusedValue));
       await interaction.respond(
         filtered.map(choice => ({ name: choice, value: choice })),
       );
     }catch(error){
       console.log("Timeout; Unknown Interaction");
+      console.log(error);
       await interaction.respond([{name: "Error: You can still enter a prompt to delete, use arrow keys to exit the box before hitting enter.", value: "N/A"}]);
     }
   },
