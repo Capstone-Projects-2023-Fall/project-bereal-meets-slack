@@ -8,6 +8,71 @@ Bot Api Spec
 **Introduction**
 This outlines the API specification for the Bot. It provides details on the methods available, their parameters, return values, and the usage.
 
+<<<<<<< HEAD
+=======
+
+## activeHoursUtils.js Methods
+
+#### (async) fetchActiveHoursFromDB(guildId) → {Promise.<{start\_time: string, end\_time: string}>}
+
+Fetches active operating hours for a guild from the database.
+
+##### Parameters:
+
+### `fetchActiveHoursFromDB(guildId)`
+
+Fetches active operating hours for a guild from the database.
+
+#### Parameters:
+
+| Name      | Type   | Description                           |
+|-----------|--------|---------------------------------------|
+| `guildId` | string | The ID of the Discord guild.           |
+
+#### Returns:
+
+A Promise that resolves to an object with `start_time` and `end_time` properties.
+
+
+## `getRandomHourWithinActiveHours(activeHoursData) → {string}`
+
+Generates a random hour within the active operating hours for a guild.
+
+### Parameters:
+
+| Name             | Type   | Description                               |
+|------------------|--------|-------------------------------------------|
+| `activeHoursData`| Object | An object containing `start_time` and `end_time`. |
+
+### Returns:
+
+- A formatted string representing a random hour within the active hours.
+
+**Type:** `string`
+
+## `storeOperatingHours(guildId, startTime, endTime) → {Promise.<void>}`
+
+Stores or updates operating hours for a guild in the database.
+
+### Parameters:
+
+| Name         | Type   | Description                            |
+|--------------|--------|----------------------------------------|
+| `guildId`    | string | The ID of the Discord guild.            |
+| `startTime`  | string | The starting time of operating hours.   |
+| `endTime`    | string | The ending time of operating hours.     |
+
+### Returns:
+
+- A Promise that resolves when the operation is complete.
+
+**Type:** `Promise.<void>`
+
+
+
+
+**Bot Methods**
+>>>>>>> ebfa7b8 (active hours methods documented)
 
 ## activeHours Module
 ##### Methods
