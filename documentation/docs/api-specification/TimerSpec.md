@@ -1,5 +1,5 @@
 ---
-sidebar_position: 17
+sidebar_position: 15
 ---
 Timer Class Spec
 =============================
@@ -22,11 +22,12 @@ Starts the timer by setting the `startTime` property to the current timestamp.
 
 ### `stop()`
 
-Stops the timer, calculates the elapsed time in seconds, and sets the `endTime` property.
+Stops the timer by setting the `endTime` to the current timestamp. Calculates and returns the elapsed time in seconds.
 
 #### Returns:
 
 - The elapsed time in seconds.
+**Type:**  `number`
 
 ### `isRunning()`
 
@@ -36,3 +37,4 @@ Checks if the timer is currently running.
 
 - `true` if the timer is running; otherwise, `false`.
 
+**Type:**  `boolean`
