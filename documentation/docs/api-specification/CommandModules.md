@@ -145,8 +145,11 @@ Add a new prompt.
 
 #### `/delete`
 
-Delete a prompt from the list.
+Delete a prompt from the list. The command includes an autocomplete function that provides suggestions based on user input.
 
+#### Permissions
+
+- **Required Role**: `bot mod` (Only moderators can use this command)
 ##### Options:
 
 - `prompt` (Required): Enter the prompt to delete.
@@ -155,13 +158,10 @@ Delete a prompt from the list.
 
 List all prompts.
 
-#### Permissions
 
-- **Required Role**: `bot mod` (Only moderators can use this command)
 
-#### Autocomplete Function
 
-The command includes an autocomplete function that provides suggestions based on user input.
+
 
 ## `/setsubmissionchannel`
 
