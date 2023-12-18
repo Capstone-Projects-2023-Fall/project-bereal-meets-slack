@@ -77,7 +77,7 @@ Displays a graph based on the provided data.
 #### Description
 A Discord slash command to display help information.
 
-## /post
+## `/post`
 
 A Discord slash command to send a prompted post.
 
@@ -97,6 +97,67 @@ Prompt a specified user.
 
 #### Permissions
 - **Required Role**: `bot mod` (Only moderators can use this command)
+
+##  `/toggle_private`
+
+A Discord slash command to toggle between public and private responses.
+
+### Description
+
+Toggles the bot to send direct messages (DMs) to the user instead of public replies.
+
+##  `/prompts`
+
+Manage prompts.
+
+### Subcommands:
+
+#### `/add`
+
+Add a new prompt.
+
+##### Options:
+
+- `prompt` (Required): Enter a new prompt.
+- `channel` (Optional): Select the channel for the prompt.
+
+#### `/delete`
+
+Delete a prompt from the list.
+
+##### Options:
+
+- `prompt` (Required): Enter the prompt to delete.
+
+#### `/list`
+
+List all prompts.
+
+### Autocomplete Function
+
+The command includes an autocomplete function that provides suggestions based on user input.
+
+
+
+##  `/setsubmissionchannel`
+
+A Discord slash command to set the submission channel for the guild.
+
+### Options:
+
+- `channel` (Required): The channel for submissions.
+
+#### Permissions
+- **Required Role**: `bot mod` (Only moderators can use this command)
+
+
+##  `/notifications`
+
+A Discord slash command to toggle bot notifications on and off.
+
+
+
+
 
 
 
