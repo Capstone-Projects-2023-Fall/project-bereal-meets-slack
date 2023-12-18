@@ -2,7 +2,7 @@
 sidebar_position: 1
 ---
 
-# Command Modules Spec
+# Slash Commands
 
 This document outlines the API specification for the Bot slash command modules.
 
