@@ -1,6 +1,5 @@
 ---
-sidebar_position: 5
-description: Get Random User Utility Module Specification Document
+sidebar_position: 8
 ---
 Get Random User Utility Module Spec
 =============================

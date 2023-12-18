@@ -1,6 +1,5 @@
 ---
-sidebar_position: 10
-description: Prompt Timeout Class Specification Document
+sidebar_position: 13
 ---
 Prompt Timeout Class Spec
 =============================

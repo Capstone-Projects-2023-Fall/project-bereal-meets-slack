@@ -1,6 +1,5 @@
 ---
-sidebar_position: 7
-description: Help Utility Module Specification Document
+sidebar_position: 10
 ---
 Help Utility Module Spec
 =============================

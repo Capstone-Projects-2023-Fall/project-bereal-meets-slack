@@ -1,6 +1,5 @@
 ---
-sidebar_position: 13
-description: Set Default Channel Utility Module Specification Document
+sidebar_position: 16
 ---
 Set Default Channel Utility Module Spec
 =============================

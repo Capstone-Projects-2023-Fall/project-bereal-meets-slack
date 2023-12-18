@@ -1,6 +1,5 @@
 ---
-sidebar_position: 8
-description: Notify Moderators Utility Module Specification Document
+sidebar_position: 11
 ---
 Notify Moderators Utility Module Spec
 =============================

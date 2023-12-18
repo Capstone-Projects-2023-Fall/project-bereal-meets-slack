@@ -1,15 +1,13 @@
----
-sidebar_position: 14
----
 
+---
+sidebar_position: 3
+---
 Bot Api Spec
 =============================
 
 **Introduction**
 This outlines the API specification for the Bot. It provides details on the methods available, their parameters, return values, and the usage.
 
-<<<<<<< HEAD
-=======
 
 
 ## getRandom Methods

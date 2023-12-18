@@ -1,9 +1,6 @@
-
 ---
-sidebar_position: 3
-description: Data Graph Utility Module Specification Document
+sidebar_position: 6
 ---
-
 Data Graph Utility Module Spec
 =============================
 **Methods**

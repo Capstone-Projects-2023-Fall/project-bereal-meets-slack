@@ -1,6 +1,5 @@
 ---
-sidebar_position: 9
-description: Prompt Class Specification Document
+sidebar_position: 12
 ---
 Prompt Class Spec
 =============================
